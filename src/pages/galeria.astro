@@ -3,7 +3,7 @@ import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
 import { galeria, opiniones, tienda } from '../data/tienda';
-import { altFoto, catalogo, urlProducto } from '../lib/catalogo';
+import { altFoto, catalogo, fotoDe, urlProducto } from '../lib/catalogo';
 import { enlaceWhatsApp, usuarioDe } from '../lib/enlaces';
 import { anchos, imagen } from '../lib/imagenes';
 
@@ -15,7 +15,7 @@ const entregados = galeria.map((item) => ({
 }));
 
 const delCatalogo = (await catalogo()).flatMap((s) =>
-  s.productos.flatMap((p) => p.data.fotos.map((foto, i) => ({ src: foto.src, alt: altFoto(p, i), producto: p }))),
+  s.productos.flatMap((p) => p.data.fotos.map((_, i) => ({ src: fotoDe(p, i), alt: altFoto(p, i), producto: p }))),
 );
 
 const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;

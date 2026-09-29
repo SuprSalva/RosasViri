@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { precio } from '../lib/enlaces';
-import { altFoto, urlProducto, type Producto } from '../lib/catalogo';
+import { altFoto, fotoDe, urlProducto, type Producto } from '../lib/catalogo';
 import { anchos } from '../lib/imagenes';
 
 interface Props {
@@ -10,17 +10,17 @@ interface Props {
   prioridad?: boolean;
 }
 const { producto, nivel: Titulo = 'h3', prioridad = false } = Astro.props;
-const { nombre, resumen, fotos, disponible } = producto.data;
-const foto = fotos[0];
+const { nombre, resumen, disponible } = producto.data;
+const foto = fotoDe(producto, 0);
 ---
 
 <a class="tarjeta" href={urlProducto(producto)}>
   <div class="foto">
     <Picture
-      src={foto.src}
+      src={foto}
       alt={altFoto(producto, 0)}
       formats={['avif', 'webp']}
-      widths={anchos(foto.src, [240, 360, 480, 640])}
+      widths={anchos(foto, [240, 360, 480, 640])}
       sizes="(min-width: 1800px) 16vw, (min-width: 1400px) 19vw, (min-width: 960px) 23vw, (min-width: 640px) 31vw, 46vw"
       loading={prioridad ? 'eager' : 'lazy'}
       fetchpriority={prioridad ? 'high' : undefined}

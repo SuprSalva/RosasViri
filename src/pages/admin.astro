@@ -1,59 +1,562 @@
 ---
+// Panel de administración del catálogo: productos, secciones, precios y fotos.
+// Los datos viven en Supabase; las fotos se guardan en el repositorio.
+import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { tienda } from '../data/tienda';
+import { todasLasImagenes } from '../lib/imagenes';
 
-const repositorio = 'SuprSalva/RosasViri';
+// Miniaturas de las fotos que ya están en el sitio, para mostrarlas en el panel.
+const miniaturas: Record<string, string> = {};
+for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
+  miniaturas[ruta] = (await getImage({ src: foto, width: Math.min(foto.width, 240), format: 'webp' })).src;
+}
 ---
 
 <Base titulo="Administración" descripcion={`Panel de administración de ${tienda.nombre}.`} noindex>
-  <div class="contenedor pagina admin">
-    <div class="pagina-cabeza">
-      <p class="antetitulo">Solo para la tienda</p>
-      <h1>Administración</h1>
+  <div class="contenedor pagina panel" data-panel>
+    <script type="application/json" data-miniaturas set:html={JSON.stringify(miniaturas)} />
+
+    <section data-vista="cargando">
+      <p class="intro">Cargando el panel…</p>
+    </section>
+
+    <section data-vista="entrar" hidden>
+      <div class="pagina-cabeza">
+        <p class="antetitulo">Solo para la tienda</p>
+        <h1>Administración</h1>
+      </div>
+      <form class="caja formulario-panel" data-form-entrar>
+        <label class="campo">
+          Correo
+          <input type="email" name="correo" autocomplete="username" required />
+        </label>
+        <label class="campo">
+          Contraseña
+          <input type="password" name="contrasena" autocomplete="current-password" required />
+        </label>
+        <button class="boton" type="submit">Entrar</button>
+        <button class="enlace" type="button" data-olvide>¿Olvidaste tu contraseña?</button>
+      </form>
+    </section>
+
+    <section data-vista="recuperar" hidden>
+      <div class="pagina-cabeza">
+        <h1>Recuperar contraseña</h1>
+        <p class="intro">Te mandamos un enlace a tu correo para crear una contraseña nueva.</p>
+      </div>
+      <form class="caja formulario-panel" data-form-recuperar>
+        <label class="campo">
+          Correo
+          <input type="email" name="correo" autocomplete="username" required />
+        </label>
+        <button class="boton" type="submit">Enviar enlace</button>
+        <button class="enlace" type="button" data-ir="entrar">Volver</button>
+      </form>
+    </section>
+
+    <section data-vista="contrasena" hidden>
+      <div class="pagina-cabeza">
+        <h1>Crea tu contraseña</h1>
+        <p class="intro">Usa al menos 10 caracteres. La vas a usar para entrar a este panel.</p>
+      </div>
+      <form class="caja formulario-panel" data-form-contrasena>
+        <label class="campo">
+          Contraseña nueva
+          <input type="password" name="contrasena" autocomplete="new-password" minlength="10" required />
+        </label>
+        <label class="campo">
+          Repítela
+          <input type="password" name="repetida" autocomplete="new-password" minlength="10" required />
+        </label>
+        <button class="boton" type="submit">Guardar contraseña</button>
+      </form>
+    </section>
+
+    <section data-vista="sin-permiso" hidden>
+      <h1>Sin permiso</h1>
       <p class="intro">
-        Aquí se editan los productos, las fotos, los precios, los textos y los datos de contacto. Cada cambio se publica
-        solo en uno o dos minutos.
+        La cuenta <strong data-correo></strong> no tiene permiso para administrar la tienda. Pide acceso a quien administra
+        el proyecto.
       </p>
-    </div>
+      <button class="boton boton-secundario" type="button" data-salir>Salir</button>
+    </section>
 
-    <a class="boton" href="https://app.pagescms.org" rel="noopener noreferrer">Entrar al panel</a>
+    <section data-vista="panel" hidden>
+      <header class="barra-panel">
+        <div>
+          <p class="antetitulo">Administración</p>
+          <p class="nota">Entraste como <strong data-correo></strong></p>
+        </div>
+        <button class="boton boton-secundario boton-chico" type="button" data-salir>Salir</button>
+      </header>
 
-    <h2>Cómo entrar</h2>
-    <ol>
-      <li>
-        Toca «Entrar al panel» y escribe el correo con el que te invitaron. Te llega un enlace para iniciar sesión, sin
-        contraseña. (Quien tenga cuenta de GitHub con acceso al proyecto también puede entrar con ella.)
-      </li>
-      <li>Elige el proyecto <strong>{repositorio}</strong> y la rama <strong>main</strong>.</li>
-      <li>En el menú verás: Productos, Datos de la tienda, Portada, Secciones, Cómo pedir, Pedidos personalizados, Galería, Opiniones y Aviso de privacidad.</li>
-    </ol>
+      <nav class="pestanas" aria-label="Secciones del panel">
+        <button type="button" data-pestana="productos" aria-current="page">Productos</button>
+        <button type="button" data-pestana="categorias">Secciones</button>
+      </nav>
 
-    <h2>Para dar acceso a otra persona</h2>
-    <p>
-      No necesita cuenta de GitHub. Quien administra el proyecto la invita por correo desde el panel, en la sección de
-      colaboradores. Las personas invitadas pueden editar productos, fotos y textos, pero no la configuración del panel.
-    </p>
-    <p>
-      Las cuentas de GitHub con acceso al proyecto pueden cambiar todo, así que conviene que tengan activada la
-      verificación en dos pasos.
-    </p>
+      <div data-lista="productos">
+        <div class="acciones">
+          <h1>Productos</h1>
+          <button class="boton" type="button" data-nuevo="producto">+ Nuevo producto</button>
+        </div>
+        <div data-productos></div>
+      </div>
+
+      <div data-lista="categorias" hidden>
+        <div class="acciones">
+          <h1>Secciones</h1>
+          <button class="boton" type="button" data-nuevo="categoria">+ Nueva sección</button>
+        </div>
+        <p class="nota">Las secciones agrupan los productos en el catálogo (por ejemplo Rosas o Girasoles).</p>
+        <ul class="filas" role="list" data-categorias></ul>
+      </div>
+
+      <p class="nota pie-panel">
+        Los textos del sitio (portada, cómo pedir, aviso de privacidad…) se editan en
+        <a href="https://app.pagescms.org" rel="noopener noreferrer">Pages CMS</a>.
+      </p>
+    </section>
+
+    <section data-vista="producto" hidden>
+      <button class="enlace volver" type="button" data-volver>← Productos</button>
+      <h1 data-titulo-editor>Producto</h1>
+      <form class="editor" data-form-producto novalidate>
+        <div class="caja grupo">
+          <label class="campo">
+            Nombre
+            <input name="nombre" required maxlength="80" />
+          </label>
+          <p class="nota" data-direccion></p>
+          <div class="dos">
+            <label class="campo">
+              Sección
+              <select name="categoria" required data-select-categoria></select>
+            </label>
+            <label class="campo">
+              Precio (sin el signo $)
+              <input name="precio" type="number" inputmode="decimal" min="1" step="any" required />
+            </label>
+          </div>
+          <label class="campo">
+            Texto corto de la tarjeta
+            <input name="resumen" maxlength="80" placeholder='Por ejemplo "12 rosas"' />
+          </label>
+          <label class="campo">
+            Descripción
+            <textarea name="descripcion" rows="4"></textarea>
+          </label>
+        </div>
+
+        <div class="caja grupo">
+          <h2>Fotos</h2>
+          <p class="nota">La primera es la que aparece en el catálogo. Usa las flechas para cambiar el orden.</p>
+          <ul class="fotos-editor" role="list" data-fotos></ul>
+          <label class="boton boton-secundario subir">
+            + Agregar fotos
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-fotos class="visualmente-oculto" />
+          </label>
+        </div>
+
+        <div class="caja grupo">
+          <h2>Lo que el cliente puede elegir</h2>
+          <p class="nota">Aparecen como preguntas antes del botón de WhatsApp. Por ejemplo "Color de rosas".</p>
+          <ul class="opciones" role="list" data-opciones></ul>
+          <button class="boton boton-secundario boton-chico" type="button" data-agregar-opcion>+ Agregar pregunta</button>
+        </div>
+
+        <div class="caja grupo">
+          <label class="interruptor">
+            <input type="checkbox" name="disponible" />
+            Disponible <span class="nota">(si lo apagas, aparece como «Agotado»)</span>
+          </label>
+          <label class="interruptor">
+            <input type="checkbox" name="destacado" />
+            Destacado en la portada
+          </label>
+          <label class="campo corto">
+            Orden dentro de su sección
+            <input name="orden" type="number" step="1" />
+            <span class="nota">El número más bajo aparece primero.</span>
+          </label>
+        </div>
+
+        <div class="botones-editor">
+          <button class="boton" type="submit">Guardar</button>
+          <button class="boton boton-secundario" type="button" data-volver>Cancelar</button>
+          <button class="boton boton-peligro" type="button" data-eliminar>Eliminar producto</button>
+        </div>
+      </form>
+    </section>
+
+    <section data-vista="categoria" hidden>
+      <button class="enlace volver" type="button" data-volver>← Secciones</button>
+      <h1 data-titulo-editor>Sección</h1>
+      <form class="editor" data-form-categoria novalidate>
+        <div class="caja grupo">
+          <label class="campo">
+            Nombre completo
+            <input name="nombre" required maxlength="80" placeholder="Rosas de listón satinado" />
+          </label>
+          <label class="campo">
+            Nombre corto (menús y botones)
+            <input name="corto" required maxlength="30" placeholder="Rosas" />
+          </label>
+          <p class="nota" data-direccion></p>
+          <label class="campo">
+            Descripción
+            <input name="descripcion" maxlength="140" />
+          </label>
+          <label class="campo corto">
+            Orden
+            <input name="orden" type="number" step="1" />
+            <span class="nota">El número más bajo aparece primero.</span>
+          </label>
+        </div>
+        <div class="caja grupo">
+          <h2>Foto de la sección</h2>
+          <p class="nota">Aparece en la portada. Elige una de tus fotos o sube una nueva.</p>
+          <div class="galeria-eleccion" role="radiogroup" aria-label="Foto de la sección" data-eleccion></div>
+          <label class="boton boton-secundario subir">
+            + Subir foto
+            <input type="file" accept="image/jpeg,image/png,image/webp" data-subir-foto-categoria class="visualmente-oculto" />
+          </label>
+        </div>
+        <div class="botones-editor">
+          <button class="boton" type="submit">Guardar</button>
+          <button class="boton boton-secundario" type="button" data-volver>Cancelar</button>
+          <button class="boton boton-peligro" type="button" data-eliminar>Eliminar sección</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="aviso-panel" role="status" aria-live="polite" data-aviso hidden></div>
   </div>
 </Base>
 
+<script>
+  import { iniciarPanel } from '../lib/panel/app';
+  iniciarPanel();
+</script>
+
 <style>
-  .admin {
-    max-width: 760px;
+  .panel {
+    max-width: 980px;
+    margin-inline: auto;
   }
 
-  .admin .boton {
+  .panel h1 {
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
+  }
+
+  .panel h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .formulario-panel {
+    display: grid;
+    gap: 14px;
+    max-width: 420px;
     margin-top: 24px;
   }
 
-  ol {
-    padding-left: 1.25em;
+  .enlace {
+    justify-self: start;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: var(--boton);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
   }
 
-  li + li {
-    margin-top: 6px;
+  .enlace:hover {
+    text-decoration: underline;
+  }
+
+  .barra-panel,
+  .acciones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .acciones {
+    margin-top: 24px;
+  }
+
+  .boton-chico {
+    min-height: 40px;
+    padding: 8px 18px;
+  }
+
+  .boton-peligro {
+    background: #8a2c1f;
+  }
+
+  .boton-peligro:hover {
+    background: #6f2317;
+  }
+
+  .pestanas {
+    display: flex;
+    gap: 6px;
+    margin-top: 20px;
+    border-bottom: 1.5px solid var(--linea);
+  }
+
+  .pestanas button {
+    padding: 10px 18px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: none;
+    color: var(--texto-suave);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .pestanas button[aria-current='page'] {
+    border-bottom-color: var(--boton);
+    color: var(--texto);
+  }
+
+  .panel :global(.grupo-titulo) {
+    margin-top: 28px;
+    font-size: 1.2rem;
+  }
+
+  .panel :global(.filas) {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .panel :global(.fila) {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--crema);
+  }
+
+  .panel :global(.fila img),
+  .panel :global(.sin-foto) {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--tarjeta);
+  }
+
+  .panel :global(.fila-texto) {
+    display: grid;
+    min-width: 0;
+  }
+
+  .panel :global(.fila-texto strong) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .panel :global(.fila-acciones) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel :global(.agotado) {
+    opacity: 0.65;
+  }
+
+  .interruptor,
+  .panel :global(.interruptor) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .interruptor input,
+  .panel :global(.interruptor input) {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--boton);
+  }
+
+  .editor {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .grupo {
+    display: grid;
+    gap: 14px;
+  }
+
+  .dos {
+    display: grid;
+    gap: 14px;
+  }
+
+  @media (min-width: 640px) {
+    .dos {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  .corto {
+    max-width: 260px;
+  }
+
+  .panel :global(.fotos-editor),
+  .panel :global(.opciones) {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .panel :global(.foto-editor) {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--fondo);
+  }
+
+  .panel :global(.foto-editor img),
+  .panel :global(.foto-editor .sin-foto) {
+    width: 96px;
+    height: 96px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+  .panel :global(.foto-editor .campo) {
+    font-weight: 400;
+  }
+
+  .panel :global(.mini-botones) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .panel :global(.mini) {
+    min-height: 36px;
+    padding: 4px 12px;
+    border: 1.5px solid var(--texto);
+    border-radius: 999px;
+    background: var(--crema);
+    color: var(--texto);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .panel :global(.mini:disabled) {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .panel :global(.opcion) {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--fondo);
+  }
+
+  @media (min-width: 640px) {
+    .panel :global(.opcion) {
+      grid-template-columns: 1fr 1fr auto;
+      align-items: end;
+    }
+  }
+
+  .subir {
+    justify-self: start;
+  }
+
+  .galeria-eleccion {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+  }
+
+  .panel :global(.eleccion) {
+    padding: 0;
+    border: 3px solid transparent;
+    border-radius: 12px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .panel :global(.eleccion[aria-checked='true']) {
+    border-color: var(--boton);
+  }
+
+  .panel :global(.eleccion img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 9px;
+    object-fit: cover;
+  }
+
+  .botones-editor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .botones-editor [data-eliminar] {
+    margin-left: auto;
+  }
+
+  .volver {
+    margin-bottom: 8px;
+  }
+
+  .pie-panel {
+    margin-top: 40px;
+  }
+
+  .aviso-panel {
+    position: fixed;
+    left: 50%;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 70;
+    max-width: calc(100% - 32px);
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: var(--texto);
+    color: var(--crema);
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgb(59 46 40 / 0.3);
+    transform: translateX(-50%);
+  }
+
+  .aviso-panel[data-tipo='error'] {
+    background: #8a2c1f;
   }
 </style>

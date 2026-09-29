@@ -5,7 +5,12 @@ name: Publicar sitio
 on:
   push:
     branches: [main]
+  # El panel de /admin/ lo lanza después de cada cambio en el catálogo.
   workflow_dispatch:
+  # Una vez por semana, para que el proyecto gratis de Supabase no se pause
+  # por falta de uso.
+  schedule:
+    - cron: '0 12 * * 1'
 
 permissions:
   contents: read

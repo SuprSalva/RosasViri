@@ -1,4 +1,6 @@
-# Panel de administración de Rossvtienda (Pages CMS: https://app.pagescms.org).
+# Textos del sitio de Rossvtienda (Pages CMS: https://app.pagescms.org).
+# Los productos, precios y secciones se editan en el panel propio del sitio
+# (/admin/), que los guarda en la base de datos.
 # Cada cambio que se guarda en el panel se publica solo en 1–2 minutos.
 
 settings:
@@ -13,89 +15,6 @@ media:
   extensions: [jpg, jpeg, png, webp]
 
 content:
-  - name: productos
-    label: Productos
-    type: collection
-    path: src/content/productos
-    filename: "{fields.nombre}.md"
-    view:
-      fields: [nombre, categoria, precio, disponible, destacado]
-      primary: nombre
-      sort: [categoria, orden, nombre]
-    fields:
-      - name: nombre
-        label: Nombre
-        type: string
-        required: true
-      - name: categoria
-        label: Sección
-        type: select
-        required: true
-        options:
-          values:
-            - value: rosas
-              label: Rosas
-            - value: girasoles
-              label: Girasoles
-            - value: hot-wheels
-              label: Hot Wheels
-      - name: resumen
-        label: Texto corto de la tarjeta
-        description: Por ejemplo "12 rosas" o "Ramo 3 carritos 3 rosas".
-        type: string
-      - name: precio
-        label: Precio
-        description: Solo el número, sin el signo $.
-        type: number
-        required: true
-      - name: fotos
-        label: Fotos
-        description: Puedes subir varias. La primera es la que aparece en el catálogo; arrástralas para cambiar el orden.
-        type: object
-        list:
-          min: 1
-        fields:
-          - name: src
-            label: Foto
-            type: image
-            required: true
-          - name: alt
-            label: Descripción de la foto (opcional)
-            description: Ayuda a Google y a personas con lectores de pantalla. Ej. "Ramo de 12 rosas azules".
-            type: string
-      - name: opciones
-        label: Lo que el cliente puede elegir
-        description: Aparecen como campos antes del botón de WhatsApp y se agregan al mensaje.
-        type: object
-        list: true
-        fields:
-          - name: nombre
-            label: Pregunta
-            description: Ej. "Color de rosas" o "Carritos que te gustan".
-            type: string
-            required: true
-          - name: ejemplo
-            label: Ejemplo
-            description: Ej. "rojo, rosa, azul...".
-            type: string
-      - name: disponible
-        label: Disponible
-        description: Si lo desactivas, el producto aparece como "Agotado".
-        type: boolean
-        default: true
-      - name: destacado
-        label: Destacado en la portada
-        type: boolean
-        default: false
-      - name: orden
-        label: Orden dentro de su sección
-        description: El número más bajo aparece primero.
-        type: number
-        default: 100
-      - name: body
-        label: Descripción
-        type: rich-text
-
   - name: tienda
     label: Datos de la tienda
     type: file
@@ -198,35 +117,6 @@ content:
           - name: texto
             label: Texto
             type: text
-
-  - name: categorias
-    label: Secciones del catálogo
-    type: file
-    path: src/data/categorias.json
-    format: json
-    fields:
-      - name: categorias
-        label: Secciones
-        type: object
-        list: true
-        fields:
-          - name: id
-            label: Identificador
-            description: "No lo cambies: es la dirección de la sección (por ejemplo, rosas → /rosas/)."
-            type: string
-            required: true
-          - name: nombre
-            label: Nombre completo
-            type: string
-          - name: corto
-            label: Nombre corto (menús y botones)
-            type: string
-          - name: descripcion
-            label: Descripción
-            type: string
-          - name: foto
-            label: Foto de la sección en la portada
-            type: image
 
   - name: como-pedir
     label: Cómo pedir, entregas y preguntas frecuentes

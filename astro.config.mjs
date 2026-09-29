@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { loadEnv } from 'vite';
 import sitemap from '@astrojs/sitemap';
 import tienda from './src/data/tienda.json' with { type: 'json' };
 
@@ -11,6 +12,10 @@ import tienda from './src/data/tienda.json' with { type: 'json' };
 //   3. Agregar el archivo public/CNAME con el dominio.
 const site = 'https://suprsalva.github.io';
 const base = '/RosasViri';
+
+// Base de datos del catálogo (Supabase): el panel de /admin/ se conecta a ella.
+const { PUBLIC_SUPABASE_URL: supabase = '' } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), 'PUBLIC_');
+const baseDatos = supabase ? [new URL(supabase).origin] : [];
 
 // Google Analytics solo se permite si hay un ID configurado en el panel.
 const analytics = Boolean(tienda.google?.analytics);
@@ -41,9 +46,12 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        /** @type {`img-src${string}`} */ (["img-src 'self' data:", ...google.imagenes].join(' ')),
+        // blob: y GitHub: fotos recién subidas en el panel, antes de que se publiquen.
+        /** @type {`img-src${string}`} */ (
+          ["img-src 'self' data: blob: https://raw.githubusercontent.com", ...google.imagenes].join(' ')
+        ),
         "font-src 'self'",
-        /** @type {`connect-src${string}`} */ (["connect-src 'self'", ...google.conexiones].join(' ')),
+        /** @type {`connect-src${string}`} */ (["connect-src 'self'", ...baseDatos, ...google.conexiones].join(' ')),
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

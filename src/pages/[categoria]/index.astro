@@ -2,17 +2,22 @@
 import Base from '../../layouts/Base.astro';
 import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
-import { categorias } from '../../data/tienda';
-import { productosDe, urlCategoria } from '../../lib/catalogo';
+import { categorias, productosDe, urlCategoria, type Categoria } from '../../lib/catalogo';
 import { ruta } from '../../lib/enlaces';
 
-export function getStaticPaths() {
-  return categorias.map((categoria) => ({ params: { categoria: categoria.id }, props: { categoria } }));
+export async function getStaticPaths() {
+  const todas = await categorias();
+  return todas.map((categoria) => ({ params: { categoria: categoria.id }, props: { categoria, todas } }));
 }
 
-const { categoria } = Astro.props;
+interface Props {
+  categoria: Categoria;
+  todas: Categoria[];
+}
+const { categoria: entrada, todas } = Astro.props;
+const categoria = { id: entrada.id, ...entrada.data };
 const productos = await productosDe(categoria.id);
-const otras = categorias.filter((c) => c.id !== categoria.id);
+const otras = todas.filter((c) => c.id !== categoria.id).map((c) => ({ id: c.id, ...c.data }));
 ---
 
 <Base titulo={categoria.nombre} descripcion={`${categoria.nombre}. ${categoria.descripcion}`} actual="catalogo">

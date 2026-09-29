@@ -7,6 +7,11 @@ const todas = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true },
 );
 
+/** Todas las fotos de src/assets/, por ruta ("/src/assets/productos/x.jpg"). */
+export function todasLasImagenes(): Record<string, ImageMetadata> {
+  return Object.fromEntries(Object.entries(todas).map(([ruta, modulo]) => [ruta, modulo.default]));
+}
+
 export function existeImagen(ruta: string): boolean {
   return `/${ruta.replace(/^\/+/, '')}` in todas;
 }

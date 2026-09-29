@@ -6,7 +6,6 @@
 import { z } from 'astro/zod';
 import { existeImagen } from '../lib/imagenes';
 import datosTienda from './tienda.json';
-import datosCategorias from './categorias.json';
 import datosPortada from './portada.json';
 import datosComoPedir from './como-pedir.json';
 import datosPersonalizados from './personalizados.json';
@@ -52,20 +51,6 @@ const esquemaTienda = z.object({
     nombre: z.string().default(''),
     domicilio: z.string().default(''),
   }),
-});
-
-const esquemaCategorias = z.object({
-  categorias: z
-    .array(
-      z.object({
-        id: z.string().regex(/^[a-z0-9-]+$/, 'El id de una sección solo lleva minúsculas, números y guiones.'),
-        nombre: z.string(),
-        corto: z.string(),
-        descripcion: z.string(),
-        foto,
-      }),
-    )
-    .min(1),
 });
 
 const texto = z.object({ titulo: z.string(), texto: z.string() });
@@ -126,7 +111,6 @@ function validar<T extends z.ZodType>(archivo: string, esquema: T, datos: unknow
 }
 
 export const tienda = validar('tienda.json', esquemaTienda, datosTienda);
-export const categorias = validar('categorias.json', esquemaCategorias, datosCategorias).categorias;
 export const portada = validar('portada.json', esquemaPortada, datosPortada);
 export const comoPedir = validar('como-pedir.json', esquemaComoPedir, datosComoPedir);
 export const personalizados = validar('personalizados.json', esquemaPersonalizados, datosPersonalizados);
@@ -134,5 +118,3 @@ export const galeria = validar('galeria.json', esquemaGaleria, datosGaleria).fot
   (a, b) => (b.fecha?.getTime() ?? 0) - (a.fecha?.getTime() ?? 0),
 );
 export const opiniones = validar('opiniones.json', esquemaOpiniones, datosOpiniones).opiniones;
-
-export type Categoria = (typeof categorias)[number];

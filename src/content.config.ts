@@ -1,33 +1,47 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import datosCategorias from './data/categorias.json';
+import { leerTabla } from './lib/basedatos';
+import { existeImagen } from './lib/imagenes';
 
-const ids = datosCategorias.categorias.map((c) => c.id) as [string, ...string[]];
+// Ruta de una foto dentro de src/assets/, por ejemplo
+// "/src/assets/productos/rosa-eterna-1.jpg".
+const foto = z.string().refine(existeImagen, {
+  error: (problema) => `No se encontró la foto "${String(problema.input)}" dentro de src/assets/.`,
+});
+
+// Secciones y productos viven en la base de datos (Supabase) y se editan
+// desde el panel en /admin/. Se leen cada vez que se publica el sitio.
+const categorias = defineCollection({
+  loader: () => leerTabla('categorias', 'orden,nombre'),
+  schema: z.object({
+    nombre: z.string(),
+    corto: z.string(),
+    descripcion: z.string(),
+    foto,
+    orden: z.number(),
+  }),
+});
 
 const productos = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/productos' }),
-  schema: ({ image }) =>
-    z.object({
-      nombre: z.string(),
-      categoria: z.enum(ids),
-      // Texto corto que se ve en la tarjeta del catálogo.
-      resumen: z.string().optional(),
-      precio: z.number().positive(),
-      // Fotos en src/assets/productos/. La primera es la de la tarjeta.
-      fotos: z
-        .array(z.object({ src: image(), alt: z.string().optional() }))
-        .min(1),
-      // Datos que el cliente escribe antes de pedir (color, carritos...).
-      opciones: z
-        .array(z.object({ nombre: z.string(), ejemplo: z.string().optional() }))
-        .default([]),
-      disponible: z.boolean().default(true),
-      // Aparece en "Destacados" en la portada.
-      destacado: z.boolean().default(false),
-      // Posición dentro de su sección: el número más bajo va primero.
-      orden: z.number().default(100),
-    }),
+  loader: () => leerTabla('productos', 'orden,nombre'),
+  schema: z.object({
+    nombre: z.string(),
+    categoria: z.string(),
+    // Texto corto que se ve en la tarjeta del catálogo.
+    resumen: z.string(),
+    precio: z.number().positive(),
+    descripcion: z.string(),
+    // La primera es la de la tarjeta.
+    fotos: z.array(z.object({ src: foto, alt: z.string().optional() })).min(1),
+    // Datos que el cliente escribe antes de pedir (color, carritos...).
+    opciones: z.array(z.object({ nombre: z.string(), ejemplo: z.string().optional() })),
+    disponible: z.boolean(),
+    // Aparece en "Destacados" en la portada.
+    destacado: z.boolean(),
+    // Posición dentro de su sección: el número más bajo va primero.
+    orden: z.number(),
+  }),
 });
 
 // Páginas de texto editables (por ahora, el aviso de privacidad).
@@ -39,4 +53,4 @@ const paginas = defineCollection({
   }),
 });
 
-export const collections = { productos, paginas };
+export const collections = { categorias, productos, paginas };
