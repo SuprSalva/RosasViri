@@ -126,7 +126,8 @@ Deno.serve(async (peticion) => {
 
   try {
     const autorizacion = peticion.headers.get('Authorization') ?? '';
-    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
+    const clavePublica = Deno.env.get('SUPABASE_ANON_KEY') ?? Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '';
+    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, clavePublica, {
       global: { headers: { Authorization: autorizacion } },
       auth: { persistSession: false },
     });

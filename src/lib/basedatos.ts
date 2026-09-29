@@ -21,7 +21,11 @@ export async function leerTabla(tabla: 'categorias' | 'productos', orden: string
   const url = `${SUPABASE_URL}/rest/v1/${tabla}?select=*&eliminado=is.null&order=${orden}`;
   let respuesta: Response;
   try {
-    respuesta = await fetch(url, { headers: { apikey: SUPABASE_CLAVE, Authorization: `Bearer ${SUPABASE_CLAVE}` } });
+    // La clave clásica (anon, empieza con "eyJ") también va como Bearer; la nueva
+    // (sb_publishable_...) solo en `apikey`.
+    const cabeceras: Record<string, string> = { apikey: SUPABASE_CLAVE };
+    if (SUPABASE_CLAVE.startsWith('eyJ')) cabeceras.Authorization = `Bearer ${SUPABASE_CLAVE}`;
+    respuesta = await fetch(url, { headers: cabeceras });
   } catch (e) {
     throw new Error(`No se pudo conectar con la base de datos (${SUPABASE_URL}). ¿Está en pausa el proyecto de Supabase?`, {
       cause: e,
