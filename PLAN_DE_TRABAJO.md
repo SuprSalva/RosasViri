@@ -167,18 +167,21 @@ enlaces de redes y WhatsApp confirmados, y decisiones tomadas.
 
 ### 1.2 Mapa del sitio
 
-1. **Inicio (`/`)**: logo, nombre, redes, botón grande "Haz tu pedido por WhatsApp" y el
-   catálogo completo por secciones, igual que hoy, para que la clientela lo reconozca.
-2. **Categorías** (`/rosas`, `/girasoles`, `/hot-wheels`): se pueden compartir por separado en
-   historias y anuncios.
-3. **Producto** (`/producto/<nombre>`): galería, precio, descripción y opciones:
-   - Rosas y girasoles: **color de rosas a elegir**.
-   - Hot Wheels: **color de rosas** y **preferencia de carritos** (sujeto a existencias).
-   - Botón "Pedir por WhatsApp" con el mensaje ya escrito.
-4. **Cómo pedir (`/como-pedir`)**: pasos, formas de pago, tiempo de elaboración, entregas o
-   envíos, anticipo y cambios. También cuidados de las flores de listón.
-5. **Contacto (`/contacto`)**: WhatsApp, correo, redes y zona de entrega.
-6. **Aviso de privacidad (`/privacidad`)** y **página 404**.
+Estructura elegida: **portada de tienda** (29/09/2026).
+
+1. **Inicio (`/`)**: portada con frase y collage de fotos, "Elige tu ramo" (las tres secciones
+   con foto, número de modelos y precio desde), destacados, bloque de pedidos personalizados,
+   cómo pedir en 3 pasos y redes.
+2. **Catálogo (`/catalogo/`)**: todos los productos por sección.
+3. **Secciones** (`/rosas/`, `/girasoles/`, `/hot-wheels/`): se pueden compartir por separado.
+4. **Producto** (`/rosas/<producto>/`): galería, precio, descripción, opciones (color de rosas y,
+   en Hot Wheels, carritos) y botón "Pedir por WhatsApp" con el mensaje ya escrito.
+5. **Pedidos personalizados (`/pedidos-personalizados/`)**: qué se puede personalizar y un
+   formulario (ocasión, fecha, colores, presupuesto, detalles) que arma el mensaje de WhatsApp.
+6. **Galería (`/galeria/`)**: ramos entregados, fotos del catálogo y opiniones reales de clientes.
+7. **Cómo pedir (`/como-pedir/`)**: pasos y preguntas frecuentes.
+8. **Contacto (`/contacto/`)**: WhatsApp, Instagram, TikTok y correo.
+9. **Página 404**. El aviso de privacidad queda pendiente hasta que el sitio recoja datos.
 
 ### 1.3 Identidad visual
 
@@ -186,8 +189,8 @@ enlaces de redes y WhatsApp confirmados, y decisiones tomadas.
 - [ ] Logo en SVG: el original o uno redibujado a partir de la captura.
 - [ ] Favicon con el tulipán en "V", más una imagen de vista previa (1200×630) para WhatsApp,
       Facebook e Instagram.
-- [ ] Tipografías de Google Fonts parecidas a las actuales: una serif gruesa para el nombre y una
-      redondeada y amigable para títulos y tarjetas. Siempre con acentos y ñ.
+- [x] Tipografías: **Playfair Display** para títulos y **Lato** para texto (opción "Elegante",
+      elegida el 29/09/2026).
 - [ ] Diseño pensado primero para celular: la clientela llega desde Instagram y TikTok.
 - [ ] Maqueta del inicio y de la ficha de producto, aprobada antes de programar.
 
@@ -280,17 +283,19 @@ El formato de cada producto está explicado en el [`README.md`](README.md).
         saber programar.
 13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales, y el
         logo redibujado por el archivo original.
-14. [ ] Agregar los productos que faltan y confirmar WhatsApp, redes, correo y los precios
-        marcados como `POR CONFIRMAR`.
-15. [ ] Aviso de privacidad: solo hace falta si el sitio empieza a recoger datos (formulario o
-        analítica con cookies).
+14. [ ] Agregar los productos que faltan y confirmar el WhatsApp y los precios marcados como
+        `POR CONFIRMAR`. (Redes y correo ya están confirmados.)
+15. [x] Panel de administración (Pages CMS) para todo el contenido y varias fotos por producto.
+16. [x] Aviso de privacidad, aviso de cookies, `favicon.ico`, íconos, configuración para Google y
+        auditoría de seguridad ([`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md)).
+        Falta llenar el nombre y domicilio del responsable en el panel.
 
-### 2.4 Edición de productos por la dueña (opcional, recomendado)
+### 2.4 Panel de administración
 
-- **Opción simple:** editar los archivos desde la web de GitHub (botón de lápiz) o desde la app
-  de GitHub en el celular. Cada cambio se publica solo en 1–2 minutos.
-- **Opción con panel:** conectar un CMS gratuito basado en Git (por ejemplo Pages CMS o Decap
-  CMS), con un formulario "Nombre, Precio, Fotos, Disponible" y subida de fotos desde el celular.
+Elegido: **Pages CMS** (https://app.pagescms.org), gratuito y sin servidor propio. Se entra con
+una cuenta de GitHub y edita productos (con varias fotos), datos de la tienda, portada,
+secciones, preguntas frecuentes, personalizados, galería, opiniones y aviso de privacidad. Cada
+cambio se publica solo en 1–2 minutos. Instrucciones en el [`README.md`](README.md#panel-de-administración).
 
 **Definición de terminado de la Fase 2:** todas las páginas funcionan en la URL de prueba de
 GitHub Pages con el catálogo real completo.
@@ -301,28 +306,30 @@ GitHub Pages con el catálogo real completo.
 
 ### SEO
 
-- [ ] Título y descripción por página, con palabras que la gente busca: "ramos de rosas de
-      listón", "rosas eternas", "ramo de Hot Wheels", "girasoles de listón" + ciudad.
-- [ ] Datos estructurados `Product` (con precio) en cada ficha y `LocalBusiness` o `Store` en el
-      inicio.
-- [ ] `sitemap.xml` y `robots.txt`.
-- [ ] Imagen de vista previa para que el enlace se vea bonito al mandarlo por WhatsApp.
-- [ ] Alta en **Google Search Console** y envío del sitemap.
+- [x] Título y descripción por página. Falta agregar la ciudad cuando se confirme.
+- [x] Datos estructurados `Product` (con precio y fotos) y `BreadcrumbList` en cada ficha;
+      `Organization` y `WebSite` en el inicio.
+- [x] `sitemap.xml` (sin `/admin/` ni 404), `robots.txt`, `favicon.ico`, íconos y manifest.
+- [x] Imagen de vista previa para que el enlace se vea bonito al mandarlo por WhatsApp.
+- [ ] Alta en **Google Search Console** (verificación desde el panel) y envío del sitemap. Pasos
+      en el [`README.md`](README.md#aparecer-en-google).
 - [ ] Crear el **Perfil de Empresa de Google** (Google Maps) con el enlace al sitio, aunque sea
       solo con zona de entrega y sin dirección pública.
 
 ### Analítica
 
-- [ ] Cloudflare Web Analytics (gratis, sin cookies) o Google Analytics 4.
+- [x] Google Analytics 4 listo: se activa pegando el ID en el panel y solo mide a quien acepta
+      las cookies.
 - [ ] Contar cada clic en "Pedir por WhatsApp", por producto: dice qué ramos interesan más.
 - [ ] Enlaces con UTM por red, por ejemplo `?utm_source=tiktok` e `?utm_source=instagram`, para
       saber qué red trae más pedidos.
-- [ ] Pixel de TikTok o Meta **solo** si se van a pagar anuncios, con aviso de cookies.
+- [ ] Pixel de TikTok o Meta **solo** si se van a pagar anuncios (habría que agregarlo al aviso
+      de cookies y a la política de seguridad).
 
 ### Legal
 
-- [ ] Aviso de privacidad (en México, conforme a la LFPDPPP) si el sitio recoge nombre, teléfono
-      o correo.
+- [x] Aviso de privacidad y sección de cookies en `/privacidad/`. Pendiente: nombre y domicilio
+      del responsable, y revisión de un abogado.
 - [ ] Políticas claras de anticipo, cambios y cancelaciones en "Cómo pedir".
 - [ ] "Hot Wheels" es marca de Mattel: se puede describir el producto ("ramo con carritos Hot
       Wheels"), pero no usar su logo como parte de la marca Rossvtienda.

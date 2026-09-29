@@ -1,0 +1,134 @@
+---
+// Solo se muestra si hay un ID de Google Analytics en tienda.json. Google
+// Analytics no se carga (y no deja cookies) hasta que la persona acepta.
+import { ruta } from '../lib/enlaces';
+
+interface Props {
+  idAnalytics: string;
+}
+const { idAnalytics } = Astro.props;
+---
+
+<section class="cookies" aria-label="Aviso de cookies" data-cookies data-ga={idAnalytics} hidden>
+  <p>
+    Usamos cookies de Google Analytics para saber cuántas personas visitan la tienda. Solo se activan si aceptas.{' '}
+    <a href={ruta('/privacidad/#cookies')}>Más información</a>
+  </p>
+  <div class="botones">
+    <button type="button" class="boton boton-secundario" data-rechazar>Rechazar</button>
+    <button type="button" class="boton" data-aceptar>Aceptar</button>
+  </div>
+</section>
+
+<script>
+  type Ventana = Window & { dataLayer?: unknown[]; [clave: string]: unknown };
+
+  const CLAVE = 'rossvtienda-cookies';
+  const ventana = window as unknown as Ventana;
+  const aviso = document.querySelector<HTMLElement>('[data-cookies]');
+  const id = aviso?.dataset.ga ?? '';
+
+  const leer = () => {
+    try {
+      return localStorage.getItem(CLAVE);
+    } catch {
+      return null;
+    }
+  };
+  const guardar = (valor: 'si' | 'no') => {
+    try {
+      localStorage.setItem(CLAVE, valor);
+    } catch {
+      // Sin almacenamiento, la decisión dura solo esta visita.
+    }
+  };
+
+  let cargado = false;
+  function cargarAnalytics() {
+    if (cargado || !id) return;
+    cargado = true;
+    ventana[`ga-disable-${id}`] = false;
+    ventana.dataLayer = ventana.dataLayer ?? [];
+    // gtag necesita recibir el objeto `arguments` tal cual.
+    function gtag(..._args: unknown[]) {
+      // eslint-disable-next-line prefer-rest-params
+      ventana.dataLayer!.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', id);
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.append(script);
+  }
+
+  function borrarCookies() {
+    ventana[`ga-disable-${id}`] = true;
+    const partes = location.hostname.split('.');
+    const dominios = partes.slice(0, -1).map((_, i) => `.${partes.slice(i).join('.')}`);
+    for (const cookie of document.cookie.split(';')) {
+      const nombre = cookie.split('=')[0].trim();
+      if (!/^_ga(_|$)|^_gid$/.test(nombre)) continue;
+      document.cookie = `${nombre}=; Max-Age=0; path=/`;
+      for (const dominio of dominios) document.cookie = `${nombre}=; Max-Age=0; path=/; domain=${dominio}`;
+    }
+  }
+
+  if (aviso && id) {
+    const decision = leer();
+    if (decision === 'si') cargarAnalytics();
+    else if (decision !== 'no') aviso.hidden = false;
+
+    aviso.querySelector('[data-aceptar]')?.addEventListener('click', () => {
+      guardar('si');
+      aviso.hidden = true;
+      cargarAnalytics();
+    });
+    aviso.querySelector('[data-rechazar]')?.addEventListener('click', () => {
+      guardar('no');
+      aviso.hidden = true;
+      if (cargado) borrarCookies();
+    });
+    for (const boton of document.querySelectorAll('[data-preferencias-cookies]')) {
+      boton.addEventListener('click', () => {
+        aviso.hidden = false;
+        aviso.querySelector<HTMLButtonElement>('[data-aceptar]')?.focus();
+      });
+    }
+  }
+</script>
+
+<style>
+  .cookies {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 60;
+    display: grid;
+    gap: 12px;
+    max-width: 560px;
+    margin-inline: auto;
+    padding: 18px;
+    border-radius: var(--radio);
+    background: var(--crema);
+    box-shadow: 0 10px 30px rgb(59 46 40 / 0.25);
+    font-size: 0.95rem;
+  }
+
+  .cookies[hidden] {
+    display: none;
+  }
+
+  .botones {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .botones .boton {
+    min-height: 44px;
+    padding: 8px 22px;
+  }
+</style>

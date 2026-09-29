@@ -5,7 +5,7 @@ categoria: hot-wheels
 resumen: Ramo 2 carritos 2 rosas
 precio: 220
 fotos:
-  - src: ./fotos/carrito-duo-1.jpg
+  - src: /src/assets/productos/carrito-duo-1.jpg
     alt: Ramo con 2 carritos Hot Wheels y rosas azules en papel negro con moño azul
 opciones:
   - nombre: Color de rosas

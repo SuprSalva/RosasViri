@@ -1,0 +1,11 @@
+{
+  "intro": "¿Tienes una idea especial? Cuéntanos qué te imaginas y te decimos si es posible y cuánto costaría.",
+  "ideas": [
+    { "titulo": "Tus colores", "texto": "Rosas y papel en los tonos que prefieras." },
+    { "titulo": "El tamaño que buscas", "texto": "Desde una sola flor hasta un ramo grande." },
+    { "titulo": "Combina", "texto": "Rosas, girasoles y carritos Hot Wheels en un mismo ramo." },
+    { "titulo": "Para cada ocasión", "texto": "Cumpleaños, aniversarios, graduaciones y fechas especiales." }
+  ],
+  "ocasiones": ["Cumpleaños", "Aniversario", "Graduación", "San Valentín", "Día de las Madres", "Otra"],
+  "aviso": "Te recomendamos escribirnos con anticipación, sobre todo cerca del 14 de febrero y del 10 de mayo."
+}

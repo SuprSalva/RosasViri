@@ -1,48 +1,85 @@
 ---
+import Logo from './Logo.astro';
 import Redes from './Redes.astro';
-import { tienda, categorias } from '../data/tienda';
+import { tienda } from '../data/tienda';
 import { ruta } from '../lib/enlaces';
-import { urlCategoria } from '../lib/catalogo';
+import { menu } from '../lib/navegacion';
 ---
 
 <footer class="pie">
   <div class="contenedor">
-    <p class="nombre">{tienda.nombre}</p>
+    <a class="marca" href={ruta('/')}>
+      <span class="ovalo"><Logo /></span>
+      <span class="nombre">{tienda.nombre}</span>
+    </a>
     <p class="lema">{tienda.lema}</p>
     <Redes class="redes-pie" />
     <nav aria-label="Pie de página">
       <ul>
         <li><a href={ruta('/')}>Inicio</a></li>
         {
-          categorias.map((c) => (
+          menu.map((m) => (
             <li>
-              <a href={urlCategoria(c.id)}>{c.corto}</a>
+              <a href={m.href}>{m.texto}</a>
             </li>
           ))
         }
-        <li><a href={ruta('/como-pedir/')}>Cómo pedir</a></li>
       </ul>
     </nav>
-    <p class="legal">© {new Date().getFullYear()} {tienda.nombre}</p>
+    <p class="legal">
+      © {new Date().getFullYear()} {tienda.nombre} · <a href={ruta('/privacidad/')}>Aviso de privacidad</a>
+      {
+        tienda.google.analytics && (
+          <>
+            {' · '}
+            <button type="button" class="enlace-boton" data-preferencias-cookies>
+              Preferencias de cookies
+            </button>
+          </>
+        )
+      }
+    </p>
   </div>
 </footer>
 
 <style>
   .pie {
-    margin-top: 48px;
-    padding-block: 32px calc(96px + env(safe-area-inset-bottom));
+    margin-top: 64px;
+    padding-block: 40px calc(32px + env(safe-area-inset-bottom));
     background: var(--crema);
     text-align: center;
   }
 
+  .marca {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .ovalo {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 66px;
+    border-radius: 999px;
+    background: var(--fondo);
+  }
+
+  .ovalo :global(svg) {
+    width: 28px;
+  }
+
   .nombre {
-    font-family: var(--f-marca);
-    font-weight: 700;
-    font-size: 1.5rem;
+    font-family: var(--f-titulos);
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: 1;
   }
 
   .lema {
-    font-family: var(--f-titulos);
+    margin-top: 6px;
     color: var(--texto-suave);
   }
 
@@ -54,21 +91,36 @@ import { urlCategoria } from '../lib/catalogo';
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 4px 20px;
+    gap: 0 20px;
     list-style: none;
-    margin: 16px 0 0;
+    margin: 12px 0 0;
     padding: 0;
   }
 
   nav a {
     display: inline-block;
-    padding-block: 8px;
-    color: var(--texto);
+    padding-block: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
   }
 
   .legal {
     margin-top: 16px;
     font-size: 0.9rem;
     color: var(--texto-suave);
+  }
+
+  .legal a,
+  .enlace-boton {
+    color: inherit;
+  }
+
+  .enlace-boton {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

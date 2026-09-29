@@ -1,0 +1,225 @@
+---
+import { Image, Picture } from 'astro:assets';
+import Icono from './Icono.astro';
+import { anchos } from '../lib/imagenes';
+
+interface Props {
+  fotos: { src: ImageMetadata; alt: string }[];
+}
+const { fotos } = Astro.props;
+const total = fotos.length;
+---
+
+<div class="galeria" data-galeria>
+  <div class="visor">
+    <div
+      class="fotos"
+      data-fotos
+      role={total > 1 ? 'region' : undefined}
+      tabindex={total > 1 ? 0 : undefined}
+      aria-label={total > 1 ? 'Fotos del producto: usa las flechas para cambiar' : undefined}
+    >
+      {
+        fotos.map((foto, i) => (
+          <Picture
+            src={foto.src}
+            alt={foto.alt}
+            formats={['avif', 'webp']}
+            widths={anchos(foto.src, [360, 480, 720, 960, 1200])}
+            sizes="(min-width: 960px) 500px, 100vw"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+          />
+        ))
+      }
+    </div>
+    {
+      total > 1 && (
+        <>
+          <button type="button" class="flecha anterior" data-anterior>
+            <Icono nombre="flecha" />
+            <span class="visualmente-oculto">Foto anterior</span>
+          </button>
+          <button type="button" class="flecha siguiente" data-siguiente>
+            <Icono nombre="flecha-der" />
+            <span class="visualmente-oculto">Foto siguiente</span>
+          </button>
+          <p class="contador" aria-hidden="true">
+            <span data-actual>1</span> / {total}
+          </p>
+        </>
+      )
+    }
+    <slot />
+  </div>
+  {
+    total > 1 && (
+      <div class="miniaturas" role="group" aria-label="Elegir foto">
+        {fotos.map((foto, i) => (
+          <button
+            type="button"
+            data-miniatura={i}
+            aria-label={`Ver foto ${i + 1} de ${total}`}
+            aria-current={i === 0 ? 'true' : undefined}
+          >
+            <Image src={foto.src} alt="" width={128} height={128} loading="lazy" />
+          </button>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<script>
+  const suave = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  for (const galeria of document.querySelectorAll<HTMLElement>('[data-galeria]')) {
+    const fotos = galeria.querySelector<HTMLElement>('[data-fotos]');
+    const miniaturas = [...galeria.querySelectorAll<HTMLButtonElement>('[data-miniatura]')];
+    const actual = galeria.querySelector<HTMLElement>('[data-actual]');
+    const total = miniaturas.length;
+    if (!fotos || total < 2) continue;
+
+    const indice = () => Math.round(fotos.scrollLeft / fotos.clientWidth);
+    const ir = (i: number) => {
+      const destino = (i + total) % total;
+      fotos.scrollTo({ left: destino * fotos.clientWidth, behavior: suave ? 'smooth' : 'auto' });
+    };
+
+    galeria.querySelector('[data-anterior]')?.addEventListener('click', () => ir(indice() - 1));
+    galeria.querySelector('[data-siguiente]')?.addEventListener('click', () => ir(indice() + 1));
+    miniaturas.forEach((m, i) => m.addEventListener('click', () => ir(i)));
+    fotos.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') ir(indice() - 1);
+      if (e.key === 'ArrowRight') ir(indice() + 1);
+    });
+    fotos.addEventListener(
+      'scroll',
+      () => {
+        const i = indice();
+        miniaturas.forEach((m, k) => (k === i ? m.setAttribute('aria-current', 'true') : m.removeAttribute('aria-current')));
+        if (actual) actual.textContent = String(i + 1);
+      },
+      { passive: true },
+    );
+  }
+</script>
+
+<style>
+  .galeria {
+    display: grid;
+    gap: 10px;
+  }
+
+  .visor {
+    position: relative;
+  }
+
+  .fotos {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    border-radius: var(--radio);
+    background: var(--crema);
+    scrollbar-width: none;
+  }
+
+  .fotos::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fotos :global(picture) {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+
+  .fotos :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .flecha {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(246 243 238 / 0.9);
+    color: var(--texto);
+    box-shadow: 0 2px 8px rgb(59 46 40 / 0.2);
+    cursor: pointer;
+  }
+
+  .flecha:hover {
+    background: var(--crema);
+  }
+
+  .flecha :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .anterior {
+    left: 10px;
+  }
+
+  .siguiente {
+    right: 10px;
+  }
+
+  .contador {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: rgb(59 46 40 / 0.75);
+    color: var(--crema);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .miniaturas {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px;
+    scrollbar-width: thin;
+  }
+
+  .miniaturas button {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--crema);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+  }
+
+  .miniaturas button:hover {
+    opacity: 1;
+  }
+
+  .miniaturas button[aria-current='true'] {
+    border-color: var(--boton);
+    opacity: 1;
+  }
+
+  .miniaturas :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

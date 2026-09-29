@@ -1,0 +1,219 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import { galeria, opiniones, tienda } from '../data/tienda';
+import { altFoto, catalogo, urlProducto } from '../lib/catalogo';
+import { enlaceWhatsApp, usuarioDe } from '../lib/enlaces';
+import { anchos, imagen } from '../lib/imagenes';
+
+// Fotos de ramos entregados: se agregan desde el panel (src/data/galeria.json).
+const entregados = galeria.map((item) => ({
+  src: imagen(item.foto),
+  alt: item.descripcion || `Ramo entregado por ${tienda.nombre}`,
+  descripcion: item.descripcion,
+}));
+
+const delCatalogo = (await catalogo()).flatMap((s) =>
+  s.productos.flatMap((p) => p.data.fotos.map((foto, i) => ({ src: foto.src, alt: altFoto(p, i), producto: p }))),
+);
+
+const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
+---
+
+<Base
+  titulo="Galería"
+  descripcion={`Fotos de ramos de listón satinado hechos a mano por ${tienda.nombre}: rosas eternas, girasoles y ramos con carritos Hot Wheels.`}
+  actual="galeria"
+>
+  <div class="contenedor pagina">
+    <div class="pagina-cabeza">
+      <p class="antetitulo">Galería</p>
+      <h1>Nuestros ramos</h1>
+      <p class="intro">Algunos de los ramos que hemos hecho a mano, uno por uno.</p>
+    </div>
+
+    {
+      entregados.length > 0 && (
+        <section aria-labelledby="entregados">
+          <h2 id="entregados">Ramos entregados</h2>
+          <ul class="mosaico" role="list">
+            {entregados.map(({ src, alt, descripcion }) => (
+              <li>
+                <figure>
+                  <Picture
+                    src={src}
+                    alt={alt}
+                    formats={['avif', 'webp']}
+                    widths={anchos(src, [320, 480, 720])}
+                    sizes="(min-width: 900px) 340px, 50vw"
+                  />
+                  {descripcion && <figcaption>{descripcion}</figcaption>}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="catalogo">
+      <h2 id="catalogo">Del catálogo</h2>
+      <ul class="mosaico" role="list">
+        {
+          delCatalogo.map(({ src, alt, producto }) => (
+            <li>
+              <a href={urlProducto(producto)}>
+                <figure>
+                  <Picture
+                    src={src}
+                    alt={alt}
+                    formats={['avif', 'webp']}
+                    widths={anchos(src, [320, 480])}
+                    sizes="(min-width: 900px) 340px, 50vw"
+                  />
+                  <figcaption>{producto.data.nombre}</figcaption>
+                </figure>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      opiniones.length > 0 && (
+        <section aria-labelledby="opiniones">
+          <h2 id="opiniones">Lo que dicen nuestros clientes</h2>
+          <ul class="opiniones" role="list">
+            {opiniones.map((o) => (
+              <li class="caja">
+                <blockquote>
+                  <p>“{o.texto}”</p>
+                </blockquote>
+                <p class="autor">
+                  {o.nombre}
+                  {o.producto && <span> · {o.producto}</span>}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="comparte">
+      <h2>¿Ya recibiste tu ramo?</h2>
+      <p>
+        Nos encantaría verlo.
+        {
+          tienda.redes.instagram && (
+            <>
+              Etiquétanos en Instagram <strong>{usuarioDe(tienda.redes.instagram)}</strong> o mándanos tu foto por
+              WhatsApp.
+            </>
+          )
+        }
+      </p>
+      <a class="boton" href={enlaceWhatsApp(invitacion)} target="_blank" rel="noopener noreferrer">
+        <Icono nombre="whatsapp" />
+        Mandar mi foto
+      </a>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .mosaico {
+    columns: 2;
+    column-gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .mosaico {
+      columns: 3;
+      column-gap: 16px;
+    }
+  }
+
+  .mosaico li {
+    break-inside: avoid;
+    margin-bottom: 12px;
+  }
+
+  .mosaico a {
+    display: block;
+    text-decoration: none;
+  }
+
+  figure {
+    margin: 0;
+    border-radius: var(--radio);
+    overflow: hidden;
+    background: var(--crema);
+  }
+
+  figure :global(img) {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .mosaico a:hover :global(img) {
+    transform: scale(1.03);
+  }
+
+  figcaption {
+    padding: 8px 12px 10px;
+    font-family: var(--f-titulos);
+    font-weight: 600;
+  }
+
+  .opiniones {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .opiniones {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  blockquote {
+    margin: 0;
+    font-family: var(--f-titulos);
+    font-style: italic;
+    font-size: 1.15rem;
+  }
+
+  .autor {
+    margin-top: 10px;
+    font-weight: 700;
+  }
+
+  .autor span {
+    font-weight: 400;
+    color: var(--texto-suave);
+  }
+
+  .comparte {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+    margin-top: 48px;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: var(--tarjeta);
+  }
+
+  .comparte h2 {
+    margin: 0;
+  }
+</style>

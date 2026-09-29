@@ -1,0 +1,159 @@
+---
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import { personalizados, tienda } from '../data/tienda';
+
+const { intro, ideas, ocasiones, aviso } = personalizados;
+const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
+---
+
+<Base
+  titulo="Pedidos personalizados"
+  descripcion={`Ramos de listón satinado a tu medida: elige colores, tamaño y ocasión. Cuéntanos tu idea y ${tienda.nombre} te dice si es posible y cuánto costaría.`}
+  actual="personalizados"
+>
+  <div class="contenedor pagina">
+    <div class="pagina-cabeza">
+      <p class="antetitulo">A tu medida</p>
+      <h1>Pedidos personalizados</h1>
+      <p class="intro">{intro}</p>
+    </div>
+
+    <div class="columnas">
+      <section aria-labelledby="que-personalizar">
+        <h2 id="que-personalizar">Qué puedes personalizar</h2>
+        <ul class="ideas" role="list">
+          {
+            ideas.map((idea) => (
+              <li class="caja">
+                <h3>{idea.titulo}</h3>
+                <p>{idea.texto}</p>
+              </li>
+            ))
+          }
+        </ul>
+        {aviso && <p class="nota aviso">{aviso}</p>}
+      </section>
+
+      <form class="formulario" data-personalizado data-mensaje={mensaje} data-numero={tienda.whatsapp}>
+        <h2>Cuéntanos tu idea</h2>
+        <label class="campo">
+          <span>Ocasión</span>
+          <select name="Ocasión">
+            <option value="">Elige una opción</option>
+            {ocasiones.map((o) => <option>{o}</option>)}
+          </select>
+        </label>
+        <label class="campo">
+          <span>¿Para cuándo lo necesitas?</span>
+          <input type="date" name="Fecha" />
+        </label>
+        <label class="campo">
+          <span>Colores</span>
+          <input type="text" name="Colores" placeholder="Ej.: rosas rojas y papel negro" autocomplete="off" />
+        </label>
+        <label class="campo">
+          <span>Presupuesto aproximado</span>
+          <input type="text" name="Presupuesto" inputmode="numeric" placeholder="Ej.: $400" autocomplete="off" />
+        </label>
+        <label class="campo">
+          <span>Detalles</span>
+          <textarea name="Detalles" placeholder="Cantidad de flores, carritos, dedicatoria..."></textarea>
+        </label>
+        <button class="boton" type="submit">
+          <Icono nombre="whatsapp" />
+          Enviar idea por WhatsApp
+        </button>
+        <p class="nota">Se abrirá WhatsApp con tu mensaje listo para enviar.</p>
+      </form>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { urlWhatsApp } from '../lib/whatsapp';
+
+  const formulario = document.querySelector<HTMLFormElement>('[data-personalizado]');
+  formulario?.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    let mensaje = formulario.dataset.mensaje ?? '';
+    const campos = formulario.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+      'input, select, textarea',
+    );
+    for (const campo of campos) {
+      let valor = campo.value.trim();
+      if (!valor) continue;
+      // La fecha llega como 2026-10-15; se manda como 15/10/2026.
+      if (campo.type === 'date') valor = valor.split('-').reverse().join('/');
+      mensaje += `\n${campo.name}: ${valor}`;
+    }
+    const url = urlWhatsApp(formulario.dataset.numero ?? '', mensaje);
+    const ventana = window.open(url, '_blank');
+    if (ventana) ventana.opener = null;
+    else location.href = url;
+  });
+</script>
+
+<style>
+  .columnas {
+    display: grid;
+    gap: 32px;
+    margin-top: 8px;
+  }
+
+  @media (min-width: 900px) {
+    .columnas {
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+  }
+
+  .ideas {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .ideas {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .ideas h3 {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  .ideas p {
+    color: var(--texto-suave);
+  }
+
+  .aviso {
+    margin-top: 16px;
+  }
+
+  .formulario {
+    margin-top: 40px;
+  }
+
+  @media (min-width: 900px) {
+    .formulario {
+      position: sticky;
+      top: calc(var(--alto-encabezado) + 16px);
+    }
+  }
+
+  .formulario h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+  }
+
+  .formulario .boton {
+    width: 100%;
+    margin-top: 4px;
+  }
+</style>

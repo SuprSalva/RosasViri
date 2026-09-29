@@ -1,0 +1,15 @@
+# Revisa cada semana si hay actualizaciones de seguridad o nuevas versiones
+# de las dependencias del sitio y de las acciones de GitHub, y abre un PR.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dependencias:
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,15 @@
+{
+  "pasos": [
+    { "titulo": "Elige tu ramo", "texto": "Explora el catálogo y toca el ramo que más te guste." },
+    { "titulo": "Personalízalo", "texto": "Escribe el color de rosas que prefieres y, si es un ramo de Hot Wheels, qué carritos te gustan." },
+    { "titulo": "Envíanos tu pedido", "texto": "Toca «Pedir por WhatsApp»: el mensaje ya va escrito con tu elección." },
+    { "titulo": "Te confirmamos", "texto": "Te confirmamos disponibilidad, fecha de entrega y forma de pago." }
+  ],
+  "preguntas": [
+    { "pregunta": "¿Las flores se marchitan?", "respuesta": "No. Son flores de listón satinado hechas a mano: no necesitan agua y duran muchísimo si las cuidas." },
+    { "pregunta": "¿Puedo elegir los colores?", "respuesta": "Sí. Dinos qué colores te gustan y te confirmamos si los tenemos." },
+    { "pregunta": "¿Puedo elegir los carritos Hot Wheels?", "respuesta": "Los modelos dependen de las existencias. Dinos qué tipo de carritos le gustan a quien lo va a recibir y te confirmamos por WhatsApp." },
+    { "pregunta": "¿Cómo cuido mis flores de listón?", "respuesta": "Mantenlas lejos de la humedad y del sol directo para que no pierdan color. Para quitarles el polvo usa una brocha suave o una secadora de pelo con aire frío." },
+    { "pregunta": "¿Hacen entregas? ¿Cómo se paga?", "respuesta": "Escríbenos por WhatsApp y te damos los detalles de entrega y pago para tu zona." }
+  ]
+}

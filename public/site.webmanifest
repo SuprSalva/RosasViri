@@ -1,0 +1,15 @@
+{
+  "name": "Rossvtienda",
+  "short_name": "Rossvtienda",
+  "description": "Flores de listón satinado hechas a mano",
+  "lang": "es-MX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#f2e6d8",
+  "theme_color": "#f2e6d8",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "antetitulo": "Hecho a mano con listón satinado",
+  "titulo": "Flores que duran",
+  "tituloCursiva": "para siempre",
+  "bajada": "Rosas eternas, girasoles y ramos con carritos Hot Wheels. Elige el tuyo y pídelo por WhatsApp.",
+  "fotos": [
+    "/src/assets/productos/unico-girasol-1.jpg",
+    "/src/assets/productos/ramo-chico-de-rosas-1.jpg",
+    "/src/assets/productos/carrito-2-1.jpg"
+  ],
+  "personalizados": {
+    "titulo": "¿Tienes una idea especial?",
+    "texto": "Cumpleaños, aniversarios, graduaciones o simplemente porque sí. Cuéntanos qué colores y qué estilo quieres, y armamos un ramo a tu medida."
+  }
+}

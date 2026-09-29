@@ -1,9 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Encabezado from '../../components/Encabezado.astro';
+import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
 import { categorias } from '../../data/tienda';
-import { productosDe } from '../../lib/catalogo';
+import { productosDe, urlCategoria } from '../../lib/catalogo';
+import { ruta } from '../../lib/enlaces';
 
 export function getStaticPaths() {
   return categorias.map((categoria) => ({ params: { categoria: categoria.id }, props: { categoria } }));
@@ -11,13 +12,19 @@ export function getStaticPaths() {
 
 const { categoria } = Astro.props;
 const productos = await productosDe(categoria.id);
+const otras = categorias.filter((c) => c.id !== categoria.id);
 ---
 
-<Base titulo={categoria.nombre} descripcion={`${categoria.nombre}. ${categoria.descripcion}`}>
-  <Encabezado slot="encabezado" actual={categoria.id} />
-  <div class="contenedor seccion">
-    <h1 class="seccion-titulo">{categoria.nombre}</h1>
-    <p class="seccion-descripcion">{categoria.descripcion}</p>
+<Base titulo={categoria.nombre} descripcion={`${categoria.nombre}. ${categoria.descripcion}`} actual="catalogo">
+  <div class="contenedor pagina">
+    <a class="volver" href={ruta('/catalogo/')}>
+      <Icono nombre="flecha" />
+      Catálogo
+    </a>
+    <div class="pagina-cabeza">
+      <h1>{categoria.nombre}</h1>
+      <p class="intro">{categoria.descripcion}</p>
+    </div>
     {
       productos.length > 0 ? (
         <ul class="rejilla" role="list">
@@ -31,12 +38,53 @@ const productos = await productosDe(categoria.id);
         <p class="vacio">Pronto tendremos productos en esta sección.</p>
       )
     }
+    <nav class="otras" aria-label="Otras secciones">
+      <p>También te puede gustar:</p>
+      <div class="chips">
+        {
+          otras.map((c) => (
+            <a class="chip" href={urlCategoria(c.id)}>
+              {c.corto}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
   </div>
 </Base>
 
 <style>
+  .volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-block: 6px;
+    font-weight: 700;
+    color: var(--texto-suave);
+    text-decoration: none;
+  }
+
+  .volver:hover {
+    color: var(--texto);
+  }
+
+  .volver :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+
   .vacio {
     margin-top: 24px;
-    text-align: center;
+  }
+
+  .otras {
+    margin-top: 40px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .otras p {
+    font-weight: 700;
   }
 </style>

@@ -1,127 +1,500 @@
 ---
+import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Logo from '../components/Logo.astro';
-import Redes from '../components/Redes.astro';
 import Icono from '../components/Icono.astro';
 import TarjetaProducto from '../components/TarjetaProducto.astro';
-import { tienda } from '../data/tienda';
-import { catalogo, urlCategoria } from '../lib/catalogo';
-import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+import { comoPedir, portada, tienda } from '../data/tienda';
+import { catalogo, destacados, urlCategoria } from '../lib/catalogo';
+import { enlaceWhatsApp, mensajePedido, precio, ruta, usuarioDe } from '../lib/enlaces';
+import { anchos, imagen } from '../lib/imagenes';
 
 const secciones = (await catalogo()).filter((s) => s.productos.length > 0);
+const favoritos = await destacados();
+const collage = portada.fotos.map(imagen);
+const pasos = comoPedir.pasos;
+const perfiles = [
+  { icono: 'instagram', red: 'Instagram', url: tienda.redes.instagram },
+  { icono: 'tiktok', red: 'TikTok', url: tienda.redes.tiktok },
+  { icono: 'facebook', red: 'Facebook', url: tienda.redes.facebook },
+] as const;
 
-const datos = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: tienda.nombre,
-  description: tienda.descripcion,
-  url: new URL(ruta('/'), Astro.site).href,
-  logo: new URL(ruta('/apple-touch-icon.png'), Astro.site).href,
-  sameAs: Object.values(tienda.redes).filter(Boolean),
-};
+const inicio = new URL(ruta('/'), Astro.site).href;
+const datos = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: tienda.nombre,
+    description: tienda.descripcion,
+    url: inicio,
+    logo: new URL(ruta('/icono-512.png'), Astro.site).href,
+    email: tienda.correo || undefined,
+    sameAs: Object.values(tienda.redes).filter(Boolean),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: tienda.nombre,
+    url: inicio,
+    inLanguage: 'es-MX',
+  },
+];
 ---
 
-<Base datos={datos}>
+<Base datos={datos} actual="inicio">
   <section class="portada contenedor">
-    <div class="ovalo"><Logo /></div>
-    <h1 class="nombre">{tienda.nombre}</h1>
-    <p class="lema">{tienda.lema}</p>
-    <Redes class="redes-portada" />
-    <a class="boton" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
-      <Icono nombre="whatsapp" />
-      Haz tu pedido por WhatsApp
-    </a>
-    <nav class="chips indice" aria-label="Secciones del catálogo">
+    <div class="portada-texto">
+      <p class="antetitulo">{portada.antetitulo}</p>
+      <h1>
+        {portada.titulo}{portada.tituloCursiva && ' '}
+        {portada.tituloCursiva && <em>{portada.tituloCursiva}</em>}
+      </h1>
+      <p class="portada-bajada">{portada.bajada}</p>
+      <div class="portada-botones">
+        <a class="boton" href={ruta('/catalogo/')}>Ver catálogo</a>
+        <a class="boton boton-secundario" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener noreferrer">
+          <Icono nombre="whatsapp" />
+          Pedir por WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class={`collage collage-${collage.length}`} aria-hidden="true">
       {
-        secciones.map(({ categoria }) => (
-          <a class="chip" href={`#${categoria.id}`}>
-            {categoria.corto}
-          </a>
+        collage.map((foto, i) => (
+          <Picture
+            src={foto}
+            alt=""
+            formats={['avif', 'webp']}
+            widths={anchos(foto, [240, 360, 480])}
+            sizes="(min-width: 960px) 180px, 32vw"
+            loading="eager"
+            fetchpriority={i === 1 ? 'high' : undefined}
+          />
         ))
       }
-      <a class="chip" href={ruta('/como-pedir/')}>Cómo pedir</a>
-    </nav>
+    </div>
   </section>
 
-  <div class="contenedor">
-    {
-      secciones.map(({ categoria, productos }, i) => (
-        <section class="seccion" id={categoria.id} aria-labelledby={`titulo-${categoria.id}`}>
-          <h2 class="seccion-titulo" id={`titulo-${categoria.id}`}>
-            <a href={urlCategoria(categoria.id)}>{categoria.nombre}</a>
+  <section class="seccion contenedor" aria-labelledby="elige">
+    <div class="seccion-cabeza">
+      <p class="antetitulo">Nuestros ramos</p>
+      <h2 class="seccion-titulo" id="elige">Elige tu ramo</h2>
+    </div>
+    <ul class="categorias" role="list">
+      {
+        secciones.map(({ categoria, productos, desde, foto }) => (
+          <li>
+            <a class="categoria" href={urlCategoria(categoria.id)}>
+              <Picture
+                src={foto}
+                alt=""
+                formats={['avif', 'webp']}
+                widths={anchos(foto, [240, 360, 480])}
+                sizes="(min-width: 960px) 340px, (min-width: 640px) 30vw, 40vw"
+              />
+              <div class="categoria-texto">
+                <h3>{categoria.corto}</h3>
+                <p>{categoria.descripcion}</p>
+                <p class="categoria-datos">
+                  {productos.length} {productos.length === 1 ? 'modelo' : 'modelos'}
+                  {desde !== undefined && (
+                    <>
+                      {' · desde '}
+                      <span class="precio-num">{precio(desde)}</span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {
+    favoritos.length > 0 && (
+      <section class="seccion contenedor" aria-labelledby="destacados">
+        <div class="seccion-cabeza">
+          <p class="antetitulo">Para regalar</p>
+          <h2 class="seccion-titulo" id="destacados">
+            Destacados
           </h2>
-          <p class="seccion-descripcion">{categoria.descripcion}</p>
-          <ul class="rejilla" role="list">
-            {productos.map((producto, j) => (
-              <li>
-                <TarjetaProducto producto={producto} prioridad={i === 0 && j < 2} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))
-    }
-  </div>
+        </div>
+        <ul class="rejilla carrusel" role="list">
+          {favoritos.map((producto) => (
+            <li>
+              <TarjetaProducto producto={producto} />
+            </li>
+          ))}
+        </ul>
+        <p class="ver-todo">
+          <a class="enlace-flecha" href={ruta('/catalogo/')}>
+            Ver todo el catálogo
+          </a>
+        </p>
+      </section>
+    )
+  }
+
+  <section class="seccion contenedor">
+    <div class="personalizados">
+      <div>
+        <p class="antetitulo">Pedidos personalizados</p>
+        <h2>{portada.personalizados.titulo}</h2>
+        <p>{portada.personalizados.texto}</p>
+      </div>
+      <a class="boton" href={ruta('/pedidos-personalizados/')}>Pedir un ramo personalizado</a>
+    </div>
+  </section>
+
+  <section class="seccion contenedor" aria-labelledby="como-pedir">
+    <div class="seccion-cabeza">
+      <p class="antetitulo">Así de fácil</p>
+      <h2 class="seccion-titulo" id="como-pedir">Cómo pedir</h2>
+    </div>
+    <ol class="pasos" role="list">
+      {
+        pasos.map((paso) => (
+          <li>
+            <h3>{paso.titulo}</h3>
+            <p>{paso.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="ver-todo">
+      <a class="enlace-flecha" href={ruta('/como-pedir/')}>Preguntas frecuentes</a>
+    </p>
+  </section>
+
+  <section class="seccion contenedor" aria-labelledby="siguenos">
+    <div class="seccion-cabeza">
+      <p class="antetitulo">Síguenos</p>
+      <h2 class="seccion-titulo" id="siguenos">Mira nuestros ramos más nuevos</h2>
+    </div>
+    <ul class="perfiles" role="list">
+      {
+        perfiles
+          .filter((p) => p.url)
+          .map((p) => (
+            <li>
+              <a href={p.url} target="_blank" rel="noopener noreferrer">
+                <Icono nombre={p.icono} />
+                <span>
+                  {p.red} <strong>{usuarioDe(p.url)}</strong>
+                </span>
+              </a>
+            </li>
+          ))
+      }
+    </ul>
+    <p class="ver-todo">
+      <a class="enlace-flecha" href={ruta('/galeria/')}>Ver la galería</a>
+    </p>
+  </section>
 </Base>
 
 <style>
+  /* Portada */
   .portada {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    display: grid;
+    gap: 32px;
     padding-top: 32px;
   }
 
-  .ovalo {
+  @media (min-width: 900px) {
+    .portada {
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      gap: 48px;
+      padding-top: 56px;
+    }
+  }
+
+  .portada-texto {
     display: grid;
-    place-items: center;
-    width: min(46vw, 200px);
-    aspect-ratio: 5 / 7;
-    border-radius: 999px;
+    gap: 14px;
+    justify-items: start;
+  }
+
+  .portada h1 {
+    font-size: clamp(2.5rem, 11vw, 4rem);
+    line-height: 1.05;
+  }
+
+  .portada h1 em {
+    color: var(--boton);
+  }
+
+  .portada-bajada {
+    font-size: 1.15rem;
+    color: var(--texto-suave);
+    max-width: 30em;
+  }
+
+  .portada-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .collage {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    align-items: end;
+    padding-top: 24px;
+  }
+
+  .collage-1 {
+    grid-template-columns: minmax(0, 260px);
+    justify-content: center;
+  }
+
+  .collage-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .collage-3 :global(picture:nth-child(2)) {
+    transform: translateY(-24px);
+  }
+
+  .collage :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4.4;
+    object-fit: cover;
+    border-radius: 999px 999px 18px 18px;
+  }
+
+  /* Categorías */
+  .categorias {
+    display: grid;
+    gap: 14px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .categorias {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+  }
+
+  .categoria {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    padding: 12px;
+    border-radius: var(--radio);
+    background: var(--tarjeta);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  @media (min-width: 640px) {
+    .categoria {
+      grid-template-columns: 1fr;
+      align-items: start;
+      padding: 14px 14px 20px;
+    }
+  }
+
+  .categoria:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgb(59 46 40 / 0.14);
+  }
+
+  .categoria :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 999px 999px 12px 12px;
+  }
+
+  @media (min-width: 640px) {
+    .categoria :global(img) {
+      aspect-ratio: 1;
+    }
+  }
+
+  .categoria-texto {
+    display: grid;
+    gap: 4px;
+  }
+
+  .categoria h3 {
+    font-size: 1.6rem;
+  }
+
+  .categoria-texto p {
+    color: var(--texto-suave);
+    line-height: 1.4;
+  }
+
+  .categoria-datos {
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* Destacados: carrusel en celular, rejilla en computadora */
+  @media (max-width: 639px) {
+    .carrusel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      margin-inline: -16px;
+      padding: 4px 16px 12px;
+      scroll-padding-inline: 16px;
+      scrollbar-width: none;
+    }
+
+    .carrusel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carrusel li {
+      flex: 0 0 62%;
+      scroll-snap-align: start;
+    }
+  }
+
+  .ver-todo {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  /* Personalizados */
+  .personalizados {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: var(--texto);
+    color: var(--crema);
+  }
+
+  .personalizados .antetitulo {
+    color: var(--tarjeta);
+  }
+
+  .personalizados h2 {
+    font-size: clamp(1.7rem, 6vw, 2.3rem);
+    margin: 6px 0 10px;
+  }
+
+  .personalizados p {
+    max-width: 34em;
+  }
+
+  .personalizados .boton {
+    background: var(--tarjeta);
+    color: var(--texto);
+  }
+
+  .personalizados .boton:hover {
     background: var(--crema);
   }
 
-  .ovalo :global(svg) {
-    width: 56%;
+  @media (min-width: 900px) {
+    .personalizados {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 40px 48px;
+    }
   }
 
-  .nombre {
-    margin-top: 20px;
-    font-family: var(--f-marca);
-    font-weight: 700;
-    font-size: clamp(2.6rem, 12vw, 3.6rem);
-    line-height: 1;
+  /* Pasos */
+  .pasos {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: paso;
   }
 
-  .lema {
-    margin-top: 8px;
+  @media (min-width: 640px) {
+    .pasos {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .pasos {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+
+  .pasos li {
+    counter-increment: paso;
+    display: grid;
+    gap: 4px;
+    padding: 20px;
+    border-radius: var(--radio);
+    background: var(--crema);
+  }
+
+  .pasos li::before {
+    content: counter(paso);
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--tarjeta);
     font-family: var(--f-titulos);
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-variant-numeric: lining-nums;
+  }
+
+  .pasos h3 {
+    font-size: 1.25rem;
+  }
+
+  .pasos p {
     color: var(--texto-suave);
   }
 
-  .portada :global(.redes-portada) {
-    margin-top: 12px;
+  /* Redes */
+  .perfiles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .boton {
-    margin-top: 16px;
-  }
-
-  .indice {
-    max-width: 100%;
-    margin-top: 20px;
-    justify-content: safe center;
-  }
-
-  .seccion-titulo a {
+  .perfiles a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    border-radius: 999px;
+    background: var(--crema);
     text-decoration: none;
+    transition: background-color 0.15s ease;
   }
 
-  .seccion-titulo a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
+  .perfiles a:hover {
+    background: var(--tarjeta);
+  }
+
+  .perfiles :global(svg) {
+    width: 24px;
+    height: 24px;
   }
 </style>

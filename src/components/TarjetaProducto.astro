@@ -1,7 +1,8 @@
 ---
 import { Picture } from 'astro:assets';
 import { precio } from '../lib/enlaces';
-import { urlProducto, type Producto } from '../lib/catalogo';
+import { altFoto, urlProducto, type Producto } from '../lib/catalogo';
+import { anchos } from '../lib/imagenes';
 
 interface Props {
   producto: Producto;
@@ -11,17 +12,15 @@ interface Props {
 const { producto, nivel: Titulo = 'h3', prioridad = false } = Astro.props;
 const { nombre, resumen, fotos, disponible } = producto.data;
 const foto = fotos[0];
-// Tamaños a generar, sin pasar del tamaño de la foto original.
-const anchos = [240, 360, 480, 640].filter((w) => w < foto.src.width).concat(Math.min(foto.src.width, 800));
 ---
 
 <a class="tarjeta" href={urlProducto(producto)}>
   <div class="foto">
     <Picture
       src={foto.src}
-      alt={foto.alt}
+      alt={altFoto(producto, 0)}
       formats={['avif', 'webp']}
-      widths={anchos}
+      widths={anchos(foto.src, [240, 360, 480, 640])}
       sizes="(min-width: 1040px) 240px, (min-width: 960px) 23vw, (min-width: 640px) 31vw, 46vw"
       loading={prioridad ? 'eager' : 'lazy'}
       fetchpriority={prioridad ? 'high' : undefined}
@@ -31,7 +30,7 @@ const anchos = [240, 360, 480, 640].filter((w) => w < foto.src.width).concat(Mat
   <div class="cuerpo">
     <Titulo class="nombre">{nombre}</Titulo>
     {resumen && <p class="resumen">{resumen}</p>}
-    <p class="precio">{precio(producto.data.precio)}</p>
+    <p class="precio precio-num">{precio(producto.data.precio)}</p>
     <span class="ver" aria-hidden="true">Ver más</span>
   </div>
 </a>
@@ -74,7 +73,7 @@ const anchos = [240, 360, 480, 640].filter((w) => w < foto.src.width).concat(Mat
     border-radius: 999px;
     background: var(--texto);
     color: var(--crema);
-    font-family: var(--f-titulos);
+    font-weight: 700;
     font-size: 0.85rem;
   }
 
@@ -83,34 +82,36 @@ const anchos = [240, 360, 480, 640].filter((w) => w < foto.src.width).concat(Mat
     flex: 1;
     flex-direction: column;
     padding: 14px 14px 16px;
-    font-family: var(--f-titulos);
   }
 
   .nombre {
-    font-size: 1.15rem;
+    font-size: 1.12rem;
+    line-height: 1.2;
   }
 
   .resumen {
     margin-top: 4px;
     color: var(--texto-suave);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.35;
   }
 
   .precio {
     margin-top: auto;
-    padding-top: 12px;
+    padding-top: 10px;
     font-size: 1.3rem;
+    font-weight: 600;
   }
 
   .ver {
     margin-top: 10px;
     padding: 9px 12px;
-    border-radius: 12px;
+    border-radius: 999px;
     background: var(--boton);
     color: var(--crema);
     text-align: center;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 0.92rem;
   }
 
   .tarjeta:hover .ver {

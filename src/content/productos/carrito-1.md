@@ -4,7 +4,7 @@ categoria: hot-wheels
 resumen: Ramo 1 carrito 1 rosa
 precio: 90
 fotos:
-  - src: ./fotos/carrito-1-1.jpg
+  - src: /src/assets/productos/carrito-1-1.jpg
     alt: Ramo con un carrito Hot Wheels verde y una rosa azul en papel negro
 opciones:
   - nombre: Color de la rosa

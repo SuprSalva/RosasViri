@@ -1,0 +1,25 @@
+{
+  "categorias": [
+    {
+      "id": "rosas",
+      "nombre": "Rosas de listón satinado",
+      "corto": "Rosas",
+      "descripcion": "Rosas eternas con el color que elijas.",
+      "foto": "/src/assets/productos/ramo-12-rosas-clasicas-1.jpg"
+    },
+    {
+      "id": "girasoles",
+      "nombre": "Girasoles de listón satinado",
+      "corto": "Girasoles",
+      "descripcion": "Girasoles que no se marchitan.",
+      "foto": "/src/assets/productos/ramo-chico-girasoles-1.jpg"
+    },
+    {
+      "id": "hot-wheels",
+      "nombre": "Ramos de Hot Wheels y flores de listón",
+      "corto": "Hot Wheels",
+      "descripcion": "Carritos y color de rosas a elegir.",
+      "foto": "/src/assets/productos/carrito-3-1.jpg"
+    }
+  ]
+}
