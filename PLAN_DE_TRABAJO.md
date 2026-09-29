@@ -34,8 +34,8 @@ pero evita perder ventas mientras se construye.
 | Fase | Qué se hace | Duración estimada | Estado |
 |---|---|---|---|
 | 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **En curso** (capturas recibidas) |
-| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | Pendiente |
-| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | Pendiente |
+| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (paleta, fuentes y logo provisional listos; faltan fotos originales) |
+| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **En curso** (primera versión lista con el catálogo visible) |
 | 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | Pendiente |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
 | 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | Pendiente |
@@ -225,79 +225,65 @@ logo) en una carpeta compartida.
   o Netlify son alternativas equivalentes.
 - **Formulario de contacto** (opcional): Formspree o Web3Forms, en su plan gratuito.
 
-### 2.2 Estructura propuesta del repositorio
+### 2.2 Estructura del repositorio
 
 ```
 RosasViri/
 ├── PLAN_DE_TRABAJO.md
-├── README.md                    # Cómo editar productos y publicar
-├── docs/referencia-beacons/     # Capturas de la página actual
-├── astro.config.mjs
-├── package.json
+├── README.md                        # Cómo editar productos y publicar
+├── docs/referencia-beacons/         # Capturas de la página actual
+├── astro.config.mjs                 # Dirección del sitio (cambiar al conectar el dominio)
 ├── public/
 │   ├── favicon.svg
-│   └── og-image.jpg             # Vista previa al compartir el enlace
+│   ├── apple-touch-icon.png
+│   └── og-image.jpg                 # Vista previa al compartir el enlace
 ├── src/
-│   ├── assets/productos/        # Fotos originales de cada ramo
-│   ├── content/
-│   │   └── productos/           # Un archivo .md por producto
-│   ├── data/
-│   │   └── tienda.json          # Nombre, WhatsApp, redes, correo, categorías y su orden
-│   ├── components/              # Encabezado, Redes, TarjetaProducto, Galeria, BotonWhatsApp...
-│   ├── layouts/Base.astro       # <head>, SEO, vista previa, analítica
+│   ├── data/tienda.ts               # WhatsApp, redes, correo, categorías y su orden
+│   ├── content/productos/           # Un archivo .md por producto
+│   │   └── fotos/                   # Fotos de cada ramo
+│   ├── content.config.ts            # Campos de los productos (valida precios, fotos...)
+│   ├── components/                  # Logo, Encabezado, Redes, TarjetaProducto, Pie, Icono
+│   ├── layouts/Base.astro           # <head>, SEO, vista previa, botón flotante de WhatsApp
+│   ├── lib/                         # Enlaces de WhatsApp, precios y orden del catálogo
 │   ├── pages/
-│   │   ├── index.astro
-│   │   ├── [categoria].astro    # /rosas, /girasoles, /hot-wheels
-│   │   ├── producto/[slug].astro
-│   │   ├── como-pedir.astro
-│   │   ├── contacto.astro
-│   │   ├── privacidad.astro
-│   │   └── 404.astro
-│   └── styles/global.css        # Paleta: #F2E6D8, #E7EAA7, #575B20, #81844B, #3B2E28...
-└── .github/workflows/deploy.yml
+│   │   ├── index.astro              # Inicio con el catálogo completo
+│   │   ├── [categoria]/index.astro  # /rosas/, /girasoles/, /hot-wheels/
+│   │   ├── [categoria]/[producto].astro  # /rosas/ramo-chico-de-rosas/
+│   │   ├── como-pedir.astro         # Pasos, preguntas frecuentes y redes
+│   │   ├── 404.astro
+│   │   └── robots.txt.ts
+│   └── styles/global.css            # Paleta: #F2E6D8, #E7EAA7, #575B20, #81844B, #3B2E28...
+└── .github/workflows/publicar.yml   # Publicación automática en GitHub Pages
 ```
 
-Ejemplo real de ficha (`src/content/productos/ramo-chico-de-rosas.md`):
-
-```md
----
-nombre: "Ramo chico de rosas"
-categoria: "rosas"
-resumen: "7 rosas clásicas"
-precio: 220
-fotos:
-  - ../../assets/productos/ramo-chico-de-rosas-1.jpg
-  - ../../assets/productos/ramo-chico-de-rosas-2.jpg
-opciones:
-  - nombre: "Color de rosas"
-    tipo: "texto"          # o una lista de colores disponibles
-disponible: true
-destacado: true
-orden: 2
----
-Ramo de 7 rosas eternas de color a elección envueltas en papel coreano con un moño decorativo.
-```
+El formato de cada producto está explicado en el [`README.md`](README.md).
 
 ### 2.3 Tareas de desarrollo (en orden)
 
-1. [ ] Crear el proyecto Astro, configurar la publicación en GitHub Pages y subir una página de
-       prueba. Así el flujo de publicación queda probado desde el día 1.
-2. [ ] Estilos base con la paleta y las tipografías de la marca.
-3. [ ] Layout base: `<head>` con título, descripción, vista previa para redes y favicon.
-4. [ ] Componentes: encabezado con logo en óvalo, redes (TikTok, Instagram, correo, WhatsApp),
+1. [x] Crear el proyecto Astro y el flujo de publicación en GitHub Pages. Falta activarlo en
+       GitHub (Settings → Pages → Source: GitHub Actions) y unir la rama a `main`.
+2. [x] Estilos base con la paleta y las tipografías de la marca (Arvo, Short Stack y Nunito).
+3. [x] Layout base: `<head>` con título, descripción, vista previa para redes y favicon.
+4. [x] Componentes: encabezado con logo en óvalo, redes (TikTok, Instagram, correo, WhatsApp),
        botón flotante de WhatsApp y pie de página.
-5. [ ] Colección de productos con validación de campos, para que un precio o una foto mal
+5. [x] Colección de productos con validación de campos, para que un precio o una foto mal
        escritos den error al publicar en vez de romper el sitio en silencio.
-6. [ ] Inicio con las tres secciones en tarjetas de 2 columnas, como hoy.
-7. [ ] Páginas por categoría.
-8. [ ] Ficha de producto: galería deslizable, opciones (color o carritos) y enlace
-       `https://wa.me/<número>?text=...` que arma el mensaje con lo elegido.
-9. [ ] Etiqueta de **"Agotado"** o **"Por temporada"** para no borrar productos.
-10. [ ] Páginas de Cómo pedir, Contacto, Privacidad y 404.
-11. [ ] Accesibilidad: texto alternativo en cada foto ("Ramo de 7 rosas color durazno en papel
-        blanco con dorado"), buen contraste y botones grandes.
-12. [ ] `README.md` con instrucciones para agregar ramos, cambiar precios o marcar agotados sin
+6. [x] Inicio con las tres secciones en tarjetas de 2 columnas, como hoy.
+7. [x] Páginas por categoría.
+8. [x] Ficha de producto: galería deslizable, opciones (color o carritos), botón de compartir y
+       enlace `https://wa.me/<número>?text=...` que arma el mensaje con lo elegido.
+9. [x] Etiqueta de **"Agotado"** (`disponible: false`) para no borrar productos.
+10. [x] Páginas de Cómo pedir (con contacto y preguntas frecuentes) y 404.
+11. [x] Accesibilidad: texto alternativo en cada foto, buen contraste, botones grandes y
+        navegación con teclado.
+12. [x] `README.md` con instrucciones para agregar ramos, cambiar precios o marcar agotados sin
         saber programar.
+13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales, y el
+        logo redibujado por el archivo original.
+14. [ ] Agregar los productos que faltan y confirmar WhatsApp, redes, correo y los precios
+        marcados como `POR CONFIRMAR`.
+15. [ ] Aviso de privacidad: solo hace falta si el sitio empieza a recoger datos (formulario o
+        analítica con cookies).
 
 ### 2.4 Edición de productos por la dueña (opcional, recomendado)
 

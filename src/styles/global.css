@@ -1,0 +1,290 @@
+/* Colores tomados de la página de Beacons de Rossvtienda. */
+:root {
+  --fondo: #f2e6d8;
+  --crema: #f6f3ee;
+  --oliva: #81844b;
+  --tarjeta: #e7eaa7;
+  --boton: #575b20;
+  --boton-hover: #464a16;
+  --texto: #3b2e28;
+  --texto-suave: #5e4e45;
+  --linea: #e2d3c2;
+
+  --f-marca: 'Arvo', Georgia, serif;
+  --f-titulos: 'Short Stack', 'Comic Sans MS', system-ui, sans-serif;
+  --f-texto: 'Nunito Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radio: 16px;
+  --ancho: 1040px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--f-texto);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--f-titulos);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--boton);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho);
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+.saltar {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  background: var(--boton);
+  color: var(--crema);
+  padding: 10px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.saltar:focus {
+  top: 12px;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Botones */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--boton);
+  color: var(--crema);
+  font-family: var(--f-titulos);
+  font-size: 1.05rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.boton:hover {
+  background: var(--boton-hover);
+}
+
+.boton:active {
+  transform: scale(0.98);
+}
+
+.boton svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.boton-secundario {
+  background: transparent;
+  color: var(--texto);
+  box-shadow: inset 0 0 0 2px var(--texto);
+}
+
+.boton-secundario:hover {
+  background: var(--crema);
+}
+
+/* Chips de categorías */
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 16px;
+  margin-inline: -16px;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--crema);
+  color: var(--texto);
+  font-family: var(--f-titulos);
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px var(--linea);
+}
+
+.chip:hover,
+.chip[aria-current='page'] {
+  background: var(--boton);
+  color: var(--crema);
+  box-shadow: none;
+}
+
+/* Catálogo */
+.seccion {
+  padding-block: 28px 8px;
+  scroll-margin-top: 12px;
+}
+
+.seccion-titulo {
+  font-size: clamp(1.45rem, 5.5vw, 1.9rem);
+  text-align: center;
+}
+
+.seccion-descripcion {
+  font-family: var(--f-titulos);
+  color: var(--texto-suave);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (min-width: 960px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Página de texto (Cómo pedir, 404...) */
+.pagina {
+  padding-block: 28px 48px;
+}
+
+.pagina h1 {
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+}
+
+.pagina h2 {
+  font-size: 1.4rem;
+  margin-top: 36px;
+}
+
+.pagina p + p {
+  margin-top: 12px;
+}
+
+.pagina .intro {
+  margin-top: 8px;
+  color: var(--texto-suave);
+  font-size: 1.1rem;
+}
+
+.caja {
+  background: var(--crema);
+  border-radius: var(--radio);
+  padding: 20px;
+}
+
+/* Botón flotante de WhatsApp */
+.whatsapp-flotante {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 40;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--boton);
+  color: var(--crema);
+  box-shadow: 0 6px 18px rgb(59 46 40 / 0.3);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.whatsapp-flotante:hover {
+  background: var(--boton-hover);
+  transform: scale(1.05);
+}
+
+.whatsapp-flotante svg {
+  width: 30px;
+  height: 30px;
+}

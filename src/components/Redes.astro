@@ -1,0 +1,64 @@
+---
+import Icono from './Icono.astro';
+import { tienda } from '../data/tienda';
+import { enlaceWhatsApp, mensajePedido } from '../lib/enlaces';
+
+interface Props {
+  class?: string;
+}
+const { class: clase } = Astro.props;
+
+const enlaces = [
+  { nombre: 'tiktok', etiqueta: 'TikTok', href: tienda.redes.tiktok },
+  { nombre: 'instagram', etiqueta: 'Instagram', href: tienda.redes.instagram },
+  { nombre: 'whatsapp', etiqueta: 'WhatsApp', href: enlaceWhatsApp(mensajePedido()) },
+  { nombre: 'correo', etiqueta: 'Correo', href: tienda.correo && `mailto:${tienda.correo}` },
+] as const;
+---
+
+<ul class:list={['redes', clase]}>
+  {
+    enlaces
+      .filter((e) => e.href)
+      .map((e) => (
+        <li>
+          <a href={e.href} target={e.nombre === 'correo' ? undefined : '_blank'} rel="noopener">
+            <Icono nombre={e.nombre} />
+            <span class="visualmente-oculto">
+              {e.etiqueta} de {tienda.nombre}
+            </span>
+          </a>
+        </li>
+      ))
+  }
+</ul>
+
+<style>
+  .redes {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: var(--texto);
+    transition: background-color 0.15s ease;
+  }
+
+  a:hover {
+    background: var(--crema);
+  }
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+</style>

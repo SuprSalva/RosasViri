@@ -1,0 +1,34 @@
+---
+// Tulipán cuyo tallo y hojas forman una "V". Redibujado a partir de la
+// captura de Beacons: reemplazar por el archivo original cuando esté.
+interface Props {
+  class?: string;
+}
+const { class: clase } = Astro.props;
+---
+
+<svg class={clase} viewBox="0 0 316 504" fill="none" aria-hidden="true" focusable="false">
+  <g stroke="var(--oliva)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 216 L156 486 L286 216" stroke-width="15"></path>
+    <path d="M156 484 C156 400 154 318 160 240 C165 172 178 124 196 84" stroke-width="5"></path>
+  </g>
+  <g fill="var(--oliva)">
+    <path d="M156 306 C131 276 115 226 122 175 C142 206 158 248 157 292 Z"></path>
+    <path d="M160 272 C168 224 188 186 215 160 C210 202 192 242 161 270 Z"></path>
+    <g transform="rotate(8 212 52)">
+      <path d="M176 56 C172 36 184 18 202 16 C212 15 219 19 223 24 C234 18 250 26 252 42 C254 60 242 78 220 84 C200 89 182 80 176 56 Z"></path>
+      <path d="M186 74 C175 71 168 78 170 85 C180 84 189 82 197 80 Z"></path>
+      <path d="M232 76 C244 72 254 78 254 85 C244 86 235 84 226 81 Z"></path>
+    </g>
+  </g>
+  <g stroke="var(--crema)" stroke-linecap="round" fill="none">
+    <g stroke-width="3" transform="rotate(8 212 52)">
+      <path d="M201 19 C192 33 193 57 205 81"></path>
+      <path d="M224 26 C214 39 213 60 221 82"></path>
+    </g>
+    <g stroke-width="2">
+      <path d="M153 290 C141 260 129 222 125 188"></path>
+      <path d="M164 260 C178 226 194 196 210 168"></path>
+    </g>
+  </g>
+</svg>

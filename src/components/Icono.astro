@@ -1,0 +1,48 @@
+---
+import { siInstagram, siTiktok, siWhatsapp } from 'simple-icons';
+
+interface Props {
+  nombre: 'whatsapp' | 'instagram' | 'tiktok' | 'correo' | 'compartir' | 'flecha';
+  class?: string;
+}
+const { nombre, class: clase } = Astro.props;
+
+const marcas = { whatsapp: siWhatsapp, instagram: siInstagram, tiktok: siTiktok } as const;
+const marca = nombre in marcas ? marcas[nombre as keyof typeof marcas] : undefined;
+---
+
+{
+  marca ? (
+    <svg class={clase} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d={marca.path} />
+    </svg>
+  ) : (
+    <svg
+      class={clase}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {nombre === 'correo' && (
+        <>
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        </>
+      )}
+      {nombre === 'compartir' && (
+        <>
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98" />
+        </>
+      )}
+      {nombre === 'flecha' && <path d="m15 18-6-6 6-6" />}
+    </svg>
+  )
+}

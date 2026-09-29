@@ -1,0 +1,78 @@
+---
+import Logo from './Logo.astro';
+import { tienda, categorias } from '../data/tienda';
+import { ruta } from '../lib/enlaces';
+import { urlCategoria } from '../lib/catalogo';
+
+interface Props {
+  actual?: string;
+}
+const { actual } = Astro.props;
+---
+
+<header class="encabezado">
+  <div class="contenedor fila">
+    <a class="marca" href={ruta('/')}>
+      <span class="ovalo"><Logo /></span>
+      <span class="nombre">{tienda.nombre}</span>
+    </a>
+  </div>
+  <nav class="contenedor" aria-label="Secciones">
+    <div class="chips">
+      {
+        categorias.map((c) => (
+          <a class="chip" href={urlCategoria(c.id)} aria-current={actual === c.id ? 'page' : undefined}>
+            {c.corto}
+          </a>
+        ))
+      }
+      <a class="chip" href={ruta('/como-pedir/')} aria-current={actual === 'como-pedir' ? 'page' : undefined}>
+        Cómo pedir
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .encabezado {
+    padding-block: 14px 10px;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .fila {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .ovalo {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 54px;
+    border-radius: 999px;
+    background: var(--crema);
+  }
+
+  .ovalo :global(svg) {
+    width: 24px;
+  }
+
+  .nombre {
+    font-family: var(--f-marca);
+    font-weight: 700;
+    font-size: 1.7rem;
+    line-height: 1;
+  }
+
+  .chips {
+    justify-content: safe center;
+  }
+</style>

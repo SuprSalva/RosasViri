@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import Encabezado from '../components/Encabezado.astro';
+import Redes from '../components/Redes.astro';
+import Icono from '../components/Icono.astro';
+import { tienda } from '../data/tienda';
+import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+
+const pasos = [
+  { titulo: 'Elige tu ramo', texto: 'Explora el catálogo y toca el ramo que más te guste.' },
+  {
+    titulo: 'Personalízalo',
+    texto: 'Escribe el color de rosas que prefieres y, si es un ramo de Hot Wheels, qué carritos te gustan.',
+  },
+  {
+    titulo: 'Envíanos tu pedido',
+    texto: 'Toca «Pedir por WhatsApp»: el mensaje ya va escrito con tu elección.',
+  },
+  { titulo: 'Te confirmamos', texto: 'Te confirmamos disponibilidad, fecha de entrega y forma de pago.' },
+];
+
+// POR CONFIRMAR: cuando se sepan los tiempos de elaboración, las zonas de
+// entrega y las formas de pago, agregarlos aquí como preguntas nuevas.
+const preguntas = [
+  {
+    pregunta: '¿Las flores se marchitan?',
+    respuesta:
+      'No. Son flores de listón satinado hechas a mano: no necesitan agua y duran muchísimo si las cuidas.',
+  },
+  {
+    pregunta: '¿Puedo elegir los colores?',
+    respuesta: 'Sí. Dinos qué colores te gustan y te confirmamos si los tenemos.',
+  },
+  {
+    pregunta: '¿Puedo elegir los carritos Hot Wheels?',
+    respuesta:
+      'Los modelos dependen de las existencias. Dinos qué tipo de carritos le gustan a quien lo va a recibir y te confirmamos por WhatsApp.',
+  },
+  {
+    pregunta: '¿Cómo cuido mis flores de listón?',
+    respuesta:
+      'Mantenlas lejos de la humedad y del sol directo para que no pierdan color. Para quitarles el polvo usa una brocha suave o una secadora de pelo con aire frío.',
+  },
+  {
+    pregunta: '¿Hacen entregas? ¿Cómo se paga?',
+    respuesta: 'Escríbenos por WhatsApp y te damos los detalles de entrega y pago para tu zona.',
+  },
+];
+---
+
+<Base titulo="Cómo pedir" descripcion={`Cómo hacer tu pedido en ${tienda.nombre}: elige tu ramo, personalízalo y envíanos tu pedido por WhatsApp.`}>
+  <Encabezado slot="encabezado" actual="como-pedir" />
+  <div class="contenedor pagina">
+    <h1>Cómo pedir</h1>
+    <p class="intro">Todos nuestros ramos se hacen a mano. Pedir es muy fácil:</p>
+
+    <ol class="pasos">
+      {
+        pasos.map((paso) => (
+          <li class="caja">
+            <h2>{paso.titulo}</h2>
+            <p>{paso.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="acciones">
+      <a class="boton" href={ruta('/')}>Ver el catálogo</a>
+      <a class="boton boton-secundario" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" />
+        Escríbenos
+      </a>
+    </div>
+
+    <h2>Preguntas frecuentes</h2>
+    <div class="preguntas">
+      {
+        preguntas.map(({ pregunta, respuesta }) => (
+          <details class="caja">
+            <summary>{pregunta}</summary>
+            <p>{respuesta}</p>
+          </details>
+        ))
+      }
+    </div>
+
+    <h2>Síguenos</h2>
+    <p>Mira nuestros ramos más nuevos en redes sociales.</p>
+    <Redes class="redes-contacto" />
+  </div>
+</Base>
+
+<style>
+  .pasos {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: paso;
+  }
+
+  @media (min-width: 640px) {
+    .pasos {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .pasos li {
+    counter-increment: paso;
+    position: relative;
+    padding-left: 68px;
+  }
+
+  .pasos li::before {
+    content: counter(paso);
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--tarjeta);
+    font-family: var(--f-titulos);
+    font-size: 1.2rem;
+  }
+
+  .pasos h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .preguntas {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  details {
+    padding: 0;
+  }
+
+  summary {
+    padding: 16px 20px;
+    font-family: var(--f-titulos);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  details p {
+    padding: 0 20px 18px;
+  }
+
+  .pagina :global(.redes-contacto) {
+    justify-content: flex-start;
+    margin-top: 8px;
+    margin-left: -8px;
+  }
+</style>

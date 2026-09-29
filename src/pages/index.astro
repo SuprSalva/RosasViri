@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import Logo from '../components/Logo.astro';
+import Redes from '../components/Redes.astro';
+import Icono from '../components/Icono.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import { tienda } from '../data/tienda';
+import { catalogo, urlCategoria } from '../lib/catalogo';
+import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+
+const secciones = (await catalogo()).filter((s) => s.productos.length > 0);
+
+const datos = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: tienda.nombre,
+  description: tienda.descripcion,
+  url: new URL(ruta('/'), Astro.site).href,
+  logo: new URL(ruta('/apple-touch-icon.png'), Astro.site).href,
+  sameAs: Object.values(tienda.redes).filter(Boolean),
+};
+---
+
+<Base datos={datos}>
+  <section class="portada contenedor">
+    <div class="ovalo"><Logo /></div>
+    <h1 class="nombre">{tienda.nombre}</h1>
+    <p class="lema">{tienda.lema}</p>
+    <Redes class="redes-portada" />
+    <a class="boton" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
+      <Icono nombre="whatsapp" />
+      Haz tu pedido por WhatsApp
+    </a>
+    <nav class="chips indice" aria-label="Secciones del catálogo">
+      {
+        secciones.map(({ categoria }) => (
+          <a class="chip" href={`#${categoria.id}`}>
+            {categoria.corto}
+          </a>
+        ))
+      }
+      <a class="chip" href={ruta('/como-pedir/')}>Cómo pedir</a>
+    </nav>
+  </section>
+
+  <div class="contenedor">
+    {
+      secciones.map(({ categoria, productos }, i) => (
+        <section class="seccion" id={categoria.id} aria-labelledby={`titulo-${categoria.id}`}>
+          <h2 class="seccion-titulo" id={`titulo-${categoria.id}`}>
+            <a href={urlCategoria(categoria.id)}>{categoria.nombre}</a>
+          </h2>
+          <p class="seccion-descripcion">{categoria.descripcion}</p>
+          <ul class="rejilla" role="list">
+            {productos.map((producto, j) => (
+              <li>
+                <TarjetaProducto producto={producto} prioridad={i === 0 && j < 2} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .portada {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 32px;
+  }
+
+  .ovalo {
+    display: grid;
+    place-items: center;
+    width: min(46vw, 200px);
+    aspect-ratio: 5 / 7;
+    border-radius: 999px;
+    background: var(--crema);
+  }
+
+  .ovalo :global(svg) {
+    width: 56%;
+  }
+
+  .nombre {
+    margin-top: 20px;
+    font-family: var(--f-marca);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 12vw, 3.6rem);
+    line-height: 1;
+  }
+
+  .lema {
+    margin-top: 8px;
+    font-family: var(--f-titulos);
+    font-size: 1.1rem;
+    color: var(--texto-suave);
+  }
+
+  .portada :global(.redes-portada) {
+    margin-top: 12px;
+  }
+
+  .boton {
+    margin-top: 16px;
+  }
+
+  .indice {
+    max-width: 100%;
+    margin-top: 20px;
+    justify-content: safe center;
+  }
+
+  .seccion-titulo a {
+    text-decoration: none;
+  }
+
+  .seccion-titulo a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+</style>
