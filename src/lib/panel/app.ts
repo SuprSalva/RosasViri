@@ -23,8 +23,18 @@ type Producto = {
   disponible: boolean;
   destacado: boolean;
   orden: number;
+  /** Fecha de eliminación (null = activo). Nada se borra: lo eliminado va a la Papelera. */
+  eliminado: string | null;
 };
-type Categoria = { id: string; nombre: string; corto: string; descripcion: string; foto: string; orden: number };
+type Categoria = {
+  id: string;
+  nombre: string;
+  corto: string;
+  descripcion: string;
+  foto: string;
+  orden: number;
+  eliminado: string | null;
+};
 
 const REPOSITORIO = 'SuprSalva/RosasViri';
 // Direcciones que ya usan otras páginas del sitio: una sección no puede llamarse así.
@@ -40,9 +50,13 @@ const RESERVADAS = new Set([
 ]);
 
 let supabase: SupabaseClient;
+// Incluyen lo eliminado (la Papelera); usa activas() y activos() para lo visible.
 let categorias: Categoria[] = [];
 let productos: Producto[] = [];
-let pestana: 'productos' | 'categorias' = 'productos';
+let pestana: 'productos' | 'categorias' | 'papelera' = 'productos';
+
+const activas = () => categorias.filter((c) => !c.eliminado);
+const activos = () => productos.filter((p) => !p.eliminado);
 // Fotos recién subidas: aún no están en el sitio publicado, se muestran desde esta computadora.
 const vistasLocales = new Map<string, string>();
 let miniaturas: Record<string, string> = {};
@@ -77,15 +91,24 @@ function mostrar(vista: string) {
     seccion.hidden = seccion.dataset.vista !== vista;
   }
   window.scrollTo({ top: 0 });
-  document.querySelector<HTMLElement>(`[data-vista="${vista}"] h1`)?.focus();
+  // Lleva el foco al título para que los lectores de pantalla anuncien la pantalla nueva.
+  const titulo = document.querySelector<HTMLElement>(`[data-vista="${vista}"] h1`);
+  titulo?.setAttribute('tabindex', '-1');
+  titulo?.focus({ preventScroll: true });
 }
+
+// Sin permiso, la base de datos no marca error: simplemente no cambia ninguna fila.
+const SIN_PERMISO = { code: '42501' };
 
 function mensajeError(error: { code?: string; message?: string } | null): string {
   if (!error) return 'Algo falló. Intenta de nuevo.';
-  if (error.code === '23503') return 'No se puede borrar: todavía tiene productos. Muévelos a otra sección primero.';
+  if (error.code === 'RV001') return 'Esta sección todavía tiene productos. Muévelos a otra sección o elimínalos primero.';
+  if (error.code === 'RV002') return 'Su sección está eliminada. Restaura primero la sección desde la Papelera.';
   if (error.code === '23505') return 'Ya existe otro con ese nombre. Usa un nombre distinto.';
   if (error.code === '42501') return 'Tu cuenta no tiene permiso para hacer este cambio.';
   if (error.code === 'PGRST301' || /JWT/i.test(error.message ?? '')) return 'Tu sesión terminó. Vuelve a entrar.';
+  // .single() sin filas: el registro ya no existe o no hay permiso para cambiarlo.
+  if (error.code === 'PGRST116') return 'No se pudo guardar: recarga la página y vuelve a intentarlo.';
   return 'No se pudo guardar. Revisa tu conexión e intenta de nuevo.';
 }
 
@@ -168,16 +191,18 @@ function verLista(cual: typeof pestana) {
   }
   $('[data-lista="productos"]').hidden = cual !== 'productos';
   $('[data-lista="categorias"]').hidden = cual !== 'categorias';
+  $('[data-lista="papelera"]').hidden = cual !== 'papelera';
   pintarProductos();
   pintarCategorias();
+  pintarPapelera();
   mostrar('panel');
 }
 
 function pintarProductos() {
   const contenedor = $('[data-productos]');
   contenedor.replaceChildren(
-    ...categorias.flatMap((categoria) => {
-      const suyos = productos.filter((p) => p.categoria === categoria.id);
+    ...activas().flatMap((categoria) => {
+      const suyos = activos().filter((p) => p.categoria === categoria.id);
       return [
         el('h2', { class: 'grupo-titulo' }, categoria.corto),
         suyos.length
@@ -209,10 +234,10 @@ function filaProducto(producto: Producto): HTMLElement {
   );
   casilla.addEventListener('change', async () => {
     const disponible = casilla.checked;
-    const { error } = await supabase.from('productos').update({ disponible }).eq('id', producto.id);
-    if (error) {
+    const { data, error } = await supabase.from('productos').update({ disponible }).eq('id', producto.id).select('id');
+    if (error || !data?.length) {
       casilla.checked = !disponible;
-      return aviso(mensajeError(error), 'error');
+      return aviso(mensajeError(error ?? SIN_PERMISO), 'error');
     }
     producto.disponible = disponible;
     fila.classList.toggle('agotado', !disponible);
@@ -224,8 +249,8 @@ function filaProducto(producto: Producto): HTMLElement {
 
 function pintarCategorias() {
   $('[data-categorias]').replaceChildren(
-    ...categorias.map((categoria) => {
-      const cuantos = productos.filter((p) => p.categoria === categoria.id).length;
+    ...activas().map((categoria) => {
+      const cuantos = activos().filter((p) => p.categoria === categoria.id).length;
       return el(
         'li',
         { class: 'fila' },
@@ -240,6 +265,66 @@ function pintarCategorias() {
       );
     }),
   );
+}
+
+function fechaCorta(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function pintarPapelera() {
+  const productosEliminados = productos.filter((p) => p.eliminado);
+  const categoriasEliminadas = categorias.filter((c) => c.eliminado);
+  const fila = (foto: string | undefined, titulo: string, detalle: string, alRestaurar: () => void) =>
+    el(
+      'li',
+      { class: 'fila fila-papelera' },
+      miniatura(foto),
+      el('div', { class: 'fila-texto' }, el('strong', {}, titulo), el('span', { class: 'nota' }, detalle)),
+      el('div', { class: 'fila-acciones' }, el('button', { type: 'button', class: 'mini', onclick: alRestaurar }, 'Restaurar')),
+    );
+  const lista = (filas: HTMLElement[], vacio: string) =>
+    filas.length ? el('ul', { class: 'filas', role: 'list' }, ...filas) : el('p', { class: 'nota' }, vacio);
+
+  $('[data-papelera-productos]').replaceChildren(
+    lista(
+      productosEliminados.map((p) =>
+        fila(p.fotos[0]?.src, p.nombre, `${precio(p.precio)} · eliminado el ${fechaCorta(p.eliminado!)}`, () =>
+          restaurar('productos', p),
+        ),
+      ),
+      'No hay productos eliminados.',
+    ),
+  );
+  $('[data-papelera-categorias]').replaceChildren(
+    lista(
+      categoriasEliminadas.map((c) =>
+        fila(c.foto, c.nombre, `/${c.id}/ · eliminada el ${fechaCorta(c.eliminado!)}`, () => restaurar('categorias', c)),
+      ),
+      'No hay secciones eliminadas.',
+    ),
+  );
+}
+
+/** Elimina de forma lógica: marca la fecha y el registro pasa a la Papelera. */
+async function marcarEliminado(tabla: 'productos' | 'categorias', registro: Producto | Categoria): Promise<boolean> {
+  const eliminado = new Date().toISOString();
+  const { data, error } = await supabase.from(tabla).update({ eliminado }).eq('id', registro.id).select('id');
+  if (error || !data?.length) {
+    aviso(mensajeError(error ?? SIN_PERMISO), 'error');
+    return false;
+  }
+  registro.eliminado = eliminado;
+  publicar();
+  return true;
+}
+
+async function restaurar(tabla: 'productos' | 'categorias', registro: Producto | Categoria) {
+  const { data, error } = await supabase.from(tabla).update({ eliminado: null }).eq('id', registro.id).select('id');
+  if (error || !data?.length) return aviso(mensajeError(error ?? SIN_PERMISO), 'error');
+  registro.eliminado = null;
+  publicar();
+  verLista('papelera');
+  aviso(`«${registro.nombre}» se restauró y vuelve a aparecer en el sitio.`);
 }
 
 // ---------------------------------------------------------------- editor de producto
@@ -267,12 +352,12 @@ function abrirProducto(producto?: Producto) {
   $('[data-eliminar]', vista).hidden = !producto;
 
   const select = $<HTMLSelectElement>('[data-select-categoria]');
-  select.replaceChildren(...categorias.map((c) => el('option', { value: c.id }, c.corto)));
+  select.replaceChildren(...activas().map((c) => el('option', { value: c.id }, c.corto)));
 
   const campo = <T extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(nombre: string) =>
     form.elements.namedItem(nombre) as T;
   campo<HTMLInputElement>('nombre').value = producto?.nombre ?? '';
-  select.value = producto?.categoria ?? categorias[0]?.id ?? '';
+  select.value = producto?.categoria ?? activas()[0]?.id ?? '';
   campo<HTMLInputElement>('precio').value = producto ? String(producto.precio) : '';
   campo<HTMLInputElement>('resumen').value = producto?.resumen ?? '';
   campo<HTMLTextAreaElement>('descripcion').value = producto?.descripcion ?? '';
@@ -468,13 +553,10 @@ async function guardarProducto(evento: SubmitEvent) {
 async function eliminarProducto() {
   const producto = edicion.original;
   if (!producto) return;
-  if (!confirm(`¿Eliminar «${producto.nombre}»? Esto no se puede deshacer.`)) return;
-  const { error } = await supabase.from('productos').delete().eq('id', producto.id);
-  if (error) return aviso(mensajeError(error), 'error');
-  productos = productos.filter((p) => p.id !== producto.id);
-  publicar();
+  if (!confirm(`¿Eliminar «${producto.nombre}»? Dejará de verse en el sitio; podrás recuperarlo desde la Papelera.`)) return;
+  if (!(await marcarEliminado('productos', producto))) return;
   verLista('productos');
-  aviso(`«${producto.nombre}» se eliminó.`);
+  aviso(`«${producto.nombre}» se movió a la Papelera.`);
 }
 
 // ---------------------------------------------------------------- editor de sección
@@ -499,7 +581,7 @@ function abrirCategoria(categoria?: Categoria) {
   campo('nombre').value = categoria?.nombre ?? '';
   campo('corto').value = categoria?.corto ?? '';
   campo('descripcion').value = categoria?.descripcion ?? '';
-  campo('orden').value = String(categoria?.orden ?? (Math.max(0, ...categorias.map((c) => c.orden)) + 1));
+  campo('orden').value = String(categoria?.orden ?? (Math.max(0, ...activas().map((c) => c.orden)) + 1));
 
   actualizarDireccionCategoria();
   pintarEleccion();
@@ -578,17 +660,14 @@ async function guardarCategoria(evento: SubmitEvent) {
 async function eliminarCategoria() {
   const categoria = edicionCategoria.original;
   if (!categoria) return;
-  if (productos.some((p) => p.categoria === categoria.id)) {
+  if (activos().some((p) => p.categoria === categoria.id)) {
     return aviso('Esta sección todavía tiene productos. Muévelos a otra sección o elimínalos primero.', 'error');
   }
-  if (categorias.length === 1) return aviso('Debe quedar al menos una sección.', 'error');
-  if (!confirm(`¿Eliminar la sección «${categoria.corto}»?`)) return;
-  const { error } = await supabase.from('categorias').delete().eq('id', categoria.id);
-  if (error) return aviso(mensajeError(error), 'error');
-  categorias = categorias.filter((c) => c.id !== categoria.id);
-  publicar();
+  if (activas().length === 1) return aviso('Debe quedar al menos una sección.', 'error');
+  if (!confirm(`¿Eliminar la sección «${categoria.corto}»? Podrás recuperarla desde la Papelera.`)) return;
+  if (!(await marcarEliminado('categorias', categoria))) return;
   verLista('categorias');
-  aviso(`La sección «${categoria.corto}» se eliminó.`);
+  aviso(`La sección «${categoria.corto}» se movió a la Papelera.`);
 }
 
 // ---------------------------------------------------------------- arranque
@@ -649,7 +728,7 @@ function conectarEventos() {
   }
 
   $('[data-nuevo="producto"]').addEventListener('click', () => {
-    if (!categorias.length) return aviso('Primero crea una sección en «Secciones».', 'error');
+    if (!activas().length) return aviso('Primero crea una sección en «Secciones».', 'error');
     abrirProducto();
   });
   $('[data-nuevo="categoria"]').addEventListener('click', () => abrirCategoria());

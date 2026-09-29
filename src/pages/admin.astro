@@ -94,6 +94,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       <nav class="pestanas" aria-label="Secciones del panel">
         <button type="button" data-pestana="productos" aria-current="page">Productos</button>
         <button type="button" data-pestana="categorias">Secciones</button>
+        <button type="button" data-pestana="papelera">Papelera</button>
       </nav>
 
       <div data-lista="productos">
@@ -111,6 +112,19 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
         </div>
         <p class="nota">Las secciones agrupan los productos en el catálogo (por ejemplo Rosas o Girasoles).</p>
         <ul class="filas" role="list" data-categorias></ul>
+      </div>
+
+      <div data-lista="papelera" hidden>
+        <div class="acciones">
+          <h1>Papelera</h1>
+        </div>
+        <p class="nota">
+          Lo que se elimina no se borra: queda aquí y deja de verse en el sitio. Restáuralo para que vuelva a aparecer.
+        </p>
+        <h2 class="grupo-titulo">Productos eliminados</h2>
+        <div data-papelera-productos></div>
+        <h2 class="grupo-titulo">Secciones eliminadas</h2>
+        <div data-papelera-categorias></div>
       </div>
 
       <p class="nota pie-panel">
@@ -375,8 +389,36 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     gap: 10px;
   }
 
+  /* En el celular, el interruptor y "Editar" van en una segunda línea para
+     que el nombre del producto se lea completo. */
+  @media (max-width: 559px) {
+    .panel :global(.fila) {
+      grid-template-columns: 56px 1fr;
+      row-gap: 6px;
+    }
+
+    .panel :global(.fila img),
+    .panel :global(.fila .sin-foto) {
+      width: 56px;
+      height: 56px;
+    }
+
+    .panel :global(.fila-acciones) {
+      grid-column: 1 / -1;
+      justify-content: space-between;
+    }
+  }
+
   .panel :global(.agotado) {
     opacity: 0.65;
+  }
+
+  .panel :global(.fila-papelera) {
+    grid-template-columns: 64px 1fr auto;
+  }
+
+  .panel :global(.fila-papelera img) {
+    filter: grayscale(0.7);
   }
 
   .interruptor,

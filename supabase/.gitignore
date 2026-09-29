@@ -6,3 +6,6 @@
 .env.keys
 .env.local
 .env.*.local
+
+# Claves del servicio del panel para pruebas locales (nunca subirlas)
+functions/.env

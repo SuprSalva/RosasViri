@@ -17,7 +17,8 @@ export async function leerTabla(tabla: 'categorias' | 'productos', orden: string
   if (!SUPABASE_URL || !SUPABASE_CLAVE) {
     throw new Error('Falta PUBLIC_SUPABASE_URL o PUBLIC_SUPABASE_ANON_KEY en el archivo .env.');
   }
-  const url = `${SUPABASE_URL}/rest/v1/${tabla}?select=*&order=${orden}`;
+  // Solo lo activo: lo eliminado (en la Papelera del panel) no se publica.
+  const url = `${SUPABASE_URL}/rest/v1/${tabla}?select=*&eliminado=is.null&order=${orden}`;
   let respuesta: Response;
   try {
     respuesta = await fetch(url, { headers: { apikey: SUPABASE_CLAVE, Authorization: `Bearer ${SUPABASE_CLAVE}` } });

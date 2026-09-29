@@ -25,49 +25,68 @@ ya escrito (producto, precio y las opciones que el cliente eligió).
 
 Tipografías: **Playfair Display** (títulos) y **Lato** (texto).
 
-## Panel de administración
+## Administración
 
-Todo el contenido se edita desde **[Pages CMS](https://app.pagescms.org)**, un panel gratuito que
-guarda los cambios en este repositorio. Cada cambio se publica solo en uno o dos minutos. La
-configuración del panel está en [`.pages.yml`](.pages.yml).
+Hay dos paneles:
 
-Desde el panel se puede editar:
+- **Catálogo** (productos, precios, fotos y secciones): el panel propio del sitio en
+  [`/admin/`](https://suprsalva.github.io/RosasViri/admin/). Guarda los datos en una base de datos
+  de [Supabase](https://supabase.com) y las fotos en este repositorio.
+- **Textos del sitio** (portada, datos de la tienda, cómo pedir, galería, opiniones, aviso de
+  privacidad): [Pages CMS](https://app.pagescms.org), configurado en [`.pages.yml`](.pages.yml).
 
-| Sección del panel | Qué se cambia | Archivo |
-|---|---|---|
-| Productos | Nombre, sección, precio, **varias fotos**, opciones, disponible, destacado, orden y descripción | `src/content/productos/*.md` |
-| Datos de la tienda | Nombre, lema, WhatsApp, correo, redes, Google (indexación, verificación, Analytics) y responsable de los datos | `src/data/tienda.json` |
-| Portada | Textos del inicio, fotos del collage y bloque de personalizados | `src/data/portada.json` |
-| Secciones del catálogo | Nombres, descripciones y foto de cada sección | `src/data/categorias.json` |
-| Cómo pedir | Pasos y preguntas frecuentes | `src/data/como-pedir.json` |
-| Pedidos personalizados | Introducción, ideas y ocasiones del formulario | `src/data/personalizados.json` |
-| Galería | Fotos de ramos entregados | `src/data/galeria.json` |
-| Opiniones | Opiniones reales de clientes (con su permiso) | `src/data/opiniones.json` |
-| Aviso de privacidad | Texto del aviso | `src/content/paginas/privacidad.md` |
+En los dos, cada cambio se publica solo en uno o dos minutos.
 
-Las fotos se guardan en [`src/assets/`](src/assets/).
+### Panel del catálogo (`/admin/`)
 
-### Primera vez
+Se entra con correo y contraseña. Desde ahí se puede:
 
-1. Entra a https://app.pagescms.org e inicia sesión con tu cuenta de GitHub.
-2. Autoriza la app de Pages CMS para el repositorio **SuprSalva/RosasViri**.
-3. Elige el repositorio y la rama **main**.
+- Crear y editar productos: nombre, sección, precio, texto corto, descripción, **varias fotos**
+  (subir, ordenar, describir, quitar), preguntas para el cliente, destacado y orden.
+- Marcar un producto como agotado con el interruptor **Disponible**, directo en la lista.
+- Crear y editar secciones del catálogo, con su foto de portada.
+- **Eliminar sin perder nada:** lo eliminado deja de verse en el sitio y pasa a la **Papelera**,
+  desde donde se restaura. La base de datos no permite borrar productos ni secciones de verdad.
 
-Para que otra persona (por ejemplo, quien atiende la tienda) pueda editar, necesita una cuenta de
-GitHub. Invítala en **Settings → Collaborators** del repositorio. Activa la verificación en dos
-pasos en todas las cuentas con acceso.
+Al subir una foto, el panel la reduce a 1600 px, la guarda como JPG y le quita los datos ocultos
+(como la ubicación GPS del celular).
+
+**Dar acceso a una persona:** en Supabase, **Authentication → Users → Invite user** con su correo
+(le llega un enlace para crear su contraseña). Después, en **SQL Editor**, dale permiso:
+
+```sql
+insert into public.administradores (usuario)
+select id from auth.users where email = 'correo@ejemplo.com';
+```
+
+Nadie puede registrarse solo. Para quitar el acceso, borra a la persona en **Authentication → Users**.
+
+### Cómo está hecho
+
+| Parte | Dónde |
+|---|---|
+| Tablas, permisos y reglas (eliminación lógica) | [`supabase/migrations/`](supabase/migrations/) |
+| Servicio que sube fotos al repositorio y lanza la publicación | [`supabase/functions/panel/`](supabase/functions/panel/index.ts) |
+| Panel | [`src/pages/admin.astro`](src/pages/admin.astro) y [`src/lib/panel/`](src/lib/panel/) |
+| Lectura del catálogo al publicar | [`src/lib/basedatos.ts`](src/lib/basedatos.ts) y [`src/content.config.ts`](src/content.config.ts) |
+
+- El sitio lee el catálogo **al publicarse**, con la clave pública (solo lectura, solo lo activo).
+  Si la base de datos no responde o viene vacía, la publicación se detiene y el sitio anterior
+  sigue en línea.
+- La conexión pública está en [`.env`](.env) (`PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY`);
+  no son secretos.
+- El servicio `panel` necesita estos secretos en Supabase (**Edge Functions → Secrets**):
+  `TOKEN_GITHUB` (clave de GitHub *fine-grained* solo para este repositorio, con **Contents: Read
+  and write** y **Actions: Read and write**) y `ORIGENES` (`https://suprsalva.github.io`).
+- Una publicación automática semanal evita que el proyecto gratis de Supabase se pause por falta de
+  uso.
 
 ### Consejos
 
-- **Fotos:** usa JPG, PNG o WEBP. La primera foto de un producto es la del catálogo; puedes
-  arrastrarlas para cambiar el orden. Las fotos tomadas con celular pueden llevar la ubicación GPS:
-  desactívala en la cámara o sube fotos que te hayas enviado por WhatsApp, que ya no la llevan.
-- **Producto agotado:** desactiva "Disponible". No hace falta borrarlo.
-- **Nuevas secciones del catálogo:** agregar una sección nueva (además de Rosas, Girasoles y Hot
-  Wheels) requiere un cambio en `.pages.yml` para que aparezca como opción en los productos.
-- **Si algo está mal escrito** (por ejemplo, un WhatsApp sin código de país o una foto que no
-  existe), la publicación se detiene y el sitio anterior sigue en línea. El error aparece en la
-  pestaña **Actions** de GitHub con el detalle de qué corregir.
+- **Producto agotado:** apaga "Disponible". No hace falta eliminarlo.
+- **Si algo está mal escrito** en Pages CMS (por ejemplo, un WhatsApp sin código de país o una foto
+  que no existe), la publicación se detiene y el sitio anterior sigue en línea. El error aparece en
+  la pestaña **Actions** de GitHub con el detalle de qué corregir.
 
 ## Aparecer en Google
 
@@ -105,6 +124,22 @@ npm run dev       # vista previa en http://localhost:4321/RosasViri/
 npm run check     # revisa errores
 npm run build     # genera el sitio en dist/
 ```
+
+Por defecto, `npm run dev` lee el catálogo de la base de datos real (la de `.env`). Si subes fotos
+desde el panel, llegan a GitHub: haz `git pull` para verlas en tu computadora (mientras tanto, el
+servidor local las omite con un aviso).
+
+**Base de datos de prueba en tu computadora** (necesita Docker Desktop abierto):
+
+```sh
+npx supabase start      # levanta Supabase local con el catálogo actual
+npx supabase db reset   # vuelve a dejarla como al inicio
+npx supabase stop       # la apaga
+```
+
+Para que el sitio use la base local, crea `.env.local` con `PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`
+y la `ANON_KEY` que muestra `npx supabase status`. Los correos (invitaciones, recuperar
+contraseña) se ven en http://127.0.0.1:54324.
 
 La política de seguridad de contenido (CSP) solo funciona en el sitio construido; para probarla usa
 `npm run build` y `npx astro preview`.
