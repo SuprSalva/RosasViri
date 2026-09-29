@@ -9,6 +9,7 @@ fotos:
 opciones:
   - nombre: Color de rosas
     ejemplo: durazno, rojo, azul...
+destacado: true
 orden: 2
 ---
 Ramo de 7 rosas eternas de color a elección envueltas en papel coreano con un moño decorativo.

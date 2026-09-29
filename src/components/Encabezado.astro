@@ -1,48 +1,104 @@
 ---
 import Logo from './Logo.astro';
-import { tienda, categorias } from '../data/tienda';
-import { ruta } from '../lib/enlaces';
-import { urlCategoria } from '../lib/catalogo';
+import Icono from './Icono.astro';
+import Redes from './Redes.astro';
+import { tienda } from '../data/tienda';
+import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+import { menu } from '../lib/navegacion';
 
 interface Props {
+  /** Página actual, para marcarla en el menú. */
   actual?: string;
 }
 const { actual } = Astro.props;
 ---
 
-<header class="encabezado">
-  <div class="contenedor fila">
-    <a class="marca" href={ruta('/')}>
+<header class="encabezado" data-encabezado>
+  <div class="contenedor barra">
+    <a class="marca" href={ruta('/')} aria-current={actual === 'inicio' ? 'page' : undefined}>
       <span class="ovalo"><Logo /></span>
       <span class="nombre">{tienda.nombre}</span>
     </a>
+
+    <nav class="nav-amplia" aria-label="Principal">
+      <ul>
+        {
+          menu.map((m) => (
+            <li>
+              <a href={m.href} aria-current={actual === m.id ? 'page' : undefined}>
+                {m.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="acciones">
+      <a class="boton pedir" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" />
+        <span class="pedir-texto">Pedir</span>
+        <span class="visualmente-oculto">por WhatsApp</span>
+      </a>
+      <button type="button" class="abrir-menu" aria-expanded="false" aria-controls="menu-movil" data-abrir-menu>
+        <span class="hamburguesa" aria-hidden="true"></span>
+        <span class="visualmente-oculto">Menú</span>
+      </button>
+    </div>
   </div>
-  <nav class="contenedor" aria-label="Secciones">
-    <div class="chips">
+
+  <nav id="menu-movil" class="menu-movil" aria-label="Principal" hidden data-menu>
+    <ul class="contenedor">
+      <li><a href={ruta('/')} aria-current={actual === 'inicio' ? 'page' : undefined}>Inicio</a></li>
       {
-        categorias.map((c) => (
-          <a class="chip" href={urlCategoria(c.id)} aria-current={actual === c.id ? 'page' : undefined}>
-            {c.corto}
-          </a>
+        menu.map((m) => (
+          <li>
+            <a href={m.href} aria-current={actual === m.id ? 'page' : undefined}>
+              {m.texto}
+            </a>
+          </li>
         ))
       }
-      <a class="chip" href={ruta('/como-pedir/')} aria-current={actual === 'como-pedir' ? 'page' : undefined}>
-        Cómo pedir
-      </a>
-    </div>
+    </ul>
+    <Redes class="redes-menu" />
   </nav>
 </header>
 
+<script>
+  const boton = document.querySelector<HTMLButtonElement>('[data-abrir-menu]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  if (boton && menu) {
+    const cambiar = (abrir: boolean) => {
+      boton.setAttribute('aria-expanded', String(abrir));
+      menu.hidden = !abrir;
+    };
+    boton.addEventListener('click', () => cambiar(boton.getAttribute('aria-expanded') !== 'true'));
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) cambiar(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) {
+        cambiar(false);
+        boton.focus();
+      }
+    });
+  }
+</script>
+
 <style>
   .encabezado {
-    padding-block: 14px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--fondo);
     border-bottom: 1px solid var(--linea);
   }
 
-  .fila {
+  .barra {
     display: flex;
-    justify-content: center;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: 16px;
+    height: var(--alto-encabezado);
   }
 
   .marca {
@@ -50,29 +106,179 @@ const { actual } = Astro.props;
     align-items: center;
     gap: 10px;
     text-decoration: none;
+    margin-right: auto;
   }
 
   .ovalo {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 54px;
+    width: 34px;
+    height: 46px;
     border-radius: 999px;
     background: var(--crema);
   }
 
   .ovalo :global(svg) {
-    width: 24px;
+    width: 20px;
   }
 
   .nombre {
-    font-family: var(--f-marca);
-    font-weight: 700;
-    font-size: 1.7rem;
+    font-family: var(--f-titulos);
+    font-weight: 600;
+    font-size: 1.45rem;
     line-height: 1;
   }
 
-  .chips {
-    justify-content: safe center;
+  .nav-amplia {
+    display: none;
+  }
+
+  .nav-amplia ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-amplia a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .nav-amplia a:hover {
+    background: var(--crema);
+  }
+
+  .nav-amplia a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pedir {
+    min-height: 40px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+  }
+
+  .abrir-menu {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--texto);
+    cursor: pointer;
+  }
+
+  .abrir-menu:hover {
+    background: var(--crema);
+  }
+
+  .hamburguesa,
+  .hamburguesa::before,
+  .hamburguesa::after {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .hamburguesa {
+    position: relative;
+  }
+
+  .hamburguesa::before,
+  .hamburguesa::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .hamburguesa::before {
+    top: -7px;
+  }
+
+  .hamburguesa::after {
+    top: 7px;
+  }
+
+  [aria-expanded='true'] .hamburguesa {
+    background: transparent;
+  }
+
+  [aria-expanded='true'] .hamburguesa::before {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  [aria-expanded='true'] .hamburguesa::after {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .menu-movil {
+    border-top: 1px solid var(--linea);
+    background: var(--fondo);
+    padding-bottom: 20px;
+    box-shadow: 0 16px 24px rgb(59 46 40 / 0.12);
+  }
+
+  .menu-movil ul {
+    list-style: none;
+    margin: 0;
+    padding-block: 8px;
+  }
+
+  .menu-movil a {
+    display: block;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--linea);
+    font-family: var(--f-titulos);
+    font-size: 1.35rem;
+    text-decoration: none;
+  }
+
+  .menu-movil a[aria-current='page'] {
+    color: var(--boton);
+  }
+
+  .menu-movil :global(.redes-menu) {
+    margin-top: 8px;
+  }
+
+  @media (max-width: 380px) {
+    .pedir-texto {
+      display: none;
+    }
+
+    .pedir {
+      padding: 8px 12px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .nav-amplia {
+      display: block;
+    }
+
+    .abrir-menu,
+    .menu-movil {
+      display: none;
+    }
   }
 </style>

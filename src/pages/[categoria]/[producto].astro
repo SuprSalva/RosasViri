@@ -2,7 +2,6 @@
 import { getCollection, render } from 'astro:content';
 import { Picture, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Encabezado from '../../components/Encabezado.astro';
 import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
 import { categorias, tienda } from '../../data/tienda';
@@ -48,8 +47,7 @@ const datos = {
 const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 ---
 
-<Base titulo={nombre} descripcion={descripcion} imagen={vistaPrevia.src} datos={datos} whatsappFlotante={false}>
-  <Encabezado slot="encabezado" actual={categoria.id} />
+<Base titulo={nombre} descripcion={descripcion} imagen={vistaPrevia.src} datos={datos} actual="catalogo">
 
   <div class="contenedor">
     <a class="volver" href={urlCategoria(categoria.id)}>
@@ -92,7 +90,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
       <div class="info">
         <h1>{nombre}</h1>
         {resumen && <p class="resumen">{resumen}</p>}
-        <p class="precio">{precio(producto.data.precio)}</p>
+        <p class="precio precio-num">{precio(producto.data.precio)}</p>
         {!disponible && <p class="aviso">Agotado por ahora. Escríbenos y te avisamos cuando vuelva.</p>}
 
         <div class="descripcion">
@@ -151,7 +149,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 
   <div class="barra" data-barra hidden>
     <div class="contenedor barra-fila">
-      <p class="barra-precio"><span class="visualmente-oculto">{nombre}: </span>{precio(producto.data.precio)}</p>
+      <p class="barra-precio precio-num"><span class="visualmente-oculto">{nombre}: </span>{precio(producto.data.precio)}</p>
       <a class="boton" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
         <Icono nombre="whatsapp" />
         {textoBoton}
@@ -244,7 +242,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     gap: 4px;
     margin-top: 16px;
     padding-block: 8px;
-    font-family: var(--f-titulos);
+    font-weight: 700;
     color: var(--texto-suave);
     text-decoration: none;
   }
@@ -301,6 +299,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 
   .fotos :global(img) {
     width: 100%;
+    height: auto;
     aspect-ratio: 1;
     object-fit: cover;
   }
@@ -369,20 +368,19 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
   }
 
   .info h1 {
-    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    font-size: clamp(2rem, 8vw, 2.8rem);
   }
 
   .resumen {
-    margin-top: 4px;
-    font-family: var(--f-titulos);
+    margin-top: 6px;
     color: var(--texto-suave);
     font-size: 1.1rem;
   }
 
   .precio {
-    margin-top: 12px;
-    font-family: var(--f-titulos);
+    margin-top: 14px;
     font-size: 2.2rem;
+    font-weight: 600;
     line-height: 1;
   }
 
@@ -420,7 +418,8 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     padding: 0;
     margin-bottom: 12px;
     font-family: var(--f-titulos);
-    font-size: 1.2rem;
+    font-weight: 600;
+    font-size: 1.3rem;
   }
 
   label {
@@ -476,8 +475,8 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
   }
 
   .barra-precio {
-    font-family: var(--f-titulos);
     font-size: 1.5rem;
+    font-weight: 600;
   }
 
   .barra .boton {

@@ -167,18 +167,21 @@ enlaces de redes y WhatsApp confirmados, y decisiones tomadas.
 
 ### 1.2 Mapa del sitio
 
-1. **Inicio (`/`)**: logo, nombre, redes, botón grande "Haz tu pedido por WhatsApp" y el
-   catálogo completo por secciones, igual que hoy, para que la clientela lo reconozca.
-2. **Categorías** (`/rosas`, `/girasoles`, `/hot-wheels`): se pueden compartir por separado en
-   historias y anuncios.
-3. **Producto** (`/producto/<nombre>`): galería, precio, descripción y opciones:
-   - Rosas y girasoles: **color de rosas a elegir**.
-   - Hot Wheels: **color de rosas** y **preferencia de carritos** (sujeto a existencias).
-   - Botón "Pedir por WhatsApp" con el mensaje ya escrito.
-4. **Cómo pedir (`/como-pedir`)**: pasos, formas de pago, tiempo de elaboración, entregas o
-   envíos, anticipo y cambios. También cuidados de las flores de listón.
-5. **Contacto (`/contacto`)**: WhatsApp, correo, redes y zona de entrega.
-6. **Aviso de privacidad (`/privacidad`)** y **página 404**.
+Estructura elegida: **portada de tienda** (29/09/2026).
+
+1. **Inicio (`/`)**: portada con frase y collage de fotos, "Elige tu ramo" (las tres secciones
+   con foto, número de modelos y precio desde), destacados, bloque de pedidos personalizados,
+   cómo pedir en 3 pasos y redes.
+2. **Catálogo (`/catalogo/`)**: todos los productos por sección.
+3. **Secciones** (`/rosas/`, `/girasoles/`, `/hot-wheels/`): se pueden compartir por separado.
+4. **Producto** (`/rosas/<producto>/`): galería, precio, descripción, opciones (color de rosas y,
+   en Hot Wheels, carritos) y botón "Pedir por WhatsApp" con el mensaje ya escrito.
+5. **Pedidos personalizados (`/pedidos-personalizados/`)**: qué se puede personalizar y un
+   formulario (ocasión, fecha, colores, presupuesto, detalles) que arma el mensaje de WhatsApp.
+6. **Galería (`/galeria/`)**: ramos entregados, fotos del catálogo y opiniones reales de clientes.
+7. **Cómo pedir (`/como-pedir/`)**: pasos y preguntas frecuentes.
+8. **Contacto (`/contacto/`)**: WhatsApp, Instagram, TikTok y correo.
+9. **Página 404**. El aviso de privacidad queda pendiente hasta que el sitio recoja datos.
 
 ### 1.3 Identidad visual
 
@@ -186,8 +189,8 @@ enlaces de redes y WhatsApp confirmados, y decisiones tomadas.
 - [ ] Logo en SVG: el original o uno redibujado a partir de la captura.
 - [ ] Favicon con el tulipán en "V", más una imagen de vista previa (1200×630) para WhatsApp,
       Facebook e Instagram.
-- [ ] Tipografías de Google Fonts parecidas a las actuales: una serif gruesa para el nombre y una
-      redondeada y amigable para títulos y tarjetas. Siempre con acentos y ñ.
+- [x] Tipografías: **Playfair Display** para títulos y **Lato** para texto (opción "Elegante",
+      elegida el 29/09/2026).
 - [ ] Diseño pensado primero para celular: la clientela llega desde Instagram y TikTok.
 - [ ] Maqueta del inicio y de la ficha de producto, aprobada antes de programar.
 

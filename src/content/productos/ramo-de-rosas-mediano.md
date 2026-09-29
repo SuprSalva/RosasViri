@@ -9,6 +9,7 @@ fotos:
 opciones:
   - nombre: Color de rosas
     ejemplo: vino y blanco, rojo...
+destacado: true
 orden: 4
 ---
 Ramo de 24 rosas eternas de listón satinado. Puedes combinar colores.

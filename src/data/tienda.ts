@@ -32,25 +32,29 @@ export const tienda = {
 
 // Secciones del catálogo, en el orden en que aparecen en el inicio.
 // El `id` es la dirección de la sección (por ejemplo /rosas/) y es el valor
-// que va en el campo `categoria` de cada producto.
+// que va en el campo `categoria` de cada producto. `foto` es el producto cuya
+// primera foto representa a la sección en la portada.
 export const categorias = [
   {
     id: 'rosas',
     nombre: 'Rosas de listón satinado',
     corto: 'Rosas',
     descripcion: 'Rosas eternas con el color que elijas.',
+    foto: 'ramo-12-rosas-clasicas',
   },
   {
     id: 'girasoles',
     nombre: 'Girasoles de listón satinado',
     corto: 'Girasoles',
     descripcion: 'Girasoles que no se marchitan.',
+    foto: 'ramo-chico-girasoles',
   },
   {
     id: 'hot-wheels',
     nombre: 'Ramos de Hot Wheels y flores de listón',
     corto: 'Hot Wheels',
     descripcion: 'Carritos y color de rosas a elegir.',
+    foto: 'carrito-3',
   },
 ] as const;
 

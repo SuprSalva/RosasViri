@@ -1,7 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Encabezado from '../components/Encabezado.astro';
-import Redes from '../components/Redes.astro';
 import Icono from '../components/Icono.astro';
 import { tienda } from '../data/tienda';
 import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
@@ -48,8 +46,11 @@ const preguntas = [
 ];
 ---
 
-<Base titulo="Cómo pedir" descripcion={`Cómo hacer tu pedido en ${tienda.nombre}: elige tu ramo, personalízalo y envíanos tu pedido por WhatsApp.`}>
-  <Encabezado slot="encabezado" actual="como-pedir" />
+<Base
+  titulo="Cómo pedir"
+  descripcion={`Cómo hacer tu pedido en ${tienda.nombre}: elige tu ramo, personalízalo y envíanos tu pedido por WhatsApp.`}
+  actual="como-pedir"
+>
   <div class="contenedor pagina">
     <h1>Cómo pedir</h1>
     <p class="intro">Todos nuestros ramos se hacen a mano. Pedir es muy fácil:</p>
@@ -85,9 +86,11 @@ const preguntas = [
       }
     </div>
 
-    <h2>Síguenos</h2>
-    <p>Mira nuestros ramos más nuevos en redes sociales.</p>
-    <Redes class="redes-contacto" />
+    <h2>¿Tienes otra duda?</h2>
+    <p>
+      Escríbenos por <a href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">WhatsApp</a> o mira
+      todas las formas de <a href={ruta('/contacto/')}>contacto</a>.
+    </p>
   </div>
 </Base>
 
@@ -125,7 +128,9 @@ const preguntas = [
     border-radius: 50%;
     background: var(--tarjeta);
     font-family: var(--f-titulos);
+    font-weight: 600;
     font-size: 1.2rem;
+    font-variant-numeric: lining-nums;
   }
 
   .pasos h2 {
@@ -153,17 +158,12 @@ const preguntas = [
   summary {
     padding: 16px 20px;
     font-family: var(--f-titulos);
-    font-size: 1.1rem;
+    font-weight: 600;
+    font-size: 1.15rem;
     cursor: pointer;
   }
 
   details p {
     padding: 0 20px 18px;
-  }
-
-  .pagina :global(.redes-contacto) {
-    justify-content: flex-start;
-    margin-top: 8px;
-    margin-left: -8px;
   }
 </style>

@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import { catalogo, urlCategoria } from '../lib/catalogo';
+
+const secciones = (await catalogo()).filter((s) => s.productos.length > 0);
+---
+
+<Base
+  titulo="Catálogo"
+  descripcion="Todos nuestros ramos: rosas eternas, girasoles y ramos con carritos Hot Wheels hechos a mano con listón satinado."
+  actual="catalogo"
+>
+  <div class="contenedor pagina">
+    <div class="pagina-cabeza">
+      <p class="antetitulo">Hecho a mano con listón satinado</p>
+      <h1>Catálogo</h1>
+      <p class="intro">Toca un ramo para ver sus fotos, personalizarlo y pedirlo por WhatsApp.</p>
+    </div>
+    <nav class="chips indice" aria-label="Secciones del catálogo">
+      {
+        secciones.map(({ categoria }) => (
+          <a class="chip" href={`#${categoria.id}`}>
+            {categoria.corto}
+          </a>
+        ))
+      }
+    </nav>
+
+    {
+      secciones.map(({ categoria, productos }, i) => (
+        <section class="seccion" id={categoria.id} aria-labelledby={`titulo-${categoria.id}`}>
+          <div class="cabeza">
+            <h2 class="seccion-titulo" id={`titulo-${categoria.id}`}>
+              {categoria.nombre}
+            </h2>
+            <p class="seccion-descripcion">{categoria.descripcion}</p>
+          </div>
+          <ul class="rejilla" role="list">
+            {productos.map((producto, j) => (
+              <li>
+                <TarjetaProducto producto={producto} prioridad={i === 0 && j < 2} />
+              </li>
+            ))}
+          </ul>
+          <p class="solo">
+            <a class="enlace-flecha" href={urlCategoria(categoria.id)}>
+              Solo {categoria.corto.toLowerCase()}
+            </a>
+          </p>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .indice {
+    margin-top: 20px;
+  }
+
+  .seccion {
+    padding-top: 36px;
+  }
+
+  .cabeza {
+    display: grid;
+    gap: 4px;
+  }
+
+  .seccion-titulo {
+    font-size: clamp(1.5rem, 5.5vw, 2rem);
+  }
+
+  .solo {
+    margin-top: 14px;
+    text-align: right;
+  }
+</style>

@@ -1,12 +1,13 @@
 ---
-import '@fontsource/arvo/700.css';
-import '@fontsource/short-stack/400.css';
-import '@fontsource-variable/nunito/index.css';
+import '@fontsource/playfair-display/600.css';
+import '@fontsource/playfair-display/600-italic.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
 import '../styles/global.css';
+import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
-import Icono from '../components/Icono.astro';
 import { tienda } from '../data/tienda';
-import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+import { ruta } from '../lib/enlaces';
 
 interface Props {
   titulo?: string;
@@ -15,10 +16,11 @@ interface Props {
   imagen?: string;
   /** Datos estructurados para Google (schema.org). */
   datos?: object;
-  whatsappFlotante?: boolean;
+  /** Página actual, para marcarla en el menú. */
+  actual?: string;
 }
 
-const { titulo, descripcion = tienda.descripcion, imagen, datos, whatsappFlotante = true } = Astro.props;
+const { titulo, descripcion = tienda.descripcion, imagen, datos, actual } = Astro.props;
 
 const tituloCompleto = titulo ? `${titulo} | ${tienda.nombre}` : `${tienda.nombre} · ${tienda.lema}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);
@@ -52,18 +54,10 @@ const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
   </head>
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
-    <slot name="encabezado" />
+    <Encabezado actual={actual} />
     <main id="contenido">
       <slot />
     </main>
     <Pie />
-    {
-      whatsappFlotante && (
-        <a class="whatsapp-flotante" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
-          <Icono nombre="whatsapp" />
-          <span class="visualmente-oculto">Haz tu pedido por WhatsApp</span>
-        </a>
-      )
-    }
   </body>
 </html>

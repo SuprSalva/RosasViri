@@ -8,6 +8,7 @@ fotos:
 opciones:
   - nombre: Color de rosas
     ejemplo: rojo, rosa, azul...
+destacado: true
 orden: 3
 ---
 Ramo de listón satinado con girasol al centro y rosas del color que elijas.

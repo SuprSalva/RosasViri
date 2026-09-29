@@ -1,4 +1,4 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { categorias } from '../data/tienda';
 import { ruta } from './enlaces';
 
@@ -16,8 +16,22 @@ export async function productosDe(categoria: string): Promise<Producto[]> {
 /** Cada categoría con sus productos, en el orden definido en tienda.ts. */
 export async function catalogo() {
   return Promise.all(
-    categorias.map(async (categoria) => ({ categoria, productos: await productosDe(categoria.id) })),
+    categorias.map(async (categoria) => {
+      const productos = await productosDe(categoria.id);
+      const precios = productos.map((p) => p.data.precio);
+      return {
+        categoria,
+        productos,
+        desde: precios.length ? Math.min(...precios) : undefined,
+        portada: await getEntry('productos', categoria.foto),
+      };
+    }),
   );
+}
+
+/** Productos marcados con `destacado: true`, en el orden del catálogo. */
+export async function destacados(): Promise<Producto[]> {
+  return (await catalogo()).flatMap((s) => s.productos.filter((p) => p.data.destacado));
 }
 
 export function urlProducto(producto: Producto): string {

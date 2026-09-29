@@ -22,6 +22,8 @@ const productos = defineCollection({
         .array(z.object({ nombre: z.string(), ejemplo: z.string().optional() }))
         .default([]),
       disponible: z.boolean().default(true),
+      // Aparece en "Destacados" en la portada.
+      destacado: z.boolean().default(false),
       // Posición dentro de su sección: el número más bajo va primero.
       orden: z.number().default(100),
     }),

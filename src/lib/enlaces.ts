@@ -22,3 +22,9 @@ export function mensajePedido(producto?: { nombre: string; precio: number }): st
 export function precio(valor: number): string {
   return `$${valor.toLocaleString('es-MX')}`;
 }
+
+/** "@usuario" a partir del enlace de una red social. */
+export function usuarioDe(url: string): string {
+  const partes = new URL(url).pathname.split('/').filter(Boolean);
+  return `@${(partes[0] ?? '').replace(/^@/, '')}`;
+}

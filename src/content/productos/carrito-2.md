@@ -11,6 +11,7 @@ opciones:
     ejemplo: rojas, azules, negras...
   - nombre: Carritos que te gustan
     ejemplo: deportivos, clásicos, camionetas...
+destacado: true
 orden: 2
 ---
 Ramo con 3 carritos Hot Wheels y 3 rosas eternas de listón satinado. Los modelos de carritos dependen de las existencias: dinos qué te gusta y te confirmamos por WhatsApp.
