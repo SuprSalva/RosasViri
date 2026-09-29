@@ -40,4 +40,4 @@ jobs:
       url: ${{ steps.publicacion.outputs.page_url }}
     steps:
       - id: publicacion
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
