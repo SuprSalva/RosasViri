@@ -4,7 +4,7 @@ categoria: rosas
 resumen: Rosas clásicas
 precio: 50
 fotos:
-  - src: ./fotos/rosa-eterna-1.jpg
+  - src: /src/assets/productos/rosa-eterna-1.jpg
     alt: Rosa roja de listón satinado envuelta en papel negro con moño rojo
 opciones:
   - nombre: Color de la rosa

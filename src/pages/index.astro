@@ -1,71 +1,75 @@
 ---
-import { getEntry } from 'astro:content';
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
 import TarjetaProducto from '../components/TarjetaProducto.astro';
-import { tienda } from '../data/tienda';
+import { comoPedir, portada, tienda } from '../data/tienda';
 import { catalogo, destacados, urlCategoria } from '../lib/catalogo';
 import { enlaceWhatsApp, mensajePedido, precio, ruta, usuarioDe } from '../lib/enlaces';
+import { anchos, imagen } from '../lib/imagenes';
 
 const secciones = (await catalogo()).filter((s) => s.productos.length > 0);
 const favoritos = await destacados();
+const collage = portada.fotos.map(imagen);
+const pasos = comoPedir.pasos;
+const perfiles = [
+  { icono: 'instagram', red: 'Instagram', url: tienda.redes.instagram },
+  { icono: 'tiktok', red: 'TikTok', url: tienda.redes.tiktok },
+  { icono: 'facebook', red: 'Facebook', url: tienda.redes.facebook },
+] as const;
 
-// Fotos del collage de la portada.
-const collage = await Promise.all(
-  ['unico-girasol', 'ramo-chico-de-rosas', 'carrito-2'].map((id) => getEntry('productos', id)),
-);
-
-const pasos = [
-  { titulo: 'Elige tu ramo', texto: 'Explora el catálogo y toca el que más te guste.' },
-  { titulo: 'Personalízalo', texto: 'Escribe el color de rosas y, si aplica, los carritos.' },
-  { titulo: 'Pídelo por WhatsApp', texto: 'El mensaje ya va escrito. Te confirmamos entrega y pago.' },
+const inicio = new URL(ruta('/'), Astro.site).href;
+const datos = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: tienda.nombre,
+    description: tienda.descripcion,
+    url: inicio,
+    logo: new URL(ruta('/icono-512.png'), Astro.site).href,
+    email: tienda.correo || undefined,
+    sameAs: Object.values(tienda.redes).filter(Boolean),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: tienda.nombre,
+    url: inicio,
+    inLanguage: 'es-MX',
+  },
 ];
-
-const datos = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: tienda.nombre,
-  description: tienda.descripcion,
-  url: new URL(ruta('/'), Astro.site).href,
-  logo: new URL(ruta('/apple-touch-icon.png'), Astro.site).href,
-  email: tienda.correo || undefined,
-  sameAs: Object.values(tienda.redes).filter(Boolean),
-};
 ---
 
 <Base datos={datos} actual="inicio">
   <section class="portada contenedor">
     <div class="portada-texto">
-      <p class="antetitulo">Hecho a mano con listón satinado</p>
-      <h1>Flores que duran <em>para siempre</em></h1>
-      <p class="portada-bajada">
-        Rosas eternas, girasoles y ramos con carritos Hot Wheels. Elige el tuyo y pídelo por WhatsApp.
-      </p>
+      <p class="antetitulo">{portada.antetitulo}</p>
+      <h1>
+        {portada.titulo}{portada.tituloCursiva && ' '}
+        {portada.tituloCursiva && <em>{portada.tituloCursiva}</em>}
+      </h1>
+      <p class="portada-bajada">{portada.bajada}</p>
       <div class="portada-botones">
         <a class="boton" href={ruta('/catalogo/')}>Ver catálogo</a>
-        <a class="boton boton-secundario" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
+        <a class="boton boton-secundario" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener noreferrer">
           <Icono nombre="whatsapp" />
           Pedir por WhatsApp
         </a>
       </div>
     </div>
-    <div class="collage" aria-hidden="true">
+    <div class={`collage collage-${collage.length}`} aria-hidden="true">
       {
-        collage.map(
-          (p, i) =>
-            p && (
-              <Picture
-                src={p.data.fotos[0].src}
-                alt=""
-                formats={['avif', 'webp']}
-                widths={[240, 360, p.data.fotos[0].src.width].filter((w) => w <= p.data.fotos[0].src.width)}
-                sizes="(min-width: 960px) 180px, 32vw"
-                loading="eager"
-                fetchpriority={i === 1 ? 'high' : undefined}
-              />
-            ),
-        )
+        collage.map((foto, i) => (
+          <Picture
+            src={foto}
+            alt=""
+            formats={['avif', 'webp']}
+            widths={anchos(foto, [240, 360, 480])}
+            sizes="(min-width: 960px) 180px, 32vw"
+            loading="eager"
+            fetchpriority={i === 1 ? 'high' : undefined}
+          />
+        ))
       }
     </div>
   </section>
@@ -77,18 +81,16 @@ const datos = {
     </div>
     <ul class="categorias" role="list">
       {
-        secciones.map(({ categoria, productos, desde, portada }) => (
+        secciones.map(({ categoria, productos, desde, foto }) => (
           <li>
             <a class="categoria" href={urlCategoria(categoria.id)}>
-              {portada && (
-                <Picture
-                  src={portada.data.fotos[0].src}
-                  alt=""
-                  formats={['avif', 'webp']}
-                  widths={[240, 360, portada.data.fotos[0].src.width].filter((w) => w <= portada.data.fotos[0].src.width)}
-                  sizes="(min-width: 960px) 340px, (min-width: 640px) 30vw, 40vw"
-                />
-              )}
+              <Picture
+                src={foto}
+                alt=""
+                formats={['avif', 'webp']}
+                widths={anchos(foto, [240, 360, 480])}
+                sizes="(min-width: 960px) 340px, (min-width: 640px) 30vw, 40vw"
+              />
               <div class="categoria-texto">
                 <h3>{categoria.corto}</h3>
                 <p>{categoria.descripcion}</p>
@@ -138,11 +140,8 @@ const datos = {
     <div class="personalizados">
       <div>
         <p class="antetitulo">Pedidos personalizados</p>
-        <h2>¿Tienes una idea especial?</h2>
-        <p>
-          Cumpleaños, aniversarios, graduaciones o simplemente porque sí. Cuéntanos qué colores y qué estilo quieres, y
-          armamos un ramo a tu medida.
-        </p>
+        <h2>{portada.personalizados.titulo}</h2>
+        <p>{portada.personalizados.texto}</p>
       </div>
       <a class="boton" href={ruta('/pedidos-personalizados/')}>Pedir un ramo personalizado</a>
     </div>
@@ -175,28 +174,18 @@ const datos = {
     </div>
     <ul class="perfiles" role="list">
       {
-        tienda.redes.instagram && (
-          <li>
-            <a href={tienda.redes.instagram} target="_blank" rel="noopener">
-              <Icono nombre="instagram" />
-              <span>
-                Instagram <strong>{usuarioDe(tienda.redes.instagram)}</strong>
-              </span>
-            </a>
-          </li>
-        )
-      }
-      {
-        tienda.redes.tiktok && (
-          <li>
-            <a href={tienda.redes.tiktok} target="_blank" rel="noopener">
-              <Icono nombre="tiktok" />
-              <span>
-                TikTok <strong>{usuarioDe(tienda.redes.tiktok)}</strong>
-              </span>
-            </a>
-          </li>
-        )
+        perfiles
+          .filter((p) => p.url)
+          .map((p) => (
+            <li>
+              <a href={p.url} target="_blank" rel="noopener noreferrer">
+                <Icono nombre={p.icono} />
+                <span>
+                  {p.red} <strong>{usuarioDe(p.url)}</strong>
+                </span>
+              </a>
+            </li>
+          ))
       }
     </ul>
     <p class="ver-todo">
@@ -258,7 +247,16 @@ const datos = {
     padding-top: 24px;
   }
 
-  .collage :global(picture:nth-child(2)) {
+  .collage-1 {
+    grid-template-columns: minmax(0, 260px);
+    justify-content: center;
+  }
+
+  .collage-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .collage-3 :global(picture:nth-child(2)) {
     transform: translateY(-24px);
   }
 
@@ -426,8 +424,14 @@ const datos = {
 
   @media (min-width: 640px) {
     .pasos {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .pasos {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
   }
 

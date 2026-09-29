@@ -1,13 +1,13 @@
 ---
-import { siInstagram, siTiktok, siWhatsapp } from 'simple-icons';
+import { siFacebook, siInstagram, siTiktok, siWhatsapp } from 'simple-icons';
 
 interface Props {
-  nombre: 'whatsapp' | 'instagram' | 'tiktok' | 'correo' | 'compartir' | 'flecha';
+  nombre: 'whatsapp' | 'instagram' | 'tiktok' | 'facebook' | 'correo' | 'compartir' | 'flecha' | 'flecha-der';
   class?: string;
 }
 const { nombre, class: clase } = Astro.props;
 
-const marcas = { whatsapp: siWhatsapp, instagram: siInstagram, tiktok: siTiktok } as const;
+const marcas = { whatsapp: siWhatsapp, instagram: siInstagram, tiktok: siTiktok, facebook: siFacebook } as const;
 const marca = nombre in marcas ? marcas[nombre as keyof typeof marcas] : undefined;
 ---
 
@@ -43,6 +43,7 @@ const marca = nombre in marcas ? marcas[nombre as keyof typeof marcas] : undefin
         </>
       )}
       {nombre === 'flecha' && <path d="m15 18-6-6 6-6" />}
+      {nombre === 'flecha-der' && <path d="m9 18 6-6-6-6" />}
     </svg>
   )
 }

@@ -4,6 +4,7 @@ import '@fontsource/playfair-display/600-italic.css';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../styles/global.css';
+import AvisoCookies from '../components/AvisoCookies.astro';
 import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
 import { tienda } from '../data/tienda';
@@ -18,13 +19,18 @@ interface Props {
   datos?: object;
   /** Página actual, para marcarla en el menú. */
   actual?: string;
+  /** Pide a Google que no muestre esta página (404, administración). */
+  noindex?: boolean;
 }
 
-const { titulo, descripcion = tienda.descripcion, imagen, datos, actual } = Astro.props;
+const { titulo, descripcion = tienda.descripcion, imagen, datos, actual, noindex = false } = Astro.props;
 
 const tituloCompleto = titulo ? `${titulo} | ${tienda.nombre}` : `${tienda.nombre} · ${tienda.lema}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);
 const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
+const ocultar = noindex || !tienda.google.indexar;
+// Evita que un texto con "</script>" cierre la etiqueta antes de tiempo.
+const jsonLd = datos && JSON.stringify(datos).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -35,10 +41,14 @@ const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
     <title>{tituloCompleto}</title>
     <meta name="description" content={descripcion} />
     <link rel="canonical" href={canonica} />
-    {!tienda.indexar && <meta name="robots" content="noindex" />}
+    {ocultar && <meta name="robots" content="noindex" />}
+    {tienda.google.verificacion && <meta name="google-site-verification" content={tienda.google.verificacion} />}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#f2e6d8" />
+    <link rel="icon" href={ruta('/favicon.ico')} sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href={ruta('/favicon.svg')} />
     <link rel="apple-touch-icon" href={ruta('/apple-touch-icon.png')} />
+    <link rel="manifest" href={ruta('/site.webmanifest')} />
     <link rel="sitemap" href={ruta('/sitemap-index.xml')} />
 
     <meta property="og:type" content="website" />
@@ -50,7 +60,7 @@ const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
     <meta property="og:image" content={vistaPrevia} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    {datos && <script type="application/ld+json" set:html={JSON.stringify(datos)} />}
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
   </head>
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -59,5 +69,6 @@ const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
       <slot />
     </main>
     <Pie />
+    {tienda.google.analytics && <AvisoCookies idAnalytics={tienda.google.analytics} />}
   </body>
 </html>

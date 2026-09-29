@@ -1,7 +1,8 @@
 ---
 import { Picture } from 'astro:assets';
 import { precio } from '../lib/enlaces';
-import { urlProducto, type Producto } from '../lib/catalogo';
+import { altFoto, urlProducto, type Producto } from '../lib/catalogo';
+import { anchos } from '../lib/imagenes';
 
 interface Props {
   producto: Producto;
@@ -11,17 +12,15 @@ interface Props {
 const { producto, nivel: Titulo = 'h3', prioridad = false } = Astro.props;
 const { nombre, resumen, fotos, disponible } = producto.data;
 const foto = fotos[0];
-// Tamaños a generar, sin pasar del tamaño de la foto original.
-const anchos = [240, 360, 480, 640].filter((w) => w < foto.src.width).concat(Math.min(foto.src.width, 800));
 ---
 
 <a class="tarjeta" href={urlProducto(producto)}>
   <div class="foto">
     <Picture
       src={foto.src}
-      alt={foto.alt}
+      alt={altFoto(producto, 0)}
       formats={['avif', 'webp']}
-      widths={anchos}
+      widths={anchos(foto.src, [240, 360, 480, 640])}
       sizes="(min-width: 1040px) 240px, (min-width: 960px) 23vw, (min-width: 640px) 31vw, 46vw"
       loading={prioridad ? 'eager' : 'lazy'}
       fetchpriority={prioridad ? 'high' : undefined}

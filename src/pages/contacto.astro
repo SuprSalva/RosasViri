@@ -4,7 +4,12 @@ import Icono from '../components/Icono.astro';
 import { tienda } from '../data/tienda';
 import { enlaceWhatsApp, mensajePedido, ruta, usuarioDe } from '../lib/enlaces';
 
-type Canal = { icono: 'whatsapp' | 'instagram' | 'tiktok' | 'correo'; titulo: string; detalle: string; href: string };
+type Canal = {
+  icono: 'whatsapp' | 'instagram' | 'tiktok' | 'facebook' | 'correo';
+  titulo: string;
+  detalle: string;
+  href: string;
+};
 
 const canales: Canal[] = [
   {
@@ -18,6 +23,8 @@ if (tienda.redes.instagram)
   canales.push({ icono: 'instagram', titulo: 'Instagram', detalle: usuarioDe(tienda.redes.instagram), href: tienda.redes.instagram });
 if (tienda.redes.tiktok)
   canales.push({ icono: 'tiktok', titulo: 'TikTok', detalle: usuarioDe(tienda.redes.tiktok), href: tienda.redes.tiktok });
+if (tienda.redes.facebook)
+  canales.push({ icono: 'facebook', titulo: 'Facebook', detalle: usuarioDe(tienda.redes.facebook), href: tienda.redes.facebook });
 if (tienda.correo)
   canales.push({ icono: 'correo', titulo: 'Correo', detalle: tienda.correo, href: `mailto:${tienda.correo}` });
 ---
@@ -42,7 +49,7 @@ if (tienda.correo)
               class:list={['canal', { principal: i === 0 }]}
               href={c.href}
               target={c.icono === 'correo' ? undefined : '_blank'}
-              rel="noopener"
+              rel="noopener noreferrer"
             >
               <Icono nombre={c.icono} />
               <span>

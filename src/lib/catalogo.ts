@@ -1,6 +1,7 @@
-import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { categorias } from '../data/tienda';
 import { ruta } from './enlaces';
+import { imagen } from './imagenes';
 
 export type Producto = CollectionEntry<'productos'>;
 
@@ -13,7 +14,7 @@ export async function productosDe(categoria: string): Promise<Producto[]> {
   return productos.sort(porOrden);
 }
 
-/** Cada categoría con sus productos, en el orden definido en tienda.ts. */
+/** Cada categoría con sus productos, en el orden de categorias.json. */
 export async function catalogo() {
   return Promise.all(
     categorias.map(async (categoria) => {
@@ -23,7 +24,7 @@ export async function catalogo() {
         categoria,
         productos,
         desde: precios.length ? Math.min(...precios) : undefined,
-        portada: await getEntry('productos', categoria.foto),
+        foto: imagen(categoria.foto),
       };
     }),
   );
@@ -32,6 +33,14 @@ export async function catalogo() {
 /** Productos marcados con `destacado: true`, en el orden del catálogo. */
 export async function destacados(): Promise<Producto[]> {
   return (await catalogo()).flatMap((s) => s.productos.filter((p) => p.data.destacado));
+}
+
+/** Texto alternativo de una foto de producto (la descripción es opcional). */
+export function altFoto(producto: Producto, indice: number): string {
+  const foto = producto.data.fotos[indice];
+  if (foto?.alt) return foto.alt;
+  const total = producto.data.fotos.length;
+  return total > 1 ? `${producto.data.nombre}, foto ${indice + 1} de ${total}` : producto.data.nombre;
 }
 
 export function urlProducto(producto: Producto): string {

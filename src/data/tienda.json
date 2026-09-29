@@ -1,0 +1,22 @@
+{
+  "nombre": "Rossvtienda",
+  "lema": "Flores de listón satinado hechas a mano",
+  "descripcion": "Rosas eternas, girasoles y ramos con carritos Hot Wheels, hechos a mano con listón satinado.",
+  "whatsapp": "",
+  "correo": "fatimaviridiana.77@gmail.com",
+  "redes": {
+    "instagram": "https://www.instagram.com/_rossv_/",
+    "tiktok": "https://www.tiktok.com/@ross_v1_",
+    "facebook": ""
+  },
+  "moneda": "MXN",
+  "google": {
+    "indexar": true,
+    "verificacion": "",
+    "analytics": ""
+  },
+  "responsable": {
+    "nombre": "",
+    "domicilio": ""
+  }
+}

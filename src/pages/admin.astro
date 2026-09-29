@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import { tienda } from '../data/tienda';
+
+const repositorio = 'SuprSalva/RosasViri';
+---
+
+<Base titulo="Administración" descripcion={`Panel de administración de ${tienda.nombre}.`} noindex>
+  <div class="contenedor pagina admin">
+    <div class="pagina-cabeza">
+      <p class="antetitulo">Solo para la tienda</p>
+      <h1>Administración</h1>
+      <p class="intro">
+        Aquí se editan los productos, las fotos, los precios, los textos y los datos de contacto. Cada cambio se publica
+        solo en uno o dos minutos.
+      </p>
+    </div>
+
+    <a class="boton" href="https://app.pagescms.org" rel="noopener noreferrer">Entrar al panel</a>
+
+    <h2>Cómo entrar</h2>
+    <ol>
+      <li>Toca «Entrar al panel» e inicia sesión con tu cuenta de GitHub.</li>
+      <li>Elige el proyecto <strong>{repositorio}</strong> y la rama <strong>main</strong>.</li>
+      <li>En el menú verás: Productos, Datos de la tienda, Portada, Secciones, Cómo pedir, Pedidos personalizados, Galería, Opiniones y Aviso de privacidad.</li>
+    </ol>
+
+    <h2>Para dar acceso a otra persona</h2>
+    <p>
+      Necesita una cuenta de GitHub. Quien administra el proyecto la invita desde GitHub en{' '}
+      <em>Settings → Collaborators</em>. Por seguridad, activa la verificación en dos pasos en todas las cuentas con
+      acceso.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .admin {
+    max-width: 760px;
+  }
+
+  .admin .boton {
+    margin-top: 24px;
+  }
+
+  ol {
+    padding-left: 1.25em;
+  }
+
+  li + li {
+    margin-top: 6px;
+  }
+</style>

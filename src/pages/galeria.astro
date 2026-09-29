@@ -2,33 +2,20 @@
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { opiniones } from '../data/opiniones';
-import { tienda } from '../data/tienda';
+import { galeria, opiniones, tienda } from '../data/tienda';
+import { altFoto, catalogo, urlProducto } from '../lib/catalogo';
 import { enlaceWhatsApp, usuarioDe } from '../lib/enlaces';
-import { catalogo, urlProducto } from '../lib/catalogo';
+import { anchos, imagen } from '../lib/imagenes';
 
-// Fotos de ramos entregados: cualquier imagen dentro de src/content/galeria/.
-// El nombre del archivo sirve de descripción; si empieza con fecha
-// (2026-10-05-ramo-rojo.jpg) se ordenan de la más nueva a la más vieja.
-const archivos = import.meta.glob<{ default: ImageMetadata }>(
-  '../content/galeria/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
-  { eager: true },
-);
-const entregados = Object.entries(archivos)
-  .sort(([a], [b]) => b.localeCompare(a))
-  .map(([ruta, modulo]) => {
-    const nombre = ruta
-      .split('/')
-      .pop()!
-      .replace(/\.[^.]+$/, '')
-      .replace(/^\d{4}-\d{2}-\d{2}-?/, '')
-      .replace(/[-_]+/g, ' ')
-      .trim();
-    return { src: modulo.default, alt: nombre ? nombre[0].toUpperCase() + nombre.slice(1) : 'Ramo entregado' };
-  });
+// Fotos de ramos entregados: se agregan desde el panel (src/data/galeria.json).
+const entregados = galeria.map((item) => ({
+  src: imagen(item.foto),
+  alt: item.descripcion || `Ramo entregado por ${tienda.nombre}`,
+  descripcion: item.descripcion,
+}));
 
 const delCatalogo = (await catalogo()).flatMap((s) =>
-  s.productos.flatMap((p) => p.data.fotos.map((foto) => ({ foto, producto: p }))),
+  s.productos.flatMap((p) => p.data.fotos.map((foto, i) => ({ src: foto.src, alt: altFoto(p, i), producto: p }))),
 );
 
 const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
@@ -51,10 +38,17 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
         <section aria-labelledby="entregados">
           <h2 id="entregados">Ramos entregados</h2>
           <ul class="mosaico" role="list">
-            {entregados.map(({ src, alt }) => (
+            {entregados.map(({ src, alt, descripcion }) => (
               <li>
                 <figure>
-                  <Picture src={src} alt={alt} formats={['avif', 'webp']} widths={[320, 480, 720].filter((w) => w <= src.width)} sizes="(min-width: 900px) 340px, 50vw" />
+                  <Picture
+                    src={src}
+                    alt={alt}
+                    formats={['avif', 'webp']}
+                    widths={anchos(src, [320, 480, 720])}
+                    sizes="(min-width: 900px) 340px, 50vw"
+                  />
+                  {descripcion && <figcaption>{descripcion}</figcaption>}
                 </figure>
               </li>
             ))}
@@ -67,15 +61,15 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
       <h2 id="catalogo">Del catálogo</h2>
       <ul class="mosaico" role="list">
         {
-          delCatalogo.map(({ foto, producto }) => (
+          delCatalogo.map(({ src, alt, producto }) => (
             <li>
               <a href={urlProducto(producto)}>
                 <figure>
                   <Picture
-                    src={foto.src}
-                    alt={foto.alt}
+                    src={src}
+                    alt={alt}
                     formats={['avif', 'webp']}
-                    widths={[320, foto.src.width].filter((w) => w <= foto.src.width)}
+                    widths={anchos(src, [320, 480])}
                     sizes="(min-width: 900px) 340px, 50vw"
                   />
                   <figcaption>{producto.data.nombre}</figcaption>
@@ -121,7 +115,7 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
           )
         }
       </p>
-      <a class="boton" href={enlaceWhatsApp(invitacion)} target="_blank" rel="noopener">
+      <a class="boton" href={enlaceWhatsApp(invitacion)} target="_blank" rel="noopener noreferrer">
         <Icono nombre="whatsapp" />
         Mandar mi foto
       </a>

@@ -1,0 +1,341 @@
+# Panel de administración de Rossvtienda (Pages CMS: https://app.pagescms.org).
+# Cada cambio que se guarda en el panel se publica solo en 1–2 minutos.
+
+media:
+  input: src/assets
+  output: /src/assets
+  extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: productos
+    label: Productos
+    type: collection
+    path: src/content/productos
+    filename: "{fields.nombre}.md"
+    view:
+      fields: [nombre, categoria, precio, disponible, destacado]
+      primary: nombre
+      sort: [categoria, orden, nombre]
+    fields:
+      - name: nombre
+        label: Nombre
+        type: string
+        required: true
+      - name: categoria
+        label: Sección
+        type: select
+        required: true
+        options:
+          values:
+            - value: rosas
+              label: Rosas
+            - value: girasoles
+              label: Girasoles
+            - value: hot-wheels
+              label: Hot Wheels
+      - name: resumen
+        label: Texto corto de la tarjeta
+        description: Por ejemplo "12 rosas" o "Ramo 3 carritos 3 rosas".
+        type: string
+      - name: precio
+        label: Precio
+        description: Solo el número, sin el signo $.
+        type: number
+        required: true
+      - name: fotos
+        label: Fotos
+        description: Puedes subir varias. La primera es la que aparece en el catálogo; arrástralas para cambiar el orden.
+        type: object
+        list:
+          min: 1
+        fields:
+          - name: src
+            label: Foto
+            type: image
+            required: true
+          - name: alt
+            label: Descripción de la foto (opcional)
+            description: Ayuda a Google y a personas con lectores de pantalla. Ej. "Ramo de 12 rosas azules".
+            type: string
+      - name: opciones
+        label: Lo que el cliente puede elegir
+        description: Aparecen como campos antes del botón de WhatsApp y se agregan al mensaje.
+        type: object
+        list: true
+        fields:
+          - name: nombre
+            label: Pregunta
+            description: Ej. "Color de rosas" o "Carritos que te gustan".
+            type: string
+            required: true
+          - name: ejemplo
+            label: Ejemplo
+            description: Ej. "rojo, rosa, azul...".
+            type: string
+      - name: disponible
+        label: Disponible
+        description: Si lo desactivas, el producto aparece como "Agotado".
+        type: boolean
+        default: true
+      - name: destacado
+        label: Destacado en la portada
+        type: boolean
+        default: false
+      - name: orden
+        label: Orden dentro de su sección
+        description: El número más bajo aparece primero.
+        type: number
+        default: 100
+      - name: body
+        label: Descripción
+        type: rich-text
+
+  - name: tienda
+    label: Datos de la tienda
+    type: file
+    path: src/data/tienda.json
+    format: json
+    fields:
+      - name: nombre
+        label: Nombre de la tienda
+        type: string
+        required: true
+      - name: lema
+        label: Lema
+        type: string
+      - name: descripcion
+        label: Descripción para Google y redes
+        type: text
+      - name: whatsapp
+        label: WhatsApp para pedidos
+        description: Con código de país y sin espacios. En México, 52 seguido de los 10 dígitos (ej. 5215512345678).
+        type: string
+      - name: correo
+        label: Correo de contacto
+        type: string
+      - name: redes
+        label: Redes sociales
+        type: object
+        fields:
+          - name: instagram
+            label: Instagram (enlace completo)
+            type: string
+          - name: tiktok
+            label: TikTok (enlace completo)
+            type: string
+          - name: facebook
+            label: Facebook (enlace completo)
+            type: string
+      - name: moneda
+        label: Moneda
+        description: Código de 3 letras, por ejemplo MXN.
+        type: string
+      - name: google
+        label: Google
+        type: object
+        fields:
+          - name: indexar
+            label: Mostrar el sitio en Google
+            type: boolean
+            default: true
+          - name: verificacion
+            label: Código de verificación de Google Search Console
+            description: Pega la etiqueta <meta> que da Search Console o solo el código.
+            type: string
+          - name: analytics
+            label: ID de Google Analytics
+            description: Empieza con G-. Si lo llenas, aparece el aviso de cookies y solo se mide a quien acepta.
+            type: string
+      - name: responsable
+        label: Responsable de los datos (aviso de privacidad)
+        type: object
+        fields:
+          - name: nombre
+            label: Nombre completo
+            type: string
+          - name: domicilio
+            label: Domicilio
+            type: text
+
+  - name: portada
+    label: Portada
+    type: file
+    path: src/data/portada.json
+    format: json
+    fields:
+      - name: antetitulo
+        label: Texto pequeño sobre el título
+        type: string
+      - name: titulo
+        label: Título
+        type: string
+      - name: tituloCursiva
+        label: Final del título en cursiva
+        type: string
+      - name: bajada
+        label: Texto bajo el título
+        type: text
+      - name: fotos
+        label: Fotos de la portada
+        description: De 1 a 3 fotos.
+        type: image
+        list:
+          min: 1
+          max: 3
+      - name: personalizados
+        label: Bloque de pedidos personalizados
+        type: object
+        fields:
+          - name: titulo
+            label: Título
+            type: string
+          - name: texto
+            label: Texto
+            type: text
+
+  - name: categorias
+    label: Secciones del catálogo
+    type: file
+    path: src/data/categorias.json
+    format: json
+    fields:
+      - name: categorias
+        label: Secciones
+        type: object
+        list: true
+        fields:
+          - name: id
+            label: Identificador
+            description: "No lo cambies: es la dirección de la sección (por ejemplo, rosas → /rosas/)."
+            type: string
+            required: true
+          - name: nombre
+            label: Nombre completo
+            type: string
+          - name: corto
+            label: Nombre corto (menús y botones)
+            type: string
+          - name: descripcion
+            label: Descripción
+            type: string
+          - name: foto
+            label: Foto de la sección en la portada
+            type: image
+
+  - name: como-pedir
+    label: Cómo pedir y preguntas frecuentes
+    type: file
+    path: src/data/como-pedir.json
+    format: json
+    fields:
+      - name: pasos
+        label: Pasos
+        type: object
+        list: true
+        fields:
+          - name: titulo
+            label: Título
+            type: string
+          - name: texto
+            label: Texto
+            type: text
+      - name: preguntas
+        label: Preguntas frecuentes
+        type: object
+        list: true
+        fields:
+          - name: pregunta
+            label: Pregunta
+            type: string
+          - name: respuesta
+            label: Respuesta
+            type: text
+
+  - name: personalizados
+    label: Pedidos personalizados
+    type: file
+    path: src/data/personalizados.json
+    format: json
+    fields:
+      - name: intro
+        label: Texto de introducción
+        type: text
+      - name: ideas
+        label: Qué se puede personalizar
+        type: object
+        list: true
+        fields:
+          - name: titulo
+            label: Título
+            type: string
+          - name: texto
+            label: Texto
+            type: text
+      - name: ocasiones
+        label: Ocasiones del formulario
+        type: string
+        list: true
+      - name: aviso
+        label: Nota bajo la lista
+        type: text
+
+  - name: galeria
+    label: Galería
+    type: file
+    path: src/data/galeria.json
+    format: json
+    fields:
+      - name: fotos
+        label: Fotos de ramos entregados
+        type: object
+        list: true
+        fields:
+          - name: foto
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción
+            type: string
+          - name: fecha
+            label: Fecha
+            type: date
+
+  - name: opiniones
+    label: Opiniones de clientes
+    type: file
+    path: src/data/opiniones.json
+    format: json
+    fields:
+      - name: opiniones
+        label: Opiniones
+        description: Solo opiniones reales y con permiso de quien las escribió.
+        type: object
+        list: true
+        fields:
+          - name: nombre
+            label: Nombre
+            type: string
+            required: true
+          - name: texto
+            label: Opinión
+            type: text
+            required: true
+          - name: producto
+            label: Producto (opcional)
+            type: string
+
+  - name: privacidad
+    label: Aviso de privacidad
+    type: file
+    path: src/content/paginas/privacidad.md
+    fields:
+      - name: titulo
+        label: Título
+        type: string
+      - name: actualizado
+        label: Última actualización
+        type: date
+      - name: body
+        label: Texto
+        type: rich-text

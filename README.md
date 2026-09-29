@@ -2,7 +2,8 @@
 
 Sitio web de **Rossvtienda** (flores de listón satinado y ramos con carritos Hot Wheels), que
 sustituye a la página de Beacons `beacons.ai/rossvtienda`. El plan completo está en
-[`PLAN_DE_TRABAJO.md`](PLAN_DE_TRABAJO.md).
+[`PLAN_DE_TRABAJO.md`](PLAN_DE_TRABAJO.md) y la auditoría de seguridad en
+[`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md).
 
 Los pedidos se hacen por WhatsApp: cada producto tiene un botón que abre el chat con un mensaje
 ya escrito (producto, precio y las opciones que el cliente eligió).
@@ -14,66 +15,85 @@ ya escrito (producto, precio y las opciones que el cliente eligió).
 | Inicio | `/` | Portada, secciones del catálogo, destacados, personalizados, cómo pedir y redes |
 | Catálogo | `/catalogo/` | Todos los productos por sección |
 | Sección | `/rosas/`, `/girasoles/`, `/hot-wheels/` | Productos de una sección |
-| Producto | `/rosas/ramo-chico-de-rosas/` | Fotos, precio, opciones y botón de WhatsApp |
+| Producto | `/rosas/ramo-chico-de-rosas/` | Galería de fotos, precio, opciones y botón de WhatsApp |
 | Personalizados | `/pedidos-personalizados/` | Formulario que arma un mensaje de WhatsApp con la idea del cliente |
 | Galería | `/galeria/` | Ramos entregados, fotos del catálogo y opiniones de clientes |
 | Cómo pedir | `/como-pedir/` | Pasos y preguntas frecuentes |
-| Contacto | `/contacto/` | WhatsApp, Instagram, TikTok y correo |
+| Contacto | `/contacto/` | WhatsApp, Instagram, TikTok, Facebook y correo |
+| Aviso de privacidad | `/privacidad/` | Datos del responsable, uso de datos, derechos ARCO y cookies |
+| Administración | `/admin/` | Cómo entrar al panel (no aparece en Google) |
 
 Tipografías: **Playfair Display** (títulos) y **Lato** (texto).
 
-## Cambiar datos de la tienda
+## Panel de administración
 
-Todo está en [`src/data/tienda.ts`](src/data/tienda.ts): número de WhatsApp, correo, redes
-sociales y las secciones del catálogo (con la foto que representa a cada una en la portada). Los
-datos marcados con `POR CONFIRMAR` hay que revisarlos antes del lanzamiento.
+Todo el contenido se edita desde **[Pages CMS](https://app.pagescms.org)**, un panel gratuito que
+guarda los cambios en este repositorio. Cada cambio se publica solo en uno o dos minutos. La
+configuración del panel está en [`.pages.yml`](.pages.yml).
 
-## Agregar o editar productos
+Desde el panel se puede editar:
 
-Cada producto es un archivo en [`src/content/productos/`](src/content/productos/), y sus fotos
-van en [`src/content/productos/fotos/`](src/content/productos/fotos/).
+| Sección del panel | Qué se cambia | Archivo |
+|---|---|---|
+| Productos | Nombre, sección, precio, **varias fotos**, opciones, disponible, destacado, orden y descripción | `src/content/productos/*.md` |
+| Datos de la tienda | Nombre, lema, WhatsApp, correo, redes, Google (indexación, verificación, Analytics) y responsable de los datos | `src/data/tienda.json` |
+| Portada | Textos del inicio, fotos del collage y bloque de personalizados | `src/data/portada.json` |
+| Secciones del catálogo | Nombres, descripciones y foto de cada sección | `src/data/categorias.json` |
+| Cómo pedir | Pasos y preguntas frecuentes | `src/data/como-pedir.json` |
+| Pedidos personalizados | Introducción, ideas y ocasiones del formulario | `src/data/personalizados.json` |
+| Galería | Fotos de ramos entregados | `src/data/galeria.json` |
+| Opiniones | Opiniones reales de clientes (con su permiso) | `src/data/opiniones.json` |
+| Aviso de privacidad | Texto del aviso | `src/content/paginas/privacidad.md` |
 
-Para agregar un producto, copia un archivo existente, cámbiale el nombre (el nombre del archivo
-es la dirección de la página, por ejemplo `ramo-chico-de-rosas.md` →
-`/rosas/ramo-chico-de-rosas/`) y edita los datos:
+Las fotos se guardan en [`src/assets/`](src/assets/).
 
-```md
----
-nombre: Ramo chico de rosas
-categoria: rosas              # rosas, girasoles o hot-wheels
-resumen: Rosas clásicas       # texto corto de la tarjeta (opcional)
-precio: 220
-fotos:                        # la primera es la de la tarjeta
-  - src: ./fotos/ramo-chico-de-rosas-1.jpg
-    alt: Ramo de 7 rosas color durazno envuelto en papel blanco
-opciones:                     # lo que el cliente escribe antes de pedir (opcional)
-  - nombre: Color de rosas
-    ejemplo: durazno, rojo, azul...
-disponible: true              # false muestra "Agotado"
-destacado: true               # aparece en "Destacados" en la portada
-orden: 2                      # posición dentro de su sección
----
-Descripción del producto.
-```
+### Primera vez
 
-- **Cambiar un precio:** edita `precio`.
-- **Producto agotado:** pon `disponible: false`. No hace falta borrarlo.
-- **Más fotos:** agrega más elementos a `fotos`. La página del producto las muestra en carrusel.
+1. Entra a https://app.pagescms.org e inicia sesión con tu cuenta de GitHub.
+2. Autoriza la app de Pages CMS para el repositorio **SuprSalva/RosasViri**.
+3. Elige el repositorio y la rama **main**.
 
-## Galería y opiniones
+Para que otra persona (por ejemplo, quien atiende la tienda) pueda editar, necesita una cuenta de
+GitHub. Invítala en **Settings → Collaborators** del repositorio. Activa la verificación en dos
+pasos en todas las cuentas con acceso.
 
-- **Fotos de ramos entregados:** súbelas a [`src/content/galeria/`](src/content/galeria/). El nombre
-  del archivo es la descripción de la foto, por ejemplo `2026-10-05-ramo-rosas-rojas.jpg` (si
-  empieza con la fecha, las más nuevas salen primero). Mientras la carpeta esté vacía, esa
-  sección no aparece.
-- **Opiniones de clientes:** agrégalas en [`src/data/opiniones.ts`](src/data/opiniones.ts). Solo
-  opiniones reales y con permiso de quien las escribió.
+### Consejos
 
-Se puede editar desde la web de GitHub (botón de lápiz en cada archivo). Al guardar en `main`,
-el sitio se vuelve a publicar solo en uno o dos minutos.
+- **Fotos:** usa JPG, PNG o WEBP. La primera foto de un producto es la del catálogo; puedes
+  arrastrarlas para cambiar el orden. Las fotos tomadas con celular pueden llevar la ubicación GPS:
+  desactívala en la cámara o sube fotos que te hayas enviado por WhatsApp, que ya no la llevan.
+- **Producto agotado:** desactiva "Disponible". No hace falta borrarlo.
+- **Nuevas secciones del catálogo:** agregar una sección nueva (además de Rosas, Girasoles y Hot
+  Wheels) requiere un cambio en `.pages.yml` para que aparezca como opción en los productos.
+- **Si algo está mal escrito** (por ejemplo, un WhatsApp sin código de país o una foto que no
+  existe), la publicación se detiene y el sitio anterior sigue en línea. El error aparece en la
+  pestaña **Actions** de GitHub con el detalle de qué corregir.
 
-> Las fotos actuales son **provisionales**: se recortaron de capturas de pantalla de Beacons.
-> Hay que reemplazarlas por las fotos originales, con el mismo nombre de archivo.
+## Aparecer en Google
+
+El sitio ya está listo para Google: títulos y descripciones por página, sitemap, datos
+estructurados de productos (con precio y fotos), rutas de navegación y datos de la tienda. La
+opción "Mostrar el sitio en Google" está activada en **Datos de la tienda**.
+
+1. Entra a [Google Search Console](https://search.google.com/search-console) y agrega una propiedad
+   de tipo **Prefijo de URL** con `https://suprsalva.github.io/RosasViri/`.
+2. Elige verificar con **Etiqueta HTML**, copia la etiqueta y pégala en el panel, en **Datos de la
+   tienda → Google → Código de verificación**. Espera a que se publique y pulsa **Verificar**.
+3. En Search Console, ve a **Sitemaps** y envía `https://suprsalva.github.io/RosasViri/sitemap-index.xml`.
+4. Crea o actualiza el **Perfil de Empresa de Google** con el enlace al sitio.
+
+Cuando conectes un dominio propio, repite estos pasos con el dominio nuevo.
+
+## Cookies y privacidad
+
+- El sitio **no usa cookies** mientras no se active Google Analytics.
+- Para medir visitas, pega el ID de Google Analytics (empieza con `G-`) en **Datos de la tienda →
+  Google**. A partir de ahí aparece el aviso de cookies: Analytics solo se carga si la persona
+  acepta, y puede cambiar su decisión en "Preferencias de cookies" al pie de la página. La sección
+  de cookies del aviso de privacidad se actualiza sola.
+- **Aviso de privacidad:** llena el **nombre completo y el domicilio del responsable** en **Datos de
+  la tienda → Responsable**; mientras falten, la página dice "Por completar". Se recomienda que un
+  abogado revise el texto antes del lanzamiento.
 
 ## Trabajar en la computadora
 
@@ -86,20 +106,20 @@ npm run check     # revisa errores
 npm run build     # genera el sitio en dist/
 ```
 
+La política de seguridad de contenido (CSP) solo funciona en el sitio construido; para probarla usa
+`npm run build` y `npx astro preview`.
+
 ## Publicación
 
 El sitio se publica en GitHub Pages con [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml)
-cada vez que hay cambios en `main`. Para activarlo la primera vez: en GitHub, **Settings → Pages →
-Source: GitHub Actions**. Quedará en https://suprsalva.github.io/RosasViri/.
-
-Mientras el sitio esté en prueba, `indexar: false` en `src/data/tienda.ts` evita que Google lo
-muestre en sus resultados.
+cada vez que hay cambios en `main`, y queda en https://suprsalva.github.io/RosasViri/.
+[Dependabot](.github/dependabot.yml) revisa cada semana las actualizaciones de seguridad.
 
 ### Conectar el dominio propio
 
 1. En `astro.config.mjs`, cambia `site` por el dominio (por ejemplo `https://rossvtienda.com`)
    y `base` por `'/'`.
 2. Crea el archivo `public/CNAME` con el dominio (por ejemplo `rossvtienda.com`).
-3. En GitHub, **Settings → Pages → Custom domain**, escribe el dominio y activa HTTPS.
+3. En GitHub, **Settings → Pages → Custom domain**, escribe el dominio y activa **Enforce HTTPS**.
 4. Configura el DNS del dominio según las instrucciones de GitHub Pages.
-5. Cambia `indexar` a `true` en `src/data/tienda.ts`.
+5. Repite los pasos de [Aparecer en Google](#aparecer-en-google) con el dominio nuevo.

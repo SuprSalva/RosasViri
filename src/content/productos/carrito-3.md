@@ -5,7 +5,7 @@ categoria: hot-wheels
 resumen: Ramo 3 carritos 5 rosas
 precio: 380
 fotos:
-  - src: ./fotos/carrito-3-1.jpg
+  - src: /src/assets/productos/carrito-3-1.jpg
     alt: Ramo con 3 carritos Hot Wheels y rosas azules en papel negro con moño azul
 opciones:
   - nombre: Color de rosas

@@ -1,16 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { tienda } from '../data/tienda';
+import { personalizados, tienda } from '../data/tienda';
 
-const ideas = [
-  { titulo: 'Tus colores', texto: 'Rosas y papel en los tonos que prefieras.' },
-  { titulo: 'El tamaño que buscas', texto: 'Desde una sola flor hasta un ramo grande.' },
-  { titulo: 'Combina', texto: 'Rosas, girasoles y carritos Hot Wheels en un mismo ramo.' },
-  { titulo: 'Para cada ocasión', texto: 'Cumpleaños, aniversarios, graduaciones y fechas especiales.' },
-];
-
-const ocasiones = ['Cumpleaños', 'Aniversario', 'Graduación', 'San Valentín', 'Día de las Madres', 'Otra'];
+const { intro, ideas, ocasiones, aviso } = personalizados;
 const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
 ---
 
@@ -23,7 +16,7 @@ const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
     <div class="pagina-cabeza">
       <p class="antetitulo">A tu medida</p>
       <h1>Pedidos personalizados</h1>
-      <p class="intro">¿Tienes una idea especial? Cuéntanos qué te imaginas y te decimos si es posible y cuánto costaría.</p>
+      <p class="intro">{intro}</p>
     </div>
 
     <div class="columnas">
@@ -39,12 +32,10 @@ const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
             ))
           }
         </ul>
-        <p class="nota aviso">
-          Te recomendamos escribirnos con anticipación, sobre todo cerca del 14 de febrero y del 10 de mayo.
-        </p>
+        {aviso && <p class="nota aviso">{aviso}</p>}
       </section>
 
-      <form class="formulario" data-personalizado data-mensaje={mensaje}>
+      <form class="formulario" data-personalizado data-mensaje={mensaje} data-numero={tienda.whatsapp}>
         <h2>Cuéntanos tu idea</h2>
         <label class="campo">
           <span>Ocasión</span>
@@ -80,7 +71,7 @@ const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
 </Base>
 
 <script>
-  import { enlaceWhatsApp } from '../lib/enlaces';
+  import { urlWhatsApp } from '../lib/whatsapp';
 
   const formulario = document.querySelector<HTMLFormElement>('[data-personalizado]');
   formulario?.addEventListener('submit', (evento) => {
@@ -96,7 +87,7 @@ const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
       if (campo.type === 'date') valor = valor.split('-').reverse().join('/');
       mensaje += `\n${campo.name}: ${valor}`;
     }
-    const url = enlaceWhatsApp(mensaje);
+    const url = urlWhatsApp(formulario.dataset.numero ?? '', mensaje);
     const ventana = window.open(url, '_blank');
     if (ventana) ventana.opener = null;
     else location.href = url;

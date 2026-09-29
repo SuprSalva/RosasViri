@@ -1,11 +1,12 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Picture, getImage } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
+import GaleriaProducto from '../../components/GaleriaProducto.astro';
 import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
 import { categorias, tienda } from '../../data/tienda';
-import { productosDe, urlCategoria, urlProducto, type Producto } from '../../lib/catalogo';
+import { altFoto, productosDe, urlCategoria, urlProducto, type Producto } from '../../lib/catalogo';
 import { enlaceWhatsApp, mensajePedido, precio, ruta } from '../../lib/enlaces';
 
 export async function getStaticPaths() {
@@ -27,28 +28,43 @@ const relacionados = (await productosDe(categoria.id)).filter((p) => p.id !== pr
 
 const mensaje = mensajePedido(producto.data);
 const descripcion = [resumen, producto.body?.trim()].filter(Boolean).join('. ');
-const vistaPrevia = await getImage({ src: fotos[0].src, format: 'jpg', width: Math.min(fotos[0].src.width, 1200) });
+const fotosGaleria = fotos.map((foto, i) => ({ src: foto.src, alt: altFoto(producto, i) }));
+const paraGoogle = await Promise.all(
+  fotos.map((foto) => getImage({ src: foto.src, format: 'jpg', width: Math.min(foto.src.width, 1200) })),
+);
+const absoluta = (url: string) => new URL(url, Astro.site).href;
 
-const datos = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: nombre,
-  description: descripcion,
-  image: new URL(vistaPrevia.src, Astro.site).href,
-  brand: { '@type': 'Brand', name: tienda.nombre },
-  offers: {
-    '@type': 'Offer',
-    price: producto.data.precio,
-    priceCurrency: tienda.moneda,
-    availability: disponible ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-    url: new URL(urlProducto(producto), Astro.site).href,
+const datos = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: nombre,
+    description: descripcion,
+    image: paraGoogle.map((img) => absoluta(img.src)),
+    brand: { '@type': 'Brand', name: tienda.nombre },
+    offers: {
+      '@type': 'Offer',
+      price: producto.data.precio,
+      priceCurrency: tienda.moneda,
+      availability: disponible ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: absoluta(urlProducto(producto)),
+    },
   },
-};
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { name: 'Inicio', item: absoluta(ruta('/')) },
+      { name: 'Catálogo', item: absoluta(ruta('/catalogo/')) },
+      { name: categoria.nombre, item: absoluta(urlCategoria(categoria.id)) },
+      { name: nombre, item: absoluta(urlProducto(producto)) },
+    ].map((paso, i) => ({ '@type': 'ListItem', position: i + 1, ...paso })),
+  },
+];
 const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 ---
 
-<Base titulo={nombre} descripcion={descripcion} imagen={vistaPrevia.src} datos={datos} actual="catalogo">
-
+<Base titulo={nombre} descripcion={descripcion} imagen={paraGoogle[0].src} datos={datos} actual="catalogo">
   <div class="contenedor">
     <a class="volver" href={urlCategoria(categoria.id)}>
       <Icono nombre="flecha" />
@@ -56,36 +72,12 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     </a>
 
     <article class="producto">
-      <div class="galeria">
-        <div class="fotos" data-fotos>
-          {
-            fotos.map((foto, i) => (
-              <Picture
-                src={foto.src}
-                alt={foto.alt}
-                formats={['avif', 'webp']}
-                widths={[360, 480, 720, 960].filter((w) => w < foto.src.width).concat(Math.min(foto.src.width, 1200))}
-                sizes="(min-width: 960px) 500px, 100vw"
-                loading={i === 0 ? 'eager' : 'lazy'}
-                fetchpriority={i === 0 ? 'high' : undefined}
-              />
-            ))
-          }
-        </div>
-        {
-          fotos.length > 1 && (
-            <div class="puntos" aria-label="Fotos">
-              {fotos.map((_, i) => (
-                <button type="button" data-punto={i} aria-label={`Ver foto ${i + 1} de ${fotos.length}`} aria-current={i === 0 ? 'true' : undefined} />
-              ))}
-            </div>
-          )
-        }
+      <GaleriaProducto fotos={fotosGaleria}>
         <button type="button" class="compartir" data-compartir>
           <Icono nombre="compartir" />
           <span class="visualmente-oculto">Compartir este producto</span>
         </button>
-      </div>
+      </GaleriaProducto>
 
       <div class="info">
         <h1>{nombre}</h1>
@@ -97,7 +89,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
           <Content />
         </div>
 
-        <form class="pedido" data-pedido data-mensaje={mensaje}>
+        <form class="pedido" data-pedido data-mensaje={mensaje} data-numero={tienda.whatsapp}>
           {
             opciones.length > 0 && (
               <fieldset>
@@ -117,7 +109,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
               </fieldset>
             )
           }
-          <a class="boton pedir" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
+          <a class="boton pedir" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener noreferrer">
             <Icono nombre="whatsapp" />
             {textoBoton}
           </a>
@@ -150,7 +142,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
   <div class="barra" data-barra hidden>
     <div class="contenedor barra-fila">
       <p class="barra-precio precio-num"><span class="visualmente-oculto">{nombre}: </span>{precio(producto.data.precio)}</p>
-      <a class="boton" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
+      <a class="boton" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener noreferrer">
         <Icono nombre="whatsapp" />
         {textoBoton}
       </a>
@@ -160,7 +152,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 </Base>
 
 <script>
-  import { enlaceWhatsApp } from '../../lib/enlaces';
+  import { urlWhatsApp } from '../../lib/whatsapp';
 
   // Arma el mensaje de WhatsApp con lo que el cliente escribió.
   const formulario = document.querySelector<HTMLFormElement>('[data-pedido]');
@@ -172,7 +164,8 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
         const valor = campo.value.trim();
         if (valor) mensaje += `\n${campo.name}: ${valor}`;
       }
-      botones.forEach((boton) => (boton.href = enlaceWhatsApp(mensaje)));
+      const url = urlWhatsApp(formulario.dataset.numero ?? '', mensaje);
+      botones.forEach((boton) => (boton.href = url));
     };
     formulario.addEventListener('input', actualizar);
     formulario.addEventListener('submit', (evento) => {
@@ -190,25 +183,6 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     new IntersectionObserver(([entrada]) => {
       barra.hidden = entrada.isIntersecting;
     }).observe(principal);
-  }
-
-  // Galería: puntos para cambiar de foto.
-  const fotos = document.querySelector<HTMLElement>('[data-fotos]');
-  const puntos = document.querySelectorAll<HTMLButtonElement>('[data-punto]');
-  if (fotos && puntos.length) {
-    puntos.forEach((punto) =>
-      punto.addEventListener('click', () => {
-        fotos.scrollTo({ left: Number(punto.dataset.punto) * fotos.clientWidth, behavior: 'smooth' });
-      }),
-    );
-    fotos.addEventListener(
-      'scroll',
-      () => {
-        const actual = Math.round(fotos.scrollLeft / fotos.clientWidth);
-        puntos.forEach((p, i) => p.toggleAttribute('aria-current', i === actual));
-      },
-      { passive: true },
-    );
   }
 
   // Compartir: menú nativo del celular o, si no hay, copiar el enlace.
@@ -269,69 +243,10 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
       align-items: start;
     }
 
-    .galeria {
+    .producto :global(.galeria) {
       position: sticky;
-      top: 16px;
+      top: calc(var(--alto-encabezado) + 16px);
     }
-  }
-
-  .galeria {
-    position: relative;
-  }
-
-  .fotos {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    border-radius: var(--radio);
-    background: var(--crema);
-    scrollbar-width: none;
-  }
-
-  .fotos::-webkit-scrollbar {
-    display: none;
-  }
-
-  .fotos :global(picture) {
-    flex: 0 0 100%;
-    scroll-snap-align: center;
-  }
-
-  .fotos :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: cover;
-  }
-
-  .puntos {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-    margin-top: 8px;
-  }
-
-  .puntos button {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-  }
-
-  .puntos button::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--linea);
-  }
-
-  .puntos button[aria-current]::before {
-    background: var(--texto);
   }
 
   .compartir {

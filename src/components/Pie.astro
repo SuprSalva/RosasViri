@@ -26,7 +26,19 @@ import { menu } from '../lib/navegacion';
         }
       </ul>
     </nav>
-    <p class="legal">© {new Date().getFullYear()} {tienda.nombre} · Hecho a mano con listón satinado</p>
+    <p class="legal">
+      © {new Date().getFullYear()} {tienda.nombre} · <a href={ruta('/privacidad/')}>Aviso de privacidad</a>
+      {
+        tienda.google.analytics && (
+          <>
+            {' · '}
+            <button type="button" class="enlace-boton" data-preferencias-cookies>
+              Preferencias de cookies
+            </button>
+          </>
+        )
+      }
+    </p>
   </div>
 </footer>
 
@@ -96,5 +108,19 @@ import { menu } from '../lib/navegacion';
     margin-top: 16px;
     font-size: 0.9rem;
     color: var(--texto-suave);
+  }
+
+  .legal a,
+  .enlace-boton {
+    color: inherit;
+  }
+
+  .enlace-boton {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

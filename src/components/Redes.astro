@@ -11,6 +11,7 @@ const { class: clase } = Astro.props;
 const enlaces = [
   { nombre: 'tiktok', etiqueta: 'TikTok', href: tienda.redes.tiktok },
   { nombre: 'instagram', etiqueta: 'Instagram', href: tienda.redes.instagram },
+  { nombre: 'facebook', etiqueta: 'Facebook', href: tienda.redes.facebook },
   { nombre: 'whatsapp', etiqueta: 'WhatsApp', href: enlaceWhatsApp(mensajePedido()) },
   { nombre: 'correo', etiqueta: 'Correo', href: tienda.correo && `mailto:${tienda.correo}` },
 ] as const;
@@ -22,7 +23,7 @@ const enlaces = [
       .filter((e) => e.href)
       .map((e) => (
         <li>
-          <a href={e.href} target={e.nombre === 'correo' ? undefined : '_blank'} rel="noopener">
+          <a href={e.href} target={e.nombre === 'correo' ? undefined : '_blank'} rel="noopener noreferrer">
             <Icono nombre={e.nombre} />
             <span class="visualmente-oculto">
               {e.etiqueta} de {tienda.nombre}
