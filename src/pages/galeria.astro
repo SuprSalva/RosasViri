@@ -46,7 +46,7 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
                     alt={alt}
                     formats={['avif', 'webp']}
                     widths={anchos(src, [320, 480, 720])}
-                    sizes="(min-width: 900px) 340px, 50vw"
+                    sizes="(min-width: 1400px) 25vw, (min-width: 640px) 33vw, 50vw"
                   />
                   {descripcion && <figcaption>{descripcion}</figcaption>}
                 </figure>
@@ -70,7 +70,7 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
                     alt={alt}
                     formats={['avif', 'webp']}
                     widths={anchos(src, [320, 480])}
-                    sizes="(min-width: 900px) 340px, 50vw"
+                    sizes="(min-width: 1400px) 25vw, (min-width: 640px) 33vw, 50vw"
                   />
                   <figcaption>{producto.data.nombre}</figcaption>
                 </figure>
@@ -136,6 +136,12 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
     .mosaico {
       columns: 3;
       column-gap: 16px;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .mosaico {
+      columns: 4;
     }
   }
 

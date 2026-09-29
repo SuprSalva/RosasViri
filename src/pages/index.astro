@@ -65,7 +65,7 @@ const datos = [
             alt=""
             formats={['avif', 'webp']}
             widths={anchos(foto, [240, 360, 480])}
-            sizes="(min-width: 960px) 180px, 32vw"
+            sizes="(min-width: 900px) 15vw, 32vw"
             loading="eager"
             fetchpriority={i === 1 ? 'high' : undefined}
           />
@@ -89,7 +89,7 @@ const datos = [
                 alt=""
                 formats={['avif', 'webp']}
                 widths={anchos(foto, [240, 360, 480])}
-                sizes="(min-width: 960px) 340px, (min-width: 640px) 30vw, 40vw"
+                sizes="(min-width: 1200px) 14vw, (min-width: 640px) 30vw, 40vw"
               />
               <div class="categoria-texto">
                 <h3>{categoria.corto}</h3>
@@ -321,6 +321,16 @@ const datos = [
   @media (min-width: 640px) {
     .categoria :global(img) {
       aspect-ratio: 1;
+    }
+  }
+
+  /* En pantallas anchas, foto y texto lado a lado para que la tarjeta no crezca tanto. */
+  @media (min-width: 1200px) {
+    .categoria {
+      grid-template-columns: 45% 1fr;
+      align-items: center;
+      gap: 24px;
+      padding: 14px;
     }
   }
 

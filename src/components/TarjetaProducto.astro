@@ -21,7 +21,7 @@ const foto = fotos[0];
       alt={altFoto(producto, 0)}
       formats={['avif', 'webp']}
       widths={anchos(foto.src, [240, 360, 480, 640])}
-      sizes="(min-width: 1040px) 240px, (min-width: 960px) 23vw, (min-width: 640px) 31vw, 46vw"
+      sizes="(min-width: 1800px) 16vw, (min-width: 1400px) 19vw, (min-width: 960px) 23vw, (min-width: 640px) 31vw, 46vw"
       loading={prioridad ? 'eager' : 'lazy'}
       fetchpriority={prioridad ? 'high' : undefined}
     />
