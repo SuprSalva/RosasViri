@@ -81,6 +81,17 @@ const esquemaPortada = z.object({
 
 const esquemaComoPedir = z.object({
   pasos: z.array(texto).min(1),
+  // Formas de entrega (puntos, a domicilio, Uber...). `datos` es lo que el
+  // cliente debe mandar para esa entrega.
+  entregas: z
+    .array(
+      z.object({
+        titulo: z.string(),
+        puntos: z.array(z.string()).default([]),
+        datos: z.array(z.string()).default([]),
+      }),
+    )
+    .default([]),
   preguntas: z.array(z.object({ pregunta: z.string(), respuesta: z.string() })),
 });
 

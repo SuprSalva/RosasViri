@@ -223,7 +223,7 @@ content:
             type: image
 
   - name: como-pedir
-    label: Cómo pedir y preguntas frecuentes
+    label: Cómo pedir, entregas y preguntas frecuentes
     type: file
     path: src/data/como-pedir.json
     format: json
@@ -239,6 +239,26 @@ content:
           - name: texto
             label: Texto
             type: text
+      - name: entregas
+        label: Formas de entrega
+        type: object
+        list: true
+        fields:
+          - name: titulo
+            label: Título
+            description: Ej. "En puntos de entrega" o "Por Uber".
+            type: string
+            required: true
+          - name: puntos
+            label: Cómo funciona
+            description: Una idea por renglón.
+            type: string
+            list: true
+          - name: datos
+            label: Datos que debe mandar el cliente (opcional)
+            description: Ej. "Nombre de quien recibe".
+            type: string
+            list: true
       - name: preguntas
         label: Preguntas frecuentes
         type: object

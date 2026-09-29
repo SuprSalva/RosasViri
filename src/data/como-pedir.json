@@ -5,11 +5,48 @@
     { "titulo": "Envíanos tu pedido", "texto": "Toca «Pedir por WhatsApp»: el mensaje ya va escrito con tu elección." },
     { "titulo": "Te confirmamos", "texto": "Te confirmamos disponibilidad, fecha de entrega y forma de pago." }
   ],
+  "entregas": [
+    {
+      "titulo": "En puntos de entrega",
+      "puntos": [
+        "Entregamos los viernes y sábados.",
+        "El jueves te decimos los lugares y horarios disponibles para que elijas el que te quede mejor.",
+        "Confirma tu lugar a más tardar el día anterior por la mañana.",
+        "Tienes 10 minutos de tolerancia para recoger tu paquete.",
+        "Si no llegas por tu paquete, ya no podrás volver a agendar una entrega en persona."
+      ],
+      "datos": []
+    },
+    {
+      "titulo": "Entrega personalizada",
+      "puntos": [
+        "Las fechas disponibles cambian; normalmente hay una semana al mes.",
+        "Agendamos el día y la hora según la disponibilidad.",
+        "El costo de la entrega se cotiza según el lugar."
+      ],
+      "datos": [
+        "Nombre de quien recibe",
+        "Dirección completa: calle, número y colonia",
+        "Color de la fachada",
+        "Número interior, si lo hay"
+      ]
+    },
+    {
+      "titulo": "Por Uber",
+      "puntos": [
+        "Avísanos a más tardar a las 8 p. m. del día anterior.",
+        "Te mandamos una foto de tu pedido terminado. Cuando verifiques que todo está bien, se liquida el pago total.",
+        "Tú pides el Uber a la dirección que te enviamos por mensaje.",
+        "Si tenemos disponibilidad, también podemos pedirlo nosotros: te enviamos el costo del Uber más el de tu pedido. El costo del Uber puede variar según la aplicación."
+      ],
+      "datos": []
+    }
+  ],
   "preguntas": [
     { "pregunta": "¿Las flores se marchitan?", "respuesta": "No. Son flores de listón satinado hechas a mano: no necesitan agua y duran muchísimo si las cuidas." },
     { "pregunta": "¿Puedo elegir los colores?", "respuesta": "Sí. Dinos qué colores te gustan y te confirmamos si los tenemos." },
     { "pregunta": "¿Puedo elegir los carritos Hot Wheels?", "respuesta": "Los modelos dependen de las existencias. Dinos qué tipo de carritos le gustan a quien lo va a recibir y te confirmamos por WhatsApp." },
     { "pregunta": "¿Cómo cuido mis flores de listón?", "respuesta": "Mantenlas lejos de la humedad y del sol directo para que no pierdan color. Para quitarles el polvo usa una brocha suave o una secadora de pelo con aire frío." },
-    { "pregunta": "¿Hacen entregas? ¿Cómo se paga?", "respuesta": "Escríbenos por WhatsApp y te damos los detalles de entrega y pago para tu zona." }
+    { "pregunta": "¿Cómo se paga?", "respuesta": "Escríbenos por WhatsApp y te damos los detalles de pago. Las formas de entrega están arriba, en esta misma página." }
   ]
 }

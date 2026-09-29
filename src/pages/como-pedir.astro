@@ -4,7 +4,7 @@ import Icono from '../components/Icono.astro';
 import { comoPedir, tienda } from '../data/tienda';
 import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
 
-const { pasos, preguntas } = comoPedir;
+const { pasos, entregas, preguntas } = comoPedir;
 ---
 
 <Base
@@ -34,6 +34,38 @@ const { pasos, preguntas } = comoPedir;
         Escríbenos
       </a>
     </div>
+
+    {
+      entregas.length > 0 && (
+        <section aria-labelledby="entregas">
+          <h2 id="entregas">Formas de entrega</h2>
+          <ul class="entregas" role="list">
+            {entregas.map((entrega) => (
+              <li class="caja">
+                <h3>{entrega.titulo}</h3>
+                {entrega.puntos.length > 0 && (
+                  <ul>
+                    {entrega.puntos.map((punto) => (
+                      <li>{punto}</li>
+                    ))}
+                  </ul>
+                )}
+                {entrega.datos.length > 0 && (
+                  <>
+                    <p class="datos-titulo">Datos que necesitamos</p>
+                    <ul class="datos">
+                      {entrega.datos.map((dato) => (
+                        <li>{dato}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
     <h2>Preguntas frecuentes</h2>
     <div class="preguntas">
@@ -104,6 +136,55 @@ const { pasos, preguntas } = comoPedir;
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 24px;
+  }
+
+  .entregas {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 960px) {
+    .entregas {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .entregas h3 {
+    font-size: 1.3rem;
+  }
+
+  .entregas ul {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding-left: 1.2em;
+  }
+
+  .datos-titulo {
+    margin-top: 16px;
+    font-weight: 700;
+  }
+
+  .entregas .datos {
+    margin-top: 8px;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .datos li {
+    position: relative;
+    padding-left: 1.5em;
+  }
+
+  .datos li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--boton);
+    font-weight: 700;
   }
 
   .preguntas {
