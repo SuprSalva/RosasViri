@@ -1,0 +1,488 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Picture, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Encabezado from '../../components/Encabezado.astro';
+import Icono from '../../components/Icono.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import { categorias, tienda } from '../../data/tienda';
+import { productosDe, urlCategoria, urlProducto, type Producto } from '../../lib/catalogo';
+import { enlaceWhatsApp, mensajePedido, precio, ruta } from '../../lib/enlaces';
+
+export async function getStaticPaths() {
+  const productos = await getCollection('productos');
+  return productos.map((producto) => ({
+    params: { categoria: producto.data.categoria, producto: producto.id },
+    props: { producto },
+  }));
+}
+
+interface Props {
+  producto: Producto;
+}
+const { producto } = Astro.props;
+const { nombre, resumen, fotos, opciones, disponible } = producto.data;
+const { Content } = await render(producto);
+const categoria = categorias.find((c) => c.id === producto.data.categoria)!;
+const relacionados = (await productosDe(categoria.id)).filter((p) => p.id !== producto.id).slice(0, 4);
+
+const mensaje = mensajePedido(producto.data);
+const descripcion = [resumen, producto.body?.trim()].filter(Boolean).join('. ');
+const vistaPrevia = await getImage({ src: fotos[0].src, format: 'jpg', width: Math.min(fotos[0].src.width, 1200) });
+
+const datos = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: nombre,
+  description: descripcion,
+  image: new URL(vistaPrevia.src, Astro.site).href,
+  brand: { '@type': 'Brand', name: tienda.nombre },
+  offers: {
+    '@type': 'Offer',
+    price: producto.data.precio,
+    priceCurrency: tienda.moneda,
+    availability: disponible ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    url: new URL(urlProducto(producto), Astro.site).href,
+  },
+};
+const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
+---
+
+<Base titulo={nombre} descripcion={descripcion} imagen={vistaPrevia.src} datos={datos} whatsappFlotante={false}>
+  <Encabezado slot="encabezado" actual={categoria.id} />
+
+  <div class="contenedor">
+    <a class="volver" href={urlCategoria(categoria.id)}>
+      <Icono nombre="flecha" />
+      {categoria.nombre}
+    </a>
+
+    <article class="producto">
+      <div class="galeria">
+        <div class="fotos" data-fotos>
+          {
+            fotos.map((foto, i) => (
+              <Picture
+                src={foto.src}
+                alt={foto.alt}
+                formats={['avif', 'webp']}
+                widths={[360, 480, 720, 960].filter((w) => w < foto.src.width).concat(Math.min(foto.src.width, 1200))}
+                sizes="(min-width: 960px) 500px, 100vw"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : undefined}
+              />
+            ))
+          }
+        </div>
+        {
+          fotos.length > 1 && (
+            <div class="puntos" aria-label="Fotos">
+              {fotos.map((_, i) => (
+                <button type="button" data-punto={i} aria-label={`Ver foto ${i + 1} de ${fotos.length}`} aria-current={i === 0 ? 'true' : undefined} />
+              ))}
+            </div>
+          )
+        }
+        <button type="button" class="compartir" data-compartir>
+          <Icono nombre="compartir" />
+          <span class="visualmente-oculto">Compartir este producto</span>
+        </button>
+      </div>
+
+      <div class="info">
+        <h1>{nombre}</h1>
+        {resumen && <p class="resumen">{resumen}</p>}
+        <p class="precio">{precio(producto.data.precio)}</p>
+        {!disponible && <p class="aviso">Agotado por ahora. Escríbenos y te avisamos cuando vuelva.</p>}
+
+        <div class="descripcion">
+          <Content />
+        </div>
+
+        <form class="pedido" data-pedido data-mensaje={mensaje}>
+          {
+            opciones.length > 0 && (
+              <fieldset>
+                <legend>Personaliza tu pedido</legend>
+                {opciones.map((opcion) => (
+                  <label>
+                    <span>{opcion.nombre}</span>
+                    <input
+                      type="text"
+                      name={opcion.nombre}
+                      placeholder={opcion.ejemplo && `Ej.: ${opcion.ejemplo}`}
+                      autocomplete="off"
+                      enterkeyhint="send"
+                    />
+                  </label>
+                ))}
+              </fieldset>
+            )
+          }
+          <a class="boton pedir" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
+            <Icono nombre="whatsapp" />
+            {textoBoton}
+          </a>
+          <p class="nota">
+            Te confirmamos disponibilidad, entrega y forma de pago por WhatsApp.{' '}
+            <a href={ruta('/como-pedir/')}>¿Cómo pedir?</a>
+          </p>
+        </form>
+      </div>
+    </article>
+
+    {
+      relacionados.length > 0 && (
+        <section class="seccion" aria-labelledby="relacionados">
+          <h2 class="seccion-titulo" id="relacionados">
+            También te puede gustar
+          </h2>
+          <ul class="rejilla" role="list">
+            {relacionados.map((p) => (
+              <li>
+                <TarjetaProducto producto={p} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+
+  <div class="barra" data-barra hidden>
+    <div class="contenedor barra-fila">
+      <p class="barra-precio"><span class="visualmente-oculto">{nombre}: </span>{precio(producto.data.precio)}</p>
+      <a class="boton" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" />
+        {textoBoton}
+      </a>
+    </div>
+  </div>
+  <p class="visualmente-oculto" role="status" data-estado></p>
+</Base>
+
+<script>
+  import { enlaceWhatsApp } from '../../lib/enlaces';
+
+  // Arma el mensaje de WhatsApp con lo que el cliente escribió.
+  const formulario = document.querySelector<HTMLFormElement>('[data-pedido]');
+  const botones = document.querySelectorAll<HTMLAnchorElement>('[data-pedir]');
+  if (formulario) {
+    const actualizar = () => {
+      let mensaje = formulario.dataset.mensaje ?? '';
+      for (const campo of formulario.querySelectorAll('input')) {
+        const valor = campo.value.trim();
+        if (valor) mensaje += `\n${campo.name}: ${valor}`;
+      }
+      botones.forEach((boton) => (boton.href = enlaceWhatsApp(mensaje)));
+    };
+    formulario.addEventListener('input', actualizar);
+    formulario.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      actualizar();
+      botones[0]?.click();
+    });
+  }
+
+  // Barra inferior con el botón de pedir, visible cuando el botón principal
+  // no está en pantalla.
+  const barra = document.querySelector<HTMLElement>('[data-barra]');
+  const principal = formulario?.querySelector('[data-pedir]');
+  if (barra && principal && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entrada]) => {
+      barra.hidden = entrada.isIntersecting;
+    }).observe(principal);
+  }
+
+  // Galería: puntos para cambiar de foto.
+  const fotos = document.querySelector<HTMLElement>('[data-fotos]');
+  const puntos = document.querySelectorAll<HTMLButtonElement>('[data-punto]');
+  if (fotos && puntos.length) {
+    puntos.forEach((punto) =>
+      punto.addEventListener('click', () => {
+        fotos.scrollTo({ left: Number(punto.dataset.punto) * fotos.clientWidth, behavior: 'smooth' });
+      }),
+    );
+    fotos.addEventListener(
+      'scroll',
+      () => {
+        const actual = Math.round(fotos.scrollLeft / fotos.clientWidth);
+        puntos.forEach((p, i) => p.toggleAttribute('aria-current', i === actual));
+      },
+      { passive: true },
+    );
+  }
+
+  // Compartir: menú nativo del celular o, si no hay, copiar el enlace.
+  const compartir = document.querySelector<HTMLButtonElement>('[data-compartir]');
+  const estado = document.querySelector<HTMLElement>('[data-estado]');
+  compartir?.addEventListener('click', async () => {
+    const datos = { title: document.title, url: location.href };
+    if (navigator.share) {
+      try {
+        await navigator.share(datos);
+      } catch {
+        // La persona cerró el menú de compartir.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(datos.url);
+      if (estado) estado.textContent = 'Enlace copiado';
+      compartir.dataset.copiado = '';
+      setTimeout(() => delete compartir.dataset.copiado, 2000);
+    } catch {
+      prompt('Copia este enlace:', datos.url);
+    }
+  });
+</script>
+
+<style>
+  .volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 16px;
+    padding-block: 8px;
+    font-family: var(--f-titulos);
+    color: var(--texto-suave);
+    text-decoration: none;
+  }
+
+  .volver:hover {
+    color: var(--texto);
+  }
+
+  .volver :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+
+  .producto {
+    display: grid;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  @media (min-width: 960px) {
+    .producto {
+      grid-template-columns: 500px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .galeria {
+      position: sticky;
+      top: 16px;
+    }
+  }
+
+  .galeria {
+    position: relative;
+  }
+
+  .fotos {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    border-radius: var(--radio);
+    background: var(--crema);
+    scrollbar-width: none;
+  }
+
+  .fotos::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fotos :global(picture) {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+
+  .fotos :global(img) {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .puntos {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .puntos button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  .puntos button::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--linea);
+  }
+
+  .puntos button[aria-current]::before {
+    background: var(--texto);
+  }
+
+  .compartir {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--texto);
+    border-radius: 50%;
+    background: var(--fondo);
+    color: var(--texto);
+    cursor: pointer;
+  }
+
+  .compartir :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .compartir[data-copiado]::after {
+    content: 'Enlace copiado';
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--texto);
+    color: var(--crema);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .info h1 {
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+  }
+
+  .resumen {
+    margin-top: 4px;
+    font-family: var(--f-titulos);
+    color: var(--texto-suave);
+    font-size: 1.1rem;
+  }
+
+  .precio {
+    margin-top: 12px;
+    font-family: var(--f-titulos);
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  .aviso {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--crema);
+  }
+
+  .descripcion {
+    margin-top: 16px;
+  }
+
+  .descripcion :global(p + p) {
+    margin-top: 12px;
+  }
+
+  .pedido {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: var(--radio);
+    background: var(--tarjeta);
+  }
+
+  fieldset {
+    border: 0;
+    margin: 0 0 16px;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  legend {
+    padding: 0;
+    margin-bottom: 12px;
+    font-family: var(--f-titulos);
+    font-size: 1.2rem;
+  }
+
+  label {
+    display: grid;
+    gap: 4px;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--oliva);
+    border-radius: 12px;
+    background: var(--crema);
+    color: var(--texto);
+    font: inherit;
+    font-weight: 400;
+  }
+
+  input::placeholder {
+    color: #7a6a60;
+  }
+
+  .pedir {
+    width: 100%;
+  }
+
+  .nota {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    color: var(--texto-suave);
+  }
+
+  .barra {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    padding-block: 10px calc(10px + env(safe-area-inset-bottom));
+    background: var(--crema);
+    box-shadow: 0 -4px 16px rgb(59 46 40 / 0.14);
+  }
+
+  .barra[hidden] {
+    display: none;
+  }
+
+  .barra-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .barra-precio {
+    font-family: var(--f-titulos);
+    font-size: 1.5rem;
+  }
+
+  .barra .boton {
+    flex: 1;
+    max-width: 320px;
+    padding-inline: 16px;
+  }
+</style>

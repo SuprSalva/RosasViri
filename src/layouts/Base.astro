@@ -1,0 +1,69 @@
+---
+import '@fontsource/arvo/700.css';
+import '@fontsource/short-stack/400.css';
+import '@fontsource-variable/nunito/index.css';
+import '../styles/global.css';
+import Pie from '../components/Pie.astro';
+import Icono from '../components/Icono.astro';
+import { tienda } from '../data/tienda';
+import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+  /** Imagen para la vista previa al compartir (ruta ya con el base del sitio). */
+  imagen?: string;
+  /** Datos estructurados para Google (schema.org). */
+  datos?: object;
+  whatsappFlotante?: boolean;
+}
+
+const { titulo, descripcion = tienda.descripcion, imagen, datos, whatsappFlotante = true } = Astro.props;
+
+const tituloCompleto = titulo ? `${titulo} | ${tienda.nombre}` : `${tienda.nombre} · ${tienda.lema}`;
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const vistaPrevia = new URL(imagen ?? ruta('/og-image.jpg'), Astro.site);
+---
+
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+    {!tienda.indexar && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#f2e6d8" />
+    <link rel="icon" type="image/svg+xml" href={ruta('/favicon.svg')} />
+    <link rel="apple-touch-icon" href={ruta('/apple-touch-icon.png')} />
+    <link rel="sitemap" href={ruta('/sitemap-index.xml')} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:site_name" content={tienda.nombre} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={vistaPrevia} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {datos && <script type="application/ld+json" set:html={JSON.stringify(datos)} />}
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <slot name="encabezado" />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Pie />
+    {
+      whatsappFlotante && (
+        <a class="whatsapp-flotante" href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener">
+          <Icono nombre="whatsapp" />
+          <span class="visualmente-oculto">Haz tu pedido por WhatsApp</span>
+        </a>
+      )
+    }
+  </body>
+</html>

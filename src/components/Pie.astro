@@ -1,0 +1,74 @@
+---
+import Redes from './Redes.astro';
+import { tienda, categorias } from '../data/tienda';
+import { ruta } from '../lib/enlaces';
+import { urlCategoria } from '../lib/catalogo';
+---
+
+<footer class="pie">
+  <div class="contenedor">
+    <p class="nombre">{tienda.nombre}</p>
+    <p class="lema">{tienda.lema}</p>
+    <Redes class="redes-pie" />
+    <nav aria-label="Pie de página">
+      <ul>
+        <li><a href={ruta('/')}>Inicio</a></li>
+        {
+          categorias.map((c) => (
+            <li>
+              <a href={urlCategoria(c.id)}>{c.corto}</a>
+            </li>
+          ))
+        }
+        <li><a href={ruta('/como-pedir/')}>Cómo pedir</a></li>
+      </ul>
+    </nav>
+    <p class="legal">© {new Date().getFullYear()} {tienda.nombre}</p>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    margin-top: 48px;
+    padding-block: 32px calc(96px + env(safe-area-inset-bottom));
+    background: var(--crema);
+    text-align: center;
+  }
+
+  .nombre {
+    font-family: var(--f-marca);
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  .lema {
+    font-family: var(--f-titulos);
+    color: var(--texto-suave);
+  }
+
+  .pie :global(.redes-pie) {
+    margin-top: 12px;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 20px;
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+  }
+
+  nav a {
+    display: inline-block;
+    padding-block: 8px;
+    color: var(--texto);
+  }
+
+  .legal {
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: var(--texto-suave);
+  }
+</style>

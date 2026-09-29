@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Encabezado from '../../components/Encabezado.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import { categorias } from '../../data/tienda';
+import { productosDe } from '../../lib/catalogo';
+
+export function getStaticPaths() {
+  return categorias.map((categoria) => ({ params: { categoria: categoria.id }, props: { categoria } }));
+}
+
+const { categoria } = Astro.props;
+const productos = await productosDe(categoria.id);
+---
+
+<Base titulo={categoria.nombre} descripcion={`${categoria.nombre}. ${categoria.descripcion}`}>
+  <Encabezado slot="encabezado" actual={categoria.id} />
+  <div class="contenedor seccion">
+    <h1 class="seccion-titulo">{categoria.nombre}</h1>
+    <p class="seccion-descripcion">{categoria.descripcion}</p>
+    {
+      productos.length > 0 ? (
+        <ul class="rejilla" role="list">
+          {productos.map((producto, i) => (
+            <li>
+              <TarjetaProducto producto={producto} nivel="h2" prioridad={i < 2} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="vacio">Pronto tendremos productos en esta sección.</p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .vacio {
+    margin-top: 24px;
+    text-align: center;
+  }
+</style>
