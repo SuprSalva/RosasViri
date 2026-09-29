@@ -37,6 +37,38 @@ html {
   }
 }
 
+/* Barra de desplazamiento con los colores de la tienda. Chrome, Edge y Safari
+   usan ::-webkit-scrollbar (permite bordes redondeados); Firefox, que no lo
+   tiene, usa scrollbar-color. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--fondo);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--oliva);
+  border: 3px solid var(--fondo);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--boton);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--fondo);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--oliva) var(--fondo);
+  }
+}
+
 body {
   margin: 0;
   background: var(--fondo);
