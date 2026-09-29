@@ -1,6 +1,12 @@
 # Panel de administración de Rossvtienda (Pages CMS: https://app.pagescms.org).
 # Cada cambio que se guarda en el panel se publica solo en 1–2 minutos.
 
+settings:
+  commit:
+    # Los cambios de colaboradores invitados por correo quedan con su nombre
+    # y correo en el historial, para saber quién cambió qué.
+    identity: user
+
 media:
   input: src/assets
   output: /src/assets
