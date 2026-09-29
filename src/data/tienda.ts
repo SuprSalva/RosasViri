@@ -3,7 +3,6 @@
 
 export const tienda = {
   nombre: 'Rossvtienda',
-  usuario: '@rossvtienda',
   lema: 'Flores de listón satinado hechas a mano',
   descripcion:
     'Rosas eternas, girasoles y ramos con carritos Hot Wheels, hechos a mano con listón satinado.',
@@ -14,14 +13,13 @@ export const tienda = {
   // persona elija a quién mandar el mensaje.
   whatsapp: '',
 
-  // POR CONFIRMAR: correo de contacto. Si queda vacío no se muestra.
-  correo: '',
+  // Correo de contacto. Si queda vacío no se muestra.
+  correo: 'fatimaviridiana.77@gmail.com',
 
-  // POR CONFIRMAR: se tomaron del usuario @rossvtienda de Beacons.
   // Si un enlace queda vacío, su ícono no se muestra.
   redes: {
-    tiktok: 'https://www.tiktok.com/@rossvtienda',
-    instagram: 'https://www.instagram.com/rossvtienda/',
+    tiktok: 'https://www.tiktok.com/@ross_v1_',
+    instagram: 'https://www.instagram.com/_rossv_/',
   },
 
   // POR CONFIRMAR: moneda de los precios (se usa para Google).
