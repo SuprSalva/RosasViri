@@ -415,3 +415,9 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# Servicio del panel. La sesión y el permiso de administración se revisan dentro
+# del propio servicio (supabase/functions/panel/index.ts), así que la revisión
+# automática de Supabase se apaga para no bloquear las peticiones previas (CORS).
+[functions.panel]
+verify_jwt = false
