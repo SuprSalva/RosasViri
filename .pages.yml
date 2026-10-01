@@ -33,7 +33,7 @@ content:
         type: text
       - name: whatsapp
         label: WhatsApp para pedidos
-        description: Con código de país y sin espacios. En México, 52 seguido de los 10 dígitos (ej. 5215512345678).
+        description: Con código de país y sin espacios. En México, 52 seguido de los 10 dígitos (ej. 525512345678).
         type: string
       - name: correo
         label: Correo de contacto
