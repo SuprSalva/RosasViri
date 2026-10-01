@@ -54,6 +54,8 @@ let supabase: SupabaseClient;
 let categorias: Categoria[] = [];
 let productos: Producto[] = [];
 let pestana: 'productos' | 'categorias' | 'papelera' = 'productos';
+// Para distinguir "Salir" de una sesión que se cerró sola.
+let salidaVoluntaria = false;
 
 const activas = () => categorias.filter((c) => !c.eliminado);
 const activos = () => productos.filter((p) => !p.eliminado);
@@ -112,6 +114,44 @@ function mensajeError(error: { code?: string; message?: string } | null): string
   return 'No se pudo guardar. Revisa tu conexión e intenta de nuevo.';
 }
 
+function sesionVencida(error: { code?: string; message?: string } | null): boolean {
+  return !!error && (error.code === 'PGRST301' || error.code === 'PGRST303' || /JWT|token/i.test(error.message ?? ''));
+}
+
+/** Muestra un error de la base de datos; si la sesión venció, abre la pantalla 401. */
+function fallo(error: { code?: string; message?: string } | null) {
+  if (sesionVencida(error)) return mostrar('error-401');
+  aviso(mensajeError(error), 'error');
+}
+
+/** Pantalla 500: no se pudo hablar con la base de datos o con el servicio. */
+function errorServidor(detalle: string) {
+  $('[data-detalle-error]').textContent = detalle;
+  mostrar('error-500');
+}
+
+/** Explicación corta del error para la pantalla 500. */
+function detalleDe(error: { message?: string }): string {
+  const mensaje = error.message ?? '';
+  if (/Timeout|Tiempo agotado|abort/i.test(mensaje)) return 'La base de datos no respondió a tiempo.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(mensaje)) return 'No hay conexión con la base de datos.';
+  return `Detalle: ${mensaje || 'sin respuesta de la base de datos'}.`;
+}
+
+/**
+ * fetch con tiempo máximo: si la base de datos no contesta (por ejemplo, está
+ * en pausa), la petición se corta y el panel muestra la pantalla 500 en vez de
+ * quedarse cargando para siempre. Subir fotos tiene más tiempo.
+ */
+function fetchConLimite(entrada: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  const direccion = entrada instanceof Request ? entrada.url : String(entrada);
+  const limite = direccion.includes('/functions/v1/') ? 90_000 : 20_000;
+  const control = new AbortController();
+  const temporizador = setTimeout(() => control.abort(new DOMException('Tiempo agotado', 'TimeoutError')), limite);
+  init.signal?.addEventListener('abort', () => control.abort(init.signal?.reason));
+  return fetch(entrada, { ...init, signal: control.signal }).finally(() => clearTimeout(temporizador));
+}
+
 /** Llama al servicio del panel y devuelve su respuesta, o lanza su mensaje de error. */
 async function invocar<T>(cuerpo: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke('panel', { body: cuerpo });
@@ -119,6 +159,7 @@ async function invocar<T>(cuerpo: Record<string, unknown>): Promise<T> {
   let mensaje = 'No se pudo conectar con el servidor del panel.';
   const respuesta = (error as { context?: unknown }).context;
   if (respuesta instanceof Response) {
+    if (respuesta.status === 401) mostrar('error-401');
     try {
       mensaje = ((await respuesta.json()) as { error?: string }).error ?? mensaje;
     } catch {
@@ -157,15 +198,25 @@ function idUnico(base: string, usados: Set<string>): string {
 // ---------------------------------------------------------------- sesión
 
 async function entrarAlPanel() {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return mostrar('entrar');
+  const { data, error: errorSesion } = await supabase.auth.getUser();
+  if (!data.user) {
+    // Sin conexión con Supabase no se sabe si la sesión sigue: mejor decirlo que pedir entrar.
+    if (errorSesion && !('status' in errorSesion && errorSesion.status)) {
+      return errorServidor('No hubo respuesta del servidor de cuentas.');
+    }
+    // Había sesión guardada pero ya no es válida (venció o se cerró en otro lado).
+    return mostrar('error-401');
+  }
   for (const nodo of document.querySelectorAll('[data-correo]')) nodo.textContent = data.user.email ?? '';
 
-  const { data: esAdmin } = await supabase.rpc('es_admin');
+  const { data: esAdmin, error } = await supabase.rpc('es_admin');
+  if (error) {
+    if (sesionVencida(error)) return mostrar('error-401');
+    return errorServidor(detalleDe(error));
+  }
   if (esAdmin !== true) return mostrar('sin-permiso');
 
-  await cargar();
-  verLista(pestana);
+  if (await cargar()) verLista(pestana);
 }
 
 async function cargar() {
@@ -173,12 +224,15 @@ async function cargar() {
     supabase.from('categorias').select('*').order('orden').order('nombre'),
     supabase.from('productos').select('*').order('orden').order('nombre'),
   ]);
-  if (c.error || p.error) {
-    aviso('No se pudo cargar el catálogo. Revisa tu conexión y recarga la página.', 'error');
-    return;
+  const error = c.error ?? p.error;
+  if (error) {
+    if (sesionVencida(error)) mostrar('error-401');
+    else errorServidor(detalleDe(error));
+    return false;
   }
   categorias = c.data as Categoria[];
   productos = (p.data as Producto[]).map((x) => ({ ...x, precio: Number(x.precio) }));
+  return true;
 }
 
 // ---------------------------------------------------------------- listas
@@ -237,7 +291,7 @@ function filaProducto(producto: Producto): HTMLElement {
     const { data, error } = await supabase.from('productos').update({ disponible }).eq('id', producto.id).select('id');
     if (error || !data?.length) {
       casilla.checked = !disponible;
-      return aviso(mensajeError(error ?? SIN_PERMISO), 'error');
+      return fallo(error ?? SIN_PERMISO);
     }
     producto.disponible = disponible;
     fila.classList.toggle('agotado', !disponible);
@@ -310,7 +364,7 @@ async function marcarEliminado(tabla: 'productos' | 'categorias', registro: Prod
   const eliminado = new Date().toISOString();
   const { data, error } = await supabase.from(tabla).update({ eliminado }).eq('id', registro.id).select('id');
   if (error || !data?.length) {
-    aviso(mensajeError(error ?? SIN_PERMISO), 'error');
+    fallo(error ?? SIN_PERMISO);
     return false;
   }
   registro.eliminado = eliminado;
@@ -320,7 +374,7 @@ async function marcarEliminado(tabla: 'productos' | 'categorias', registro: Prod
 
 async function restaurar(tabla: 'productos' | 'categorias', registro: Producto | Categoria) {
   const { data, error } = await supabase.from(tabla).update({ eliminado: null }).eq('id', registro.id).select('id');
-  if (error || !data?.length) return aviso(mensajeError(error ?? SIN_PERMISO), 'error');
+  if (error || !data?.length) return fallo(error ?? SIN_PERMISO);
   registro.eliminado = null;
   publicar();
   verLista('papelera');
@@ -538,7 +592,7 @@ async function guardarProducto(evento: SubmitEvent) {
           .select()
           .single();
     const { data, error } = await consulta;
-    if (error) return aviso(mensajeError(error), 'error');
+    if (error) return fallo(error);
     const guardado = { ...(data as Producto), precio: Number((data as Producto).precio) };
     productos = original ? productos.map((p) => (p.id === original.id ? guardado : p)) : [...productos, guardado];
     productos.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre, 'es'));
@@ -648,7 +702,7 @@ async function guardarCategoria(evento: SubmitEvent) {
         .select()
         .single();
   const { data, error } = await consulta;
-  if (error) return aviso(mensajeError(error), 'error');
+  if (error) return fallo(error);
   const guardada = data as Categoria;
   categorias = original ? categorias.map((c) => (c.id === original.id ? guardada : c)) : [...categorias, guardada];
   categorias.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre, 'es'));
@@ -716,10 +770,14 @@ function conectarEventos() {
   }
   for (const boton of document.querySelectorAll('[data-salir]')) {
     boton.addEventListener('click', async () => {
-      await supabase.auth.signOut();
+      salidaVoluntaria = true;
+      // "local": cierra la sesión en este navegador aunque el servidor no responda.
+      await supabase.auth.signOut({ scope: 'local' });
+      salidaVoluntaria = false;
       mostrar('entrar');
     });
   }
+  $('[data-reintentar]').addEventListener('click', () => location.reload());
   for (const boton of document.querySelectorAll<HTMLElement>('[data-pestana]')) {
     boton.addEventListener('click', () => verLista(boton.dataset.pestana as typeof pestana));
   }
@@ -792,10 +850,24 @@ export async function iniciarPanel() {
   const tipoEnlace = enlace.get('type');
   const errorEnlace = enlace.get('error_description');
 
-  supabase = createClient(url, clave, { auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true } });
+  // ¿Había una sesión guardada en este navegador? Si al arrancar ya no sirve,
+  // se explica con la pantalla 401 en vez de mostrar el formulario sin más.
+  let habiaSesion = false;
+  try {
+    habiaSesion = Object.keys(localStorage).some((clave) => /^sb-.+-auth-token$/.test(clave));
+  } catch {
+    // Sin acceso al almacenamiento: se trata como si no hubiera sesión.
+  }
+
+  supabase = createClient(url, clave, {
+    auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true },
+    global: { fetch: fetchConLimite },
+  });
   conectarEventos();
   supabase.auth.onAuthStateChange((evento) => {
     if (evento === 'PASSWORD_RECOVERY') mostrar('contrasena');
+    // La sesión se cerró sola a mitad del trabajo (venció y no se pudo renovar).
+    if (evento === 'SIGNED_OUT' && !salidaVoluntaria && !$('[data-vista="panel"]').hidden) mostrar('error-401');
   });
 
   const { data } = await supabase.auth.getSession();
@@ -807,5 +879,5 @@ export async function iniciarPanel() {
   }
   if (data.session && (tipoEnlace === 'invite' || tipoEnlace === 'recovery')) return mostrar('contrasena');
   if (data.session) return entrarAlPanel();
-  mostrar('entrar');
+  mostrar(habiaSesion ? 'error-401' : 'entrar');
 }

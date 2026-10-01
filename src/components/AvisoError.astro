@@ -1,0 +1,83 @@
+---
+// Pantalla de error con la imagen de la tienda: 404 del sitio y los errores
+// del panel (401 sesión, 403 permiso, 500 servidor).
+import Logo from './Logo.astro';
+
+interface Props {
+  codigo: '401' | '403' | '404' | '500';
+  titulo: string;
+}
+const { codigo, titulo } = Astro.props;
+---
+
+<div class="aviso-error">
+  <div class="marca" aria-hidden="true">
+    <Logo class="logo-error" />
+    <span class="codigo">{codigo}</span>
+  </div>
+  <p class="antetitulo">Error {codigo}</p>
+  <h1>{titulo}</h1>
+  <div class="texto">
+    <slot />
+  </div>
+  <div class="acciones-error">
+    <slot name="acciones" />
+  </div>
+</div>
+
+<style>
+  .aviso-error {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    max-width: 34rem;
+    margin: 0 auto;
+    padding-block: 24px 16px;
+    text-align: center;
+  }
+
+  .marca {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .marca :global(.logo-error) {
+    width: 46px;
+    height: auto;
+  }
+
+  .codigo {
+    font-family: var(--f-titulos);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(4.5rem, 22vw, 7rem);
+    line-height: 0.8;
+    color: var(--boton);
+    font-variant-numeric: lining-nums;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+  }
+
+  .texto {
+    display: grid;
+    gap: 12px;
+    color: var(--texto-suave);
+    font-size: 1.08rem;
+  }
+
+  .acciones-error {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .acciones-error:empty {
+    display: none;
+  }
+</style>

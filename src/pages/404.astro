@@ -1,22 +1,60 @@
 ---
+// GitHub Pages muestra esta página en cualquier dirección que no exista.
 import Base from '../layouts/Base.astro';
-import { ruta } from '../lib/enlaces';
+import AvisoError from '../components/AvisoError.astro';
+import Icono from '../components/Icono.astro';
+import { categorias, urlCategoria } from '../lib/catalogo';
+import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
+
+const secciones = await categorias();
 ---
 
 <Base titulo="Página no encontrada" noindex>
-  <div class="contenedor pagina no-encontrada">
-    <h1>Esta página no existe</h1>
-    <p class="intro">Tal vez el enlace cambió o el producto ya no está. Mira todo el catálogo:</p>
-    <a class="boton" href={ruta('/catalogo/')}>Ir al catálogo</a>
+  <div class="contenedor pagina">
+    <AvisoError codigo="404" titulo="Esta página no existe">
+      <p>Tal vez el enlace cambió o el producto ya no está disponible. Estas son nuestras secciones:</p>
+      <nav class="chips secciones" aria-label="Secciones del catálogo">
+        {secciones.map((s) => <a class="chip" href={urlCategoria(s.id)}>{s.data.corto}</a>)}
+      </nav>
+      <Fragment slot="acciones">
+        <a class="boton" href={ruta('/catalogo/')}>Ver el catálogo</a>
+        <a class="boton boton-secundario" href={ruta('/')}>Ir al inicio</a>
+      </Fragment>
+    </AvisoError>
+    <p class="ayuda">
+      ¿Buscabas algo en especial?{' '}
+      <a href={enlaceWhatsApp(mensajePedido())} target="_blank" rel="noopener noreferrer">
+        <Icono nombre="whatsapp" />
+        Escríbenos por WhatsApp
+      </a>
+    </p>
   </div>
 </Base>
 
 <style>
-  .no-encontrada {
-    text-align: center;
+  .secciones {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
   }
 
-  .boton {
-    margin-top: 24px;
+  .ayuda {
+    margin-top: 32px;
+    text-align: center;
+    color: var(--texto-suave);
+  }
+
+  .ayuda a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--boton);
+  }
+
+  .ayuda :global(svg) {
+    width: 18px;
+    height: 18px;
   }
 </style>

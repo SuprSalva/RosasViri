@@ -3,6 +3,7 @@
 // Los datos viven en Supabase; las fotos se guardan en el repositorio.
 import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import AvisoError from '../components/AvisoError.astro';
 import { tienda } from '../data/tienda';
 import { todasLasImagenes } from '../lib/imagenes';
 
@@ -74,12 +75,39 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     </section>
 
     <section data-vista="sin-permiso" hidden>
-      <h1>Sin permiso</h1>
-      <p class="intro">
-        La cuenta <strong data-correo></strong> no tiene permiso para administrar la tienda. Pide acceso a quien administra
-        el proyecto.
-      </p>
-      <button class="boton boton-secundario" type="button" data-salir>Salir</button>
+      <AvisoError codigo="403" titulo="Esta cuenta no tiene permiso">
+        <p>
+          Entraste como <strong data-correo></strong>, pero esa cuenta no puede administrar la tienda. Pide acceso a
+          quien administra el proyecto.
+        </p>
+        <Fragment slot="acciones">
+          <button class="boton boton-secundario" type="button" data-salir>Entrar con otra cuenta</button>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="error-401" hidden>
+      <AvisoError codigo="401" titulo="Tu sesión terminó">
+        <p>Por seguridad, la sesión se cierra después de un tiempo. Vuelve a entrar para seguir.</p>
+        <p class="nota">Si estabas editando algo y no se guardó, tendrás que escribirlo de nuevo.</p>
+        <Fragment slot="acciones">
+          <button class="boton" type="button" data-salir>Volver a entrar</button>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="error-500" hidden>
+      <AvisoError codigo="500" titulo="No pudimos conectar con la tienda">
+        <p>
+          Puede ser tu conexión a internet o que la base de datos esté en mantenimiento. Tus productos están a salvo: no se
+          perdió nada.
+        </p>
+        <p class="nota" data-detalle-error></p>
+        <Fragment slot="acciones">
+          <button class="boton" type="button" data-reintentar>Reintentar</button>
+          <a class="boton boton-secundario" href={import.meta.env.BASE_URL}>Ver el sitio</a>
+        </Fragment>
+      </AvisoError>
     </section>
 
     <section data-vista="panel" hidden>
