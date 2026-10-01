@@ -156,7 +156,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       </div>
 
       <p class="nota pie-panel">
-        Los textos del sitio (portada, cómo pedir, aviso de privacidad…) se editan en
+        Los textos del sitio (portada, cómo pedir, aviso de privacidad…) se editan en{' '}
         <a href="https://app.pagescms.org" rel="noopener noreferrer">Pages CMS</a>.
       </p>
     </section>
@@ -165,65 +165,69 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       <button class="enlace volver" type="button" data-volver>← Productos</button>
       <h1 data-titulo-editor>Producto</h1>
       <form class="editor" data-form-producto novalidate>
-        <div class="caja grupo">
-          <label class="campo">
-            Nombre
-            <input name="nombre" required maxlength="80" />
-          </label>
-          <p class="nota" data-direccion></p>
-          <div class="dos">
+        <div class="columna">
+          <div class="caja grupo g-datos">
             <label class="campo">
-              Sección
-              <select name="categoria" required data-select-categoria></select>
+              Nombre
+              <input name="nombre" required maxlength="80" />
+            </label>
+            <p class="nota" data-direccion></p>
+            <div class="dos">
+              <label class="campo">
+                Sección
+                <select name="categoria" required data-select-categoria></select>
+              </label>
+              <label class="campo">
+                Precio (sin el signo $)
+                <input name="precio" type="number" inputmode="decimal" min="1" step="any" required />
+              </label>
+            </div>
+            <label class="campo">
+              Texto corto de la tarjeta
+              <input name="resumen" maxlength="80" placeholder='Por ejemplo "12 rosas"' />
             </label>
             <label class="campo">
-              Precio (sin el signo $)
-              <input name="precio" type="number" inputmode="decimal" min="1" step="any" required />
+              Descripción
+              <textarea name="descripcion" rows="4"></textarea>
             </label>
           </div>
-          <label class="campo">
-            Texto corto de la tarjeta
-            <input name="resumen" maxlength="80" placeholder='Por ejemplo "12 rosas"' />
-          </label>
-          <label class="campo">
-            Descripción
-            <textarea name="descripcion" rows="4"></textarea>
-          </label>
-        </div>
 
-        <div class="caja grupo">
-          <h2>Fotos</h2>
-          <p class="nota">La primera es la que aparece en el catálogo. Usa las flechas para cambiar el orden.</p>
-          <ul class="fotos-editor" role="list" data-fotos></ul>
-          <label class="boton boton-secundario subir">
-            + Agregar fotos
-            <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-fotos class="visualmente-oculto" />
-          </label>
-        </div>
+          <div class="caja grupo g-opciones">
+            <h2>Lo que el cliente puede elegir</h2>
+            <p class="nota">Aparecen como preguntas antes del botón de WhatsApp. Por ejemplo "Color de rosas".</p>
+            <ul class="opciones" role="list" data-opciones></ul>
+            <button class="boton boton-secundario boton-chico" type="button" data-agregar-opcion>+ Agregar pregunta</button>
+          </div>
 
-        <div class="caja grupo">
-          <h2>Lo que el cliente puede elegir</h2>
-          <p class="nota">Aparecen como preguntas antes del botón de WhatsApp. Por ejemplo "Color de rosas".</p>
-          <ul class="opciones" role="list" data-opciones></ul>
-          <button class="boton boton-secundario boton-chico" type="button" data-agregar-opcion>+ Agregar pregunta</button>
         </div>
+        <div class="columna">
+          <div class="caja grupo g-fotos">
+            <h2>Fotos</h2>
+            <p class="nota">La primera es la que aparece en el catálogo. Usa las flechas para cambiar el orden.</p>
+            <ul class="fotos-editor" role="list" data-fotos></ul>
+            <label class="boton boton-secundario subir">
+              + Agregar fotos
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-fotos class="visualmente-oculto" />
+            </label>
+          </div>
 
-        <div class="caja grupo">
-          <label class="interruptor">
-            <input type="checkbox" name="disponible" />
-            Disponible <span class="nota">(si lo apagas, aparece como «Agotado»)</span>
-          </label>
-          <label class="interruptor">
-            <input type="checkbox" name="destacado" />
-            Destacado en la portada
-          </label>
-          <label class="campo corto">
-            Orden dentro de su sección
-            <input name="orden" type="number" step="1" />
-            <span class="nota">El número más bajo aparece primero.</span>
-          </label>
+          <div class="caja grupo g-estado">
+            <label class="interruptor">
+              <input type="checkbox" name="disponible" />
+              Disponible <span class="nota">(si lo apagas, aparece como «Agotado»)</span>
+            </label>
+            <label class="interruptor">
+              <input type="checkbox" name="destacado" />
+              Destacado en la portada
+            </label>
+            <label class="campo corto">
+              Orden dentro de su sección
+              <input name="orden" type="number" step="1" />
+              <span class="nota">El número más bajo aparece primero.</span>
+            </label>
+          </div>
+
         </div>
-
         <div class="botones-editor">
           <button class="boton" type="submit">Guardar</button>
           <button class="boton boton-secundario" type="button" data-volver>Cancelar</button>
@@ -236,34 +240,38 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       <button class="enlace volver" type="button" data-volver>← Secciones</button>
       <h1 data-titulo-editor>Sección</h1>
       <form class="editor" data-form-categoria novalidate>
-        <div class="caja grupo">
-          <label class="campo">
-            Nombre completo
-            <input name="nombre" required maxlength="80" placeholder="Rosas de listón satinado" />
-          </label>
-          <label class="campo">
-            Nombre corto (menús y botones)
-            <input name="corto" required maxlength="30" placeholder="Rosas" />
-          </label>
-          <p class="nota" data-direccion></p>
-          <label class="campo">
-            Descripción
-            <input name="descripcion" maxlength="140" />
-          </label>
-          <label class="campo corto">
-            Orden
-            <input name="orden" type="number" step="1" />
-            <span class="nota">El número más bajo aparece primero.</span>
-          </label>
+        <div class="columna">
+          <div class="caja grupo">
+            <label class="campo">
+              Nombre completo
+              <input name="nombre" required maxlength="80" placeholder="Rosas de listón satinado" />
+            </label>
+            <label class="campo">
+              Nombre corto (menús y botones)
+              <input name="corto" required maxlength="30" placeholder="Rosas" />
+            </label>
+            <p class="nota" data-direccion></p>
+            <label class="campo">
+              Descripción
+              <input name="descripcion" maxlength="140" />
+            </label>
+            <label class="campo corto">
+              Orden
+              <input name="orden" type="number" step="1" />
+              <span class="nota">El número más bajo aparece primero.</span>
+            </label>
+          </div>
         </div>
-        <div class="caja grupo">
-          <h2>Foto de la sección</h2>
-          <p class="nota">Aparece en la portada. Elige una de tus fotos o sube una nueva.</p>
-          <div class="galeria-eleccion" role="radiogroup" aria-label="Foto de la sección" data-eleccion></div>
-          <label class="boton boton-secundario subir">
-            + Subir foto
-            <input type="file" accept="image/jpeg,image/png,image/webp" data-subir-foto-categoria class="visualmente-oculto" />
-          </label>
+        <div class="columna">
+          <div class="caja grupo">
+            <h2>Foto de la sección</h2>
+            <p class="nota">Aparece en la portada. Elige una de tus fotos o sube una nueva.</p>
+            <div class="galeria-eleccion" role="radiogroup" aria-label="Foto de la sección" data-eleccion></div>
+            <label class="boton boton-secundario subir">
+              + Subir foto
+              <input type="file" accept="image/jpeg,image/png,image/webp" data-subir-foto-categoria class="visualmente-oculto" />
+            </label>
+          </div>
         </div>
         <div class="botones-editor">
           <button class="boton" type="submit">Guardar</button>
@@ -283,9 +291,16 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
 </script>
 
 <style>
+  /* El panel usa todo el ancho; en pantallas grandes, listas y editores van en columnas. */
   .panel {
-    max-width: 980px;
-    margin-inline: auto;
+    width: 100%;
+  }
+
+  @media (min-width: 1100px) {
+    .panel :global(.filas) {
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      gap: 10px 14px;
+    }
   }
 
   .panel h1 {
@@ -470,6 +485,50 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     display: grid;
     gap: 16px;
     margin-top: 16px;
+  }
+
+  .columna {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+  }
+
+  /* En el celular: una sola columna en el orden datos → fotos → preguntas → estado. */
+  @media (max-width: 1099px) {
+    .columna {
+      display: contents;
+    }
+
+    .g-datos {
+      order: 1;
+    }
+
+    .g-fotos {
+      order: 2;
+    }
+
+    .g-opciones {
+      order: 3;
+    }
+
+    .g-estado {
+      order: 4;
+    }
+
+    .botones-editor {
+      order: 5;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .editor {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .botones-editor {
+      grid-column: 1 / -1;
+    }
   }
 
   .grupo {

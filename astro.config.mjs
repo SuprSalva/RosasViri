@@ -27,6 +27,34 @@ const google = analytics
     }
   : { scripts: [], conexiones: [], imagenes: [] };
 
+/**
+ * En la computadora, el sitio vive en http://localhost:4321/RosasViri/. Si se
+ * abre una página sin "/RosasViri" (por ejemplo http://localhost:4321/), se
+ * redirige a la misma página dentro del sitio en vez de mostrar el 404 de Astro.
+ */
+const redirigirAlBase = {
+  name: 'redirigir-al-base',
+  /** @param {import('vite').ViteDevServer} servidor */
+  configureServer(servidor) {
+    const prefijo = base.replace(/\/$/, '');
+    if (!prefijo) return;
+    /** @type {import('vite').Connect.NextHandleFunction} */
+    const redirigir = (peticion, respuesta, siguiente) => {
+      const url = peticion.originalUrl ?? peticion.url ?? '/';
+      const esPagina = peticion.method === 'GET' && (peticion.headers.accept ?? '').includes('text/html');
+      // Archivos internos de Vite y Astro (/@vite, /@fs, /node_modules, /src...) no se tocan.
+      const interna = /^\/(@|node_modules\/|src\/|__|\.well-known\/appspecific)/.test(url);
+      if (!esPagina || interna || url === prefijo || url.startsWith(`${prefijo}/`)) return siguiente();
+      respuesta.writeHead(302, { Location: `${prefijo}${url}` }).end();
+    };
+    // Antes que todo lo demás: Astro responde su propio 404 antes que cualquier
+    // middleware registrado de forma normal.
+    const atender = servidor.middlewares.handle.bind(servidor.middlewares);
+    servidor.middlewares.handle = (peticion, respuesta, siguiente) =>
+      redirigir(peticion, respuesta, () => atender(peticion, respuesta, siguiente));
+  },
+};
+
 export default defineConfig({
   site,
   base,
@@ -34,7 +62,7 @@ export default defineConfig({
   markdown: { syntaxHighlight: false },
   // No incrustar fuentes ni imágenes como `data:`; la política de seguridad solo
   // permite archivos del propio sitio.
-  vite: { build: { assetsInlineLimit: 0 } },
+  vite: { build: { assetsInlineLimit: 0 }, plugins: [redirigirAlBase] },
   integrations: [
     sitemap({
       filter: (pagina) => !/\/(admin|404)\/?$/.test(new URL(pagina).pathname),
