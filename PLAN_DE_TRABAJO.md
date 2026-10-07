@@ -322,8 +322,8 @@ GitHub Pages con el catálogo real completo.
       las cookies.
 - [x] Contar cada clic en "Pedir por WhatsApp", por producto: dice qué ramos interesan más
       (evento `pedido_whatsapp`; ver el [`README.md`](README.md#cookies-y-privacidad)).
-- [ ] Enlaces con UTM por red, por ejemplo `?utm_source=tiktok` e `?utm_source=instagram`, para
-      saber qué red trae más pedidos.
+- [x] Enlaces con UTM por red, por ejemplo `?utm_source=tiktok` e `?utm_source=instagram`, para
+      saber qué red trae más pedidos (lista en el [`README.md`](README.md#enlaces-para-redes-sociales)).
 - [ ] Pixel de TikTok o Meta **solo** si se van a pagar anuncios (habría que agregarlo al aviso
       de cookies y a la política de seguridad).
 

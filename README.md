@@ -103,6 +103,32 @@ opción "Mostrar el sitio en Google" está activada en **Datos de la tienda**.
 
 Cuando conectes un dominio propio, repite estos pasos con el dominio nuevo.
 
+## Enlaces para redes sociales
+
+Usa estos enlaces (y no el del sitio a secas) en cada lugar donde se comparta la tienda. Así
+Google Analytics dice de qué red llega cada visita y cada pedido por WhatsApp (en **Informes →
+Adquisición → Adquisición de tráfico**, por *Fuente/medio de la sesión*).
+
+| Dónde | Enlace |
+|---|---|
+| Biografía de Instagram | `https://suprsalva.github.io/RosasViri/?utm_source=instagram&utm_medium=social&utm_campaign=biografia` |
+| Biografía de TikTok | `https://suprsalva.github.io/RosasViri/?utm_source=tiktok&utm_medium=social&utm_campaign=biografia` |
+| Facebook | `https://suprsalva.github.io/RosasViri/?utm_source=facebook&utm_medium=social&utm_campaign=biografia` |
+| Perfil y catálogo de WhatsApp Business | `https://suprsalva.github.io/RosasViri/?utm_source=whatsapp&utm_medium=social&utm_campaign=perfil` |
+| Estados de WhatsApp | `https://suprsalva.github.io/RosasViri/?utm_source=whatsapp&utm_medium=social&utm_campaign=estados` |
+| Perfil de Empresa de Google | `https://suprsalva.github.io/RosasViri/?utm_source=google&utm_medium=organic&utm_campaign=perfil-empresa` |
+| Código QR (tarjetas, etiquetas, bolsas) | `https://suprsalva.github.io/RosasViri/?utm_source=qr&utm_medium=impreso&utm_campaign=tarjeta` |
+| Página de Beacons ("Nos mudamos") | `https://suprsalva.github.io/RosasViri/?utm_source=beacons&utm_medium=referral&utm_campaign=mudanza` |
+
+- Para una publicación o temporada, cambia `utm_campaign` (por ejemplo `utm_campaign=san-valentin`).
+  Usa siempre minúsculas y guiones, sin espacios ni acentos.
+- Funcionan con cualquier página, no solo con el inicio: por ejemplo
+  `https://suprsalva.github.io/RosasViri/girasoles/?utm_source=tiktok&utm_medium=social&utm_campaign=flores-amarillas`.
+- Al conectar el dominio propio, cambia `https://suprsalva.github.io/RosasViri/` por el dominio
+  en todos los enlaces (y genera el QR con el enlace nuevo).
+- La red de origen se cuenta aunque la persona acepte las cookies en otra página que no sea la de
+  llegada: el sitio la recuerda durante la visita.
+
 ## Cookies y privacidad
 
 - El sitio **no usa cookies** mientras no se active Google Analytics.

@@ -51,13 +51,48 @@ const { idAnalytics } = Astro.props;
     ventana.dataLayer.push(arguments);
   }
 
+  // Campaña de los enlaces con UTM (por ejemplo ?utm_source=instagram). Si la
+  // persona llega por uno y acepta las cookies en otra página, la dirección ya
+  // no los trae; se recuerdan durante la visita para no perder de qué red vino.
+  const CAMPAÑA = 'rossvtienda-campaña';
+  const UTM = ['source', 'medium', 'campaign', 'content', 'term'] as const;
+  const utmEnDireccion = new URLSearchParams(location.search).has('utm_source');
+  if (utmEnDireccion) {
+    const parametros = new URLSearchParams(location.search);
+    const campaña = Object.fromEntries(
+      UTM.filter((clave) => parametros.get(`utm_${clave}`)).map((clave) => [
+        `campaign_${clave === 'campaign' ? 'name' : clave}`,
+        parametros.get(`utm_${clave}`),
+      ]),
+    );
+    try {
+      sessionStorage.setItem(CAMPAÑA, JSON.stringify(campaña));
+    } catch {
+      // Sin almacenamiento, solo se mide si acepta en la página de llegada.
+    }
+  }
+  const campañaGuardada = (): Record<string, string> => {
+    if (utmEnDireccion) return {}; // Analytics ya la lee de la dirección.
+    try {
+      return JSON.parse(sessionStorage.getItem(CAMPAÑA) ?? '{}');
+    } catch {
+      return {};
+    }
+  };
+
   let cargado = false;
   function cargarAnalytics() {
     if (cargado || !id) return;
     cargado = true;
     ventana[`ga-disable-${id}`] = false;
     gtag('js', new Date());
-    gtag('config', id);
+    gtag('config', id, campañaGuardada());
+    // Desde aquí la cookie de Analytics ya recuerda de dónde vino la visita.
+    try {
+      sessionStorage.removeItem(CAMPAÑA);
+    } catch {
+      // Nada que borrar.
+    }
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
