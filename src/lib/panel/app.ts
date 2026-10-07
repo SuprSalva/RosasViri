@@ -833,6 +833,11 @@ function conectarEventos() {
 }
 
 export async function iniciarPanel() {
+  // Contra el "clickjacking": GitHub Pages no deja mandar el encabezado que
+  // prohíbe mostrar la página dentro de un marco, así que el panel se niega a
+  // arrancar (no lee la sesión ni muestra el formulario) si está en uno.
+  if (window.top !== window.self) return mostrar('en-marco');
+
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const clave = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   try {

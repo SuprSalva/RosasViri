@@ -17,7 +17,8 @@ sube fotos al repositorio y lanza la publicación.
 
 No se encontraron vulnerabilidades críticas. Hay **un hallazgo de riesgo medio** (el panel comparte
 dirección con otros proyectos de GitHub Pages, ver #13) que se resuelve al conectar el dominio
-propio, y algunos puntos bajos pendientes.
+propio, y algunos puntos bajos pendientes. Las dependencias (#1) y el marco ajeno (#18) se
+corrigieron el mismo día.
 
 ## Resultados
 
@@ -25,7 +26,7 @@ propio, y algunos puntos bajos pendientes.
 
 | # | Área | Resultado | Acción |
 |---|---|---|---|
-| 1 | Dependencias (`npm audit`) | 7 de octubre: **2 avisos altos** en paquetes que solo se usan al construir el sitio (`http-cache-semantics` y `source-map-js`). No llegan al navegador de los visitantes | ⏳ Pendiente: `npm audit fix` (o aceptar el PR de Dependabot) |
+| 1 | Dependencias (`npm audit`) | 7 de octubre: 2 avisos altos en paquetes que solo se usan al construir el sitio (`http-cache-semantics` y `source-map-js`); no llegaban al navegador de los visitantes | ✅ Corregido con `npm audit fix`: 0 vulnerabilidades |
 | 2 | Secretos en el código | Ninguno. `.env` solo tiene la dirección de Supabase y la **clave pública**, que está pensada para ir en el navegador; lo que protege los datos son las reglas de la base de datos (#9) | — |
 | 3 | Inyección de código (XSS) | El sitio no usa `innerHTML`, `eval` ni `document.write`. El panel arma todo con `textContent` (`src/lib/panel/dom.ts`). Los datos para Google escapan `<` | ✅ Correcto |
 | 4 | Política de seguridad de contenido (CSP) | CSP estricta con hashes en cada página. `connect-src` solo permite el propio sitio y el proyecto de Supabase; `img-src` agrega `blob:` y `raw.githubusercontent.com` para ver en el panel las fotos recién subidas | ✅ Correcto |
@@ -47,7 +48,7 @@ propio, y algunos puntos bajos pendientes.
 | 15 | Clave de GitHub del servicio | Clave *fine-grained* limitada a este repositorio (Contents y Actions). Vive solo en los secretos de Supabase, nunca en el navegador | Recomendación: ponerle **fecha de vencimiento** y anotarla para renovarla a tiempo |
 | 16 | Ubicación en las fotos | El panel `/admin/` reduce la foto, la vuelve a guardar como JPG y le quita los datos ocultos (GPS) **antes** de subirla. **Pages CMS no lo hace**: las fotos de la portada y de la galería que se suban por ahí quedan tal cual en el repositorio y se publican | ⏳ Recomendación: subir por Pages CMS solo fotos enviadas por WhatsApp (ya no llevan la ubicación) o con la ubicación de la cámara desactivada |
 | 17 | Enlaces de invitación | El panel usa el flujo *implicit*: el enlace del correo trae la sesión en la dirección, y el panel la borra de la barra en cuanto la lee. Es lo que permite abrir la invitación en otro dispositivo | Aceptado |
-| 18 | Marco ajeno (clickjacking) | GitHub Pages no permite el encabezado `frame-ancestors`, así que otro sitio podría mostrar el panel dentro de un marco e inducir clics. Ahora que hay inicio de sesión, el riesgo ya no es nulo, aunque es bajo: eliminar pide confirmación y nada se borra de verdad (todo se recupera de la Papelera) | ⏳ Pendiente: que el panel se niegue a funcionar dentro de un marco, o Cloudflare delante del dominio propio |
+| 18 | Marco ajeno (clickjacking) | GitHub Pages no permite el encabezado `frame-ancestors`, así que otro sitio podría mostrar el panel dentro de un marco e inducir clics. Ahora que hay inicio de sesión, el riesgo ya no es nulo, aunque es bajo: eliminar pide confirmación y nada se borra de verdad (todo se recupera de la Papelera) | ✅ Corregido: dentro de un marco, el panel no arranca (no lee la sesión ni muestra el formulario) y muestra un aviso con un botón para abrirlo directamente. Con el dominio propio, Cloudflare puede agregar además el encabezado `frame-ancestors` |
 | 19 | Verificación en dos pasos | El panel no pide un segundo factor | Opcional: activar TOTP en Supabase (**Authentication → Multi-Factor**) y pedirlo en el panel |
 
 ### Publicación
@@ -62,13 +63,13 @@ propio, y algunos puntos bajos pendientes.
 
 En orden de importancia:
 
-1. **Conectar el dominio propio** (resuelve #13 y permite #18 con Cloudflare). Hasta entonces,
+1. **Conectar el dominio propio** (resuelve #13). Hasta entonces,
    desactivar GitHub Pages en los proyectos de prueba que ya no se usen.
 2. **Verificación en dos pasos (2FA)** en las cuentas de GitHub y de Supabase con acceso al
    proyecto. Quien entra a cualquiera de las dos puede cambiar el sitio.
 3. **Revisar la configuración de Supabase** del proyecto real (#12): registro desactivado,
    contraseña mínima de 10 caracteres y *Leaked password protection*.
-4. **Actualizar dependencias** (#1) y **fijar las acciones por SHA** (#20).
+4. **Fijar las acciones por SHA** (#20).
 5. **Dar acceso solo a quien lo necesite**: en GitHub (Settings → Collaborators y GitHub Apps; Pages
    CMS necesita escritura) y en Supabase (tabla `administradores`).
 6. **Activar las alertas de seguridad** en GitHub (Settings → Code security): *Dependabot alerts* y
@@ -83,10 +84,12 @@ En orden de importancia:
 - 29 de septiembre: `npm audit`, búsqueda de patrones de claves en todos los archivos, recorrido
   automático de las 22 páginas (enlaces, errores de JavaScript y CSP) y prueba del aviso de cookies.
 - 7 de octubre:
-  - `npm audit` (2 avisos altos, ver #1).
+  - `npm audit` (2 avisos altos, ver #1; tras `npm audit fix`, 0).
   - Lectura de las reglas de la base de datos (`supabase/migrations/`), del servicio `panel` y de la
     configuración de autenticación (`supabase/config.toml`).
   - Búsqueda de `innerHTML`, `eval` y similares en el sitio y el panel: ninguno.
   - Lista pública de proyectos de la cuenta con GitHub Pages activo (#13).
   - Prueba en el navegador, con un ID de Analytics de prueba, de que el evento `pedido_whatsapp` y
     la campaña UTM no se envían antes de aceptar ni después de rechazar.
+  - Prueba en el navegador del panel dentro de un marco (muestra solo el aviso) y abierto
+    directamente (muestra el formulario de entrada).

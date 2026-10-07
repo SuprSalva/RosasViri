@@ -305,7 +305,7 @@ Cómo administrar el catálogo y los textos está explicado en el [`README.md`](
 18. [x] Eliminación lógica con **Papelera** (nada se borra de verdad) y pruebas del panel.
 19. [x] Páginas de error propias: 404 del sitio y 401, 403 y 500 del panel.
 20. [x] Publicación automática semanal para que el proyecto gratis de Supabase no se pause.
-21. [ ] Que el panel no funcione dentro de un marco de otro sitio (auditoría, #18).
+21. [x] Que el panel no funcione dentro de un marco de otro sitio (auditoría, #18).
 
 ### 2.4 Panel de administración
 

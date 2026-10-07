@@ -86,6 +86,18 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       </AvisoError>
     </section>
 
+    <section data-vista="en-marco" hidden>
+      <AvisoError codigo="403" titulo="El panel no se puede abrir aquí">
+        <p>
+          Otra página está mostrando el panel dentro de la suya. Por seguridad, solo funciona abierto directamente en el
+          navegador.
+        </p>
+        <Fragment slot="acciones">
+          <a class="boton" href={Astro.url.pathname} target="_blank" rel="noopener noreferrer">Abrir el panel</a>
+        </Fragment>
+      </AvisoError>
+    </section>
+
     <section data-vista="error-401" hidden>
       <AvisoError codigo="401" titulo="Tu sesión terminó">
         <p>Por seguridad, la sesión se cierra después de un tiempo. Vuelve a entrar para seguir.</p>
