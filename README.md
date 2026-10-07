@@ -110,6 +110,13 @@ Cuando conectes un dominio propio, repite estos pasos con el dominio nuevo.
   Google**. A partir de ahí aparece el aviso de cookies: Analytics solo se carga si la persona
   acepta, y puede cambiar su decisión en "Preferencias de cookies" al pie de la página. La sección
   de cookies del aviso de privacidad se actualiza sola.
+- **Clics en WhatsApp:** cada clic en un botón de WhatsApp (y cada envío del formulario de
+  pedidos personalizados) se registra en Analytics como el evento `pedido_whatsapp`, con el
+  `producto` ("General" en los botones que no son de un producto), la `pagina` y el precio. Para
+  ver los productos en los informes, en Analytics ve a **Administrar → Definiciones
+  personalizadas → Crear dimensión personalizada** y crea una de tipo *Evento* con el parámetro
+  `producto` (y otra con `pagina`, si quieres). Solo se cuentan las visitas que aceptaron las
+  cookies.
 - **Aviso de privacidad:** llena el **nombre completo y el domicilio del responsable** en **Datos de
   la tienda → Responsable**; mientras falten, la página dice "Por completar". Se recomienda que un
   abogado revise el texto antes del lanzamiento.

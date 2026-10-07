@@ -119,7 +119,15 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
               </fieldset>
             )
           }
-          <a class="boton pedir" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener noreferrer">
+          <a
+            class="boton pedir"
+            data-pedir
+            data-producto={nombre}
+            data-precio={producto.data.precio}
+            href={enlaceWhatsApp(mensaje)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Icono nombre="whatsapp" />
             {textoBoton}
           </a>
@@ -152,7 +160,15 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
   <div class="barra" data-barra hidden>
     <div class="contenedor barra-fila">
       <p class="barra-precio precio-num"><span class="visualmente-oculto">{nombre}: </span>{precio(producto.data.precio)}</p>
-      <a class="boton" data-pedir href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener noreferrer">
+      <a
+        class="boton"
+        data-pedir
+        data-producto={nombre}
+        data-precio={producto.data.precio}
+        href={enlaceWhatsApp(mensaje)}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <Icono nombre="whatsapp" />
         {textoBoton}
       </a>

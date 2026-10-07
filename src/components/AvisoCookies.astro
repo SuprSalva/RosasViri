@@ -1,6 +1,7 @@
 ---
 // Solo se muestra si hay un ID de Google Analytics en tienda.json. Google
 // Analytics no se carga (y no deja cookies) hasta que la persona acepta.
+import { tienda } from '../data/tienda';
 import { ruta } from '../lib/enlaces';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 const { idAnalytics } = Astro.props;
 ---
 
-<section class="cookies" aria-label="Aviso de cookies" data-cookies data-ga={idAnalytics} hidden>
+<section class="cookies" aria-label="Aviso de cookies" data-cookies data-ga={idAnalytics} data-moneda={tienda.moneda} hidden>
   <p>
     Usamos cookies de Google Analytics para saber cuántas personas visitan la tienda. Solo se activan si aceptas.{' '}
     <a href={ruta('/privacidad/#cookies')}>Más información</a>
@@ -43,17 +44,18 @@ const { idAnalytics } = Astro.props;
     }
   };
 
+  // gtag necesita recibir el objeto `arguments` tal cual.
+  function gtag(..._args: unknown[]) {
+    ventana.dataLayer = ventana.dataLayer ?? [];
+    // eslint-disable-next-line prefer-rest-params
+    ventana.dataLayer.push(arguments);
+  }
+
   let cargado = false;
   function cargarAnalytics() {
     if (cargado || !id) return;
     cargado = true;
     ventana[`ga-disable-${id}`] = false;
-    ventana.dataLayer = ventana.dataLayer ?? [];
-    // gtag necesita recibir el objeto `arguments` tal cual.
-    function gtag(..._args: unknown[]) {
-      // eslint-disable-next-line prefer-rest-params
-      ventana.dataLayer!.push(arguments);
-    }
     gtag('js', new Date());
     gtag('config', id);
     const script = document.createElement('script');
@@ -95,6 +97,29 @@ const { idAnalytics } = Astro.props;
         aviso.querySelector<HTMLButtonElement>('[data-aceptar]')?.focus();
       });
     }
+
+    // Cuenta cada pedido por WhatsApp (por producto y por página), solo si la
+    // persona aceptó las cookies.
+    const moneda = aviso.dataset.moneda ?? 'MXN';
+    const contarPedido = (origen: HTMLElement) => {
+      if (!cargado) return;
+      const precio = Number(origen.dataset.precio);
+      gtag('event', 'pedido_whatsapp', {
+        producto: origen.dataset.producto ?? 'General',
+        pagina: location.pathname,
+        ...(precio > 0 && { value: precio, currency: moneda }),
+      });
+    };
+    document.addEventListener('click', (evento) => {
+      const enlace = (evento.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="https://wa.me/"]');
+      if (enlace) contarPedido(enlace);
+    });
+    document.addEventListener('submit', (evento) => {
+      const formulario = evento.target as HTMLFormElement;
+      // El formulario de cada producto abre WhatsApp con un clic en su botón,
+      // que ya se cuenta arriba.
+      if (formulario.matches('form[data-producto]')) contarPedido(formulario);
+    });
   }
 </script>
 
