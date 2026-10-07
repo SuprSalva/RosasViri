@@ -17,8 +17,8 @@ sube fotos al repositorio y lanza la publicación.
 
 No se encontraron vulnerabilidades críticas. Hay **un hallazgo de riesgo medio** (el panel comparte
 dirección con otros proyectos de GitHub Pages, ver #13) que se resuelve al conectar el dominio
-propio, y algunos puntos bajos pendientes. Las dependencias (#1) y el marco ajeno (#18) se
-corrigieron el mismo día.
+propio, y algunos puntos bajos pendientes. Las dependencias (#1), el marco ajeno (#18) y la
+fijación de acciones (#20) se corrigieron el mismo día.
 
 ## Resultados
 
@@ -55,7 +55,7 @@ corrigieron el mismo día.
 
 | # | Área | Resultado | Acción |
 |---|---|---|---|
-| 20 | Flujo de publicación | Permisos mínimos (`contents: read`, `pages: write`, `id-token: write`), `npm ci` y revisión de tipos antes de construir. Si la base de datos falla o viene vacía, no se publica | Recomendación: fijar las acciones por SHA |
+| 20 | Flujo de publicación | Permisos mínimos (`contents: read`, `pages: write`, `id-token: write`), `npm ci` y revisión de tipos antes de construir. Si la base de datos falla o viene vacía, no se publica | ✅ Corregido: las 4 acciones van fijadas por SHA (con la versión en un comentario), así un cambio en una etiqueta de otro repositorio no altera la publicación. Dependabot sigue proponiendo las versiones nuevas |
 | 21 | Validación de datos | Cada publicación valida WhatsApp, correo, enlaces, precios y que las fotos existan. Un error en el panel o en Pages CMS detiene la publicación y el sitio anterior sigue en línea | ✅ Correcto |
 | 22 | HTTPS | GitHub Pages sirve el sitio con HTTPS | Al conectar el dominio, activar **Enforce HTTPS** |
 
@@ -69,14 +69,13 @@ En orden de importancia:
    proyecto. Quien entra a cualquiera de las dos puede cambiar el sitio.
 3. **Revisar la configuración de Supabase** del proyecto real (#12): registro desactivado,
    contraseña mínima de 10 caracteres y *Leaked password protection*.
-4. **Fijar las acciones por SHA** (#20).
-5. **Dar acceso solo a quien lo necesite**: en GitHub (Settings → Collaborators y GitHub Apps; Pages
+4. **Dar acceso solo a quien lo necesite**: en GitHub (Settings → Collaborators y GitHub Apps; Pages
    CMS necesita escritura) y en Supabase (tabla `administradores`).
-6. **Activar las alertas de seguridad** en GitHub (Settings → Code security): *Dependabot alerts* y
+5. **Activar las alertas de seguridad** en GitHub (Settings → Code security): *Dependabot alerts* y
    *Secret scanning*.
-7. **Clave de GitHub del servicio con vencimiento** (#15).
-8. **Fotos sin ubicación en Pages CMS** (#16).
-9. **Correo público.** El correo aparece en el sitio y puede recibir spam. Como alternativa, se
+6. **Clave de GitHub del servicio con vencimiento** (#15).
+7. **Fotos sin ubicación en Pages CMS** (#16).
+8. **Correo público.** El correo aparece en el sitio y puede recibir spam. Como alternativa, se
    puede usar un correo dedicado a la tienda.
 
 ## Cómo se probó
