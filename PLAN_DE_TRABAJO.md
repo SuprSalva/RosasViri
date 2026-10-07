@@ -6,6 +6,8 @@ todo lo que hace hoy la página de Beacons (catálogo, redes, contacto) y que ad
 recibir pedidos**, sin comisiones de terceros, sin publicidad de Beacons y con la imagen de la marca.
 
 **Repositorio:** `SuprSalva/RosasViri`.
+**Sitio de prueba:** https://suprsalva.github.io/RosasViri/ (en línea).
+**Última actualización:** 7 de octubre de 2026.
 
 ---
 
@@ -23,8 +25,8 @@ configurados como **producto digital** (un archivo descargable) y no como produc
 en inglés. Hoy se pueden estar perdiendo pedidos.
 
 **Acción inmediata (hoy, antes de construir nada):** en Beacons, agregar arriba de todo un botón
-**"Haz tu pedido por WhatsApp"** con el enlace `https://wa.me/52XXXXXXXXXX` y poner en la
-descripción de cada producto "Pedidos por WhatsApp: <número>". Esto no reemplaza el sitio nuevo,
+**"Haz tu pedido por WhatsApp"** con el enlace `https://wa.me/524792025177` y poner en la
+descripción de cada producto "Pedidos por WhatsApp: 479 202 5177". Esto no reemplaza el sitio nuevo,
 pero evita perder ventas mientras se construye.
 
 ---
@@ -33,10 +35,10 @@ pero evita perder ventas mientras se construye.
 
 | Fase | Qué se hace | Duración estimada | Estado |
 |---|---|---|---|
-| 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **En curso** (capturas recibidas) |
-| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (paleta, fuentes y logo provisional listos; faltan fotos originales) |
-| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **En curso** (primera versión lista con el catálogo visible) |
-| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | Pendiente |
+| 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **En curso** (redes, correo y WhatsApp confirmados; faltan productos y fotos originales) |
+| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (paleta, fuentes, logo provisional e íconos listos; faltan fotos originales y descripciones) |
+| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **Casi lista** (sitio en línea, catálogo en Supabase con panel propio; falta el contenido real) |
+| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (SEO, cookies, clics en WhatsApp y UTM listos; faltan Google y datos del responsable) |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
 | 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | Pendiente |
 | 6. Seguimiento y Fase 2 | Medir, ajustar y (opcional) pagos en línea | continuo | Pendiente |
@@ -58,6 +60,11 @@ Conviene que el sitio esté en línea y probado **antes** de las temporadas fuer
 
 Con un arranque a inicios de octubre, el lanzamiento caería a finales de octubre: a tiempo para
 Día de Muertos y Navidad, y con margen para afinar antes del 14 de febrero.
+
+**Al 7 de octubre:** lo técnico está listo; lo que frena el lanzamiento es el contenido (fotos,
+productos que faltan, precios por confirmar) y el dominio. Para Día de Muertos ya no hay las 2–3
+semanas de margen: si se quiere vender esa temporada, lanzar con las fotos actuales y cambiarlas
+después desde el panel. Navidad sigue siendo una meta cómoda.
 
 ---
 
@@ -129,8 +136,8 @@ Precios en `$`; lo más probable es que sean pesos mexicanos (MXN), por confirma
       de cada ficha. Las capturas no sirven como fotos del sitio.
 - [ ] **Logo original** (archivo PNG grande o SVG). Si no existe, se redibuja en SVG a partir de
       la captura.
-- [ ] **Enlaces exactos** de TikTok e Instagram y el correo de contacto.
-- [ ] **Número de WhatsApp** para pedidos (¿WhatsApp Business?).
+- [x] **Enlaces exactos** de TikTok e Instagram y el correo de contacto.
+- [x] **Número de WhatsApp** para pedidos: 52 479 202 5177.
 - [ ] **Estadísticas de Beacons** (visitas y clics de los últimos 30–90 días), como línea base.
 - [ ] **Suscriptores o contactos** registrados en Beacons, si hay: exportar a CSV.
 - [ ] **Dónde está publicado el enlace de Beacons:** biografías, estados, tarjetas, etiquetas,
@@ -144,7 +151,7 @@ Precios en `$`; lo más probable es que sean pesos mexicanos (MXN), por confirma
 | Dominio | `rossvtienda.com`, `rossvtienda.mx`, `rossvtienda.com.mx` | Un `.com` o `.mx` con el mismo nombre de las redes. Revisar disponibilidad. |
 | Forma de pedido al lanzar | a) Pedido por WhatsApp · b) Carrito con pago en línea | ✅ **a) WhatsApp**: los ramos llevan elección de colores y carritos, y eso se acuerda mejor platicando. Además, hoy no hay ningún método de pago conectado. El pago en línea queda para la Fase 6. |
 | Plataforma | a) Sitio propio en este repo · b) Shopify, Tiendanube u otra | ✅ **a) Sitio propio**: el catálogo es de unos 15 productos, así que no hace falta una plataforma de pago mensual. |
-| Quién actualiza productos | Dueña, desarrollo o ambos | Archivos sencillos + panel de edición opcional (ver 2.4) |
+| Quién actualiza productos | Dueña, desarrollo o ambos | ✅ **La dueña**, desde el panel propio en `/admin/`; los textos del sitio, desde Pages CMS (ver 2.4) |
 
 **Definición de terminado de la Fase 0:** catálogo completo, fotos y logo originales reunidos,
 enlaces de redes y WhatsApp confirmados, y decisiones tomadas.
@@ -181,17 +188,19 @@ Estructura elegida: **portada de tienda** (29/09/2026).
 6. **Galería (`/galeria/`)**: ramos entregados, fotos del catálogo y opiniones reales de clientes.
 7. **Cómo pedir (`/como-pedir/`)**: pasos y preguntas frecuentes.
 8. **Contacto (`/contacto/`)**: WhatsApp, Instagram, TikTok y correo.
-9. **Página 404**. El aviso de privacidad queda pendiente hasta que el sitio recoja datos.
+9. **Aviso de privacidad (`/privacidad/`)**, con la sección de cookies.
+10. **Página 404**, y páginas de error propias en el panel (401, 403 y 500).
+11. **Administración (`/admin/`)**: panel del catálogo, fuera de Google.
 
 ### 1.3 Identidad visual
 
-- [ ] Conservar la paleta actual (tabla de la sección 0.1) como base del diseño.
-- [ ] Logo en SVG: el original o uno redibujado a partir de la captura.
-- [ ] Favicon con el tulipán en "V", más una imagen de vista previa (1200×630) para WhatsApp,
+- [x] Conservar la paleta actual (tabla de la sección 0.1) como base del diseño.
+- [x] Logo en SVG redibujado a partir de la captura. Falta cambiarlo por el original, si existe.
+- [x] Favicon con el tulipán en "V", más una imagen de vista previa (1200×630) para WhatsApp,
       Facebook e Instagram.
 - [x] Tipografías: **Playfair Display** para títulos y **Lato** para texto (opción "Elegante",
       elegida el 29/09/2026).
-- [ ] Diseño pensado primero para celular: la clientela llega desde Instagram y TikTok.
+- [x] Diseño pensado primero para celular: la clientela llega desde Instagram y TikTok.
 - [ ] Maqueta del inicio y de la ficha de producto, aprobada antes de programar.
 
 ### 1.4 Contenido
@@ -202,7 +211,7 @@ Estructura elegida: **portada de tienda** (29/09/2026).
       cuántas flores, material, tipo de papel, moño, colores disponibles y tamaño aproximado.
 - [ ] Textos de "Cómo pedir": tiempo de elaboración, anticipo, formas de pago (transferencia,
       efectivo, etc.), entregas y costo de envío.
-- [ ] Mensaje de WhatsApp prellenado, por ejemplo:
+- [x] Mensaje de WhatsApp prellenado, por ejemplo:
       > Hola Rossvtienda 🌷 Quiero pedir: **Ramo chico de rosas** ($220).
       > Color de rosas: ____. ¿Para qué fecha lo tendrían?
 
@@ -223,49 +232,50 @@ logo) en una carpeta compartida.
   servidor que mantener.
 - **CSS propio** con los colores de la marca como variables. Las imágenes se optimizan solas
   (WebP o AVIF, varios tamaños): importante porque todo el catálogo son fotos.
-- **Productos en archivos Markdown** dentro del repo. Agregar un ramo es agregar un archivo.
+- **Catálogo en Supabase** (plan gratuito): productos y secciones en una base de datos que se
+  edita desde el panel `/admin/`. El sitio la lee **al publicarse**, así que sigue siendo estático.
+  Las fotos viven en el repositorio. *(Al principio los productos eran archivos Markdown; se
+  cambió el 29 de septiembre para tener un panel propio, más sencillo para la dueña.)*
 - **Hosting gratuito:** GitHub Pages con publicación automática en cada cambio. Cloudflare Pages
   o Netlify son alternativas equivalentes.
-- **Formulario de contacto** (opcional): Formspree o Web3Forms, en su plan gratuito.
+- **Formularios:** no hacen falta. Pedidos y personalizados arman un mensaje de WhatsApp.
 
 ### 2.2 Estructura del repositorio
 
 ```
 RosasViri/
 ├── PLAN_DE_TRABAJO.md
-├── README.md                        # Cómo editar productos y publicar
-├── docs/referencia-beacons/         # Capturas de la página actual
-├── astro.config.mjs                 # Dirección del sitio (cambiar al conectar el dominio)
-├── public/
-│   ├── favicon.svg
-│   ├── apple-touch-icon.png
-│   └── og-image.jpg                 # Vista previa al compartir el enlace
+├── README.md                        # Cómo administrar, enlaces para redes y publicar
+├── .pages.yml                       # Pages CMS: textos del sitio
+├── .env                             # Conexión pública con Supabase (no es secreta)
+├── docs/
+│   ├── auditoria-seguridad.md
+│   └── referencia-beacons/          # Capturas de la página de Beacons
+├── astro.config.mjs                 # Dirección del sitio y CSP (cambiar al conectar el dominio)
+├── public/                          # favicon, íconos, manifest y og-image.jpg
+├── supabase/
+│   ├── migrations/                  # Tablas, permisos y eliminación lógica
+│   └── functions/panel/             # Servicio que sube fotos y lanza la publicación
 ├── src/
-│   ├── data/tienda.ts               # WhatsApp, redes, correo, categorías y su orden
-│   ├── content/productos/           # Un archivo .md por producto
-│   │   └── fotos/                   # Fotos de cada ramo
-│   ├── content.config.ts            # Campos de los productos (valida precios, fotos...)
-│   ├── components/                  # Logo, Encabezado, Redes, TarjetaProducto, Pie, Icono
-│   ├── layouts/Base.astro           # <head>, SEO, vista previa, botón flotante de WhatsApp
-│   ├── lib/                         # Enlaces de WhatsApp, precios y orden del catálogo
-│   ├── pages/
-│   │   ├── index.astro              # Inicio con el catálogo completo
-│   │   ├── [categoria]/index.astro  # /rosas/, /girasoles/, /hot-wheels/
-│   │   ├── [categoria]/[producto].astro  # /rosas/ramo-chico-de-rosas/
-│   │   ├── como-pedir.astro         # Pasos, preguntas frecuentes y redes
-│   │   ├── 404.astro
-│   │   └── robots.txt.ts
+│   ├── assets/productos/            # Fotos de los productos
+│   ├── data/                        # tienda.json, portada, cómo pedir, galería, opiniones...
+│   ├── content/paginas/             # Texto del aviso de privacidad
+│   ├── content.config.ts            # Lee el catálogo de Supabase y valida precios y fotos
+│   ├── components/                  # Logo, Encabezado, Redes, TarjetaProducto, AvisoCookies...
+│   ├── layouts/Base.astro           # <head>, SEO, vista previa y aviso de cookies
+│   ├── lib/                         # WhatsApp, catálogo, base de datos y el panel (lib/panel/)
+│   ├── pages/                       # Inicio, catálogo, secciones, fichas, personalizados,
+│   │                                # galería, cómo pedir, contacto, privacidad, admin y 404
 │   └── styles/global.css            # Paleta: #F2E6D8, #E7EAA7, #575B20, #81844B, #3B2E28...
-└── .github/workflows/publicar.yml   # Publicación automática en GitHub Pages
+└── .github/workflows/publicar.yml   # Publicación en GitHub Pages (cambios, panel y cada lunes)
 ```
 
-El formato de cada producto está explicado en el [`README.md`](README.md).
+Cómo administrar el catálogo y los textos está explicado en el [`README.md`](README.md).
 
 ### 2.3 Tareas de desarrollo (en orden)
 
-1. [x] Crear el proyecto Astro y el flujo de publicación en GitHub Pages. Falta activarlo en
-       GitHub (Settings → Pages → Source: GitHub Actions) y unir la rama a `main`.
-2. [x] Estilos base con la paleta y las tipografías de la marca (Arvo, Short Stack y Nunito).
+1. [x] Crear el proyecto Astro y el flujo de publicación en GitHub Pages (activo y en línea).
+2. [x] Estilos base con la paleta y las tipografías de la marca (Playfair Display y Lato).
 3. [x] Layout base: `<head>` con título, descripción, vista previa para redes y favicon.
 4. [x] Componentes: encabezado con logo en óvalo, redes (TikTok, Instagram, correo, WhatsApp),
        botón flotante de WhatsApp y pie de página.
@@ -283,19 +293,32 @@ El formato de cada producto está explicado en el [`README.md`](README.md).
         saber programar.
 13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales, y el
         logo redibujado por el archivo original.
-14. [ ] Agregar los productos que faltan y confirmar el WhatsApp y los precios marcados como
-        `POR CONFIRMAR`. (Redes y correo ya están confirmados.)
+14. [ ] Agregar los productos que faltan y confirmar los precios de **Carrito 3** ($380) y
+        **Carrito duo** ($220). (Redes, correo y WhatsApp ya están confirmados.) Revisar si
+        **"rosa-roja"**, creado desde el panel, es un producto real o una prueba.
 15. [x] Panel de administración (Pages CMS) para todo el contenido y varias fotos por producto.
 16. [x] Aviso de privacidad, aviso de cookies, `favicon.ico`, íconos, configuración para Google y
         auditoría de seguridad ([`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md)).
-        Falta llenar el nombre y domicilio del responsable en el panel.
+        Falta llenar el nombre y domicilio del responsable en Pages CMS.
+17. [x] Catálogo en Supabase con panel propio en `/admin/`: productos y secciones, varias fotos
+        (se reducen y se les quita el GPS), disponible/agotado, destacados y orden.
+18. [x] Eliminación lógica con **Papelera** (nada se borra de verdad) y pruebas del panel.
+19. [x] Páginas de error propias: 404 del sitio y 401, 403 y 500 del panel.
+20. [x] Publicación automática semanal para que el proyecto gratis de Supabase no se pause.
+21. [ ] Que el panel no funcione dentro de un marco de otro sitio (auditoría, #18).
 
 ### 2.4 Panel de administración
 
-Elegido: **Pages CMS** (https://app.pagescms.org), gratuito y sin servidor propio. Se entra con
-una cuenta de GitHub y edita productos (con varias fotos), datos de la tienda, portada,
-secciones, preguntas frecuentes, personalizados, galería, opiniones y aviso de privacidad. Cada
-cambio se publica solo en 1–2 minutos. Instrucciones en el [`README.md`](README.md#panel-de-administración).
+Hay **dos paneles** (instrucciones en el [`README.md`](README.md#administración)):
+
+- **Catálogo** (productos, precios, fotos y secciones): panel propio en `/admin/`, con correo y
+  contraseña. Guarda en Supabase y sube las fotos al repositorio. Solo entran las personas
+  invitadas y agregadas a la tabla `administradores`.
+- **Textos del sitio** (datos de la tienda, portada, cómo pedir, personalizados, galería,
+  opiniones y aviso de privacidad): **Pages CMS** (https://app.pagescms.org), con la cuenta de
+  GitHub.
+
+En los dos, cada cambio se publica solo en 1–2 minutos.
 
 **Definición de terminado de la Fase 2:** todas las páginas funcionan en la URL de prueba de
 GitHub Pages con el catálogo real completo.
@@ -331,7 +354,9 @@ GitHub Pages con el catálogo real completo.
 
 - [x] Aviso de privacidad y sección de cookies en `/privacidad/`. Pendiente: nombre y domicilio
       del responsable, y revisión de un abogado.
-- [ ] Políticas claras de anticipo, cambios y cancelaciones en "Cómo pedir".
+- [ ] Políticas claras de anticipo, cambios y cancelaciones en "Cómo pedir". Hoy solo dice que el
+      pago total se liquida al ver la foto del pedido terminado; falta cuánto es el anticipo y qué
+      pasa si se cancela.
 - [ ] "Hot Wheels" es marca de Mattel: se puede describir el producto ("ramo con carritos Hot
       Wheels"), pero no usar su logo como parte de la marca Rossvtienda.
 
@@ -357,8 +382,10 @@ GitHub Pages con el catálogo real completo.
 2. [ ] Apuntar el dominio a GitHub Pages, activar HTTPS y probar con `www` y sin `www`.
 3. [ ] **Cambiar el enlace** en las biografías de TikTok e Instagram, en el perfil y catálogo de
        WhatsApp Business, en el Perfil de Empresa de Google y en cualquier otro lugar anotado en
-       la Fase 0.
-4. [ ] Generar un **código QR nuevo** al dominio para tarjetas, etiquetas de los ramos y bolsas.
+       la Fase 0. Usar los **enlaces con UTM** del [`README.md`](README.md#enlaces-para-redes-sociales),
+       ya con el dominio nuevo.
+4. [ ] Generar un **código QR nuevo** al dominio (con su enlace UTM) para tarjetas, etiquetas de
+       los ramos y bolsas.
 5. [ ] Publicar el lanzamiento en TikTok e Instagram (video mostrando la página nueva).
 6. [ ] **No borrar Beacons de inmediato.** Durante 2 o 3 meses, dejar en la página de Beacons un
        solo botón grande: "Nuestra tienda se mudó a **<dominio>**".
@@ -407,7 +434,10 @@ Cuando el volumen de pedidos lo justifique:
 | Se siguen perdiendo pedidos mientras se construye el sitio | **Acción inmediata:** botón de WhatsApp en Beacons desde hoy |
 | Se pierden visitas de enlaces viejos a Beacons | Mantener Beacons con el botón "Nos mudamos" 2 o 3 meses |
 | Las fotos del sitio se ven borrosas | Usar archivos originales, nunca capturas |
-| La dueña no puede actualizar productos o precios | Archivos simples + README + panel CMS opcional |
+| La dueña no puede actualizar productos o precios | Panel propio en `/admin/` + Pages CMS + README |
+| Supabase (plan gratis) se pausa por falta de uso | Publicación automática cada lunes, que lee la base de datos |
+| Supabase no responde al publicar | La publicación se detiene y el sitio anterior sigue en línea |
+| Alguien toma la sesión del panel desde otro proyecto de `suprsalva.github.io` | Conectar el dominio propio (ver la [auditoría](docs/auditoria-seguridad.md), #13) |
 | El sitio se ve mal dentro de TikTok o Instagram | Probar en esos navegadores integrados (Fase 4) |
 | Pedidos de Hot Wheels con carritos que ya no hay | Aclarar "sujeto a existencias" y confirmar modelos por WhatsApp |
 | No está listo para San Valentín | Lanzar en octubre o noviembre y dejar enero solo para ajustes |
@@ -428,11 +458,14 @@ Cuando el volumen de pedidos lo justifique:
 
 ## Preguntas abiertas
 
+Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram y correo.
+
 1. ¿Qué productos hay debajo de lo que se ve en las capturas? (nombre, descripción, precio)
-2. ¿Cuál es el número de WhatsApp para pedidos?
-3. ¿Cuáles son los enlaces exactos de TikTok e Instagram y el correo?
-4. ¿Los precios son en pesos mexicanos? ¿En qué ciudad o zona entregan, y hacen envíos?
-5. ¿Cuánto tarda la elaboración de un ramo y piden anticipo? ¿Qué formas de pago aceptan?
-6. ¿Qué colores de rosas y de papel ofrecen?
-7. ¿Tienen el logo en archivo original y las fotos en buena calidad?
-8. ¿Qué dominio prefieren (`rossvtienda.com`, `rossvtienda.mx`, otro)?
+2. ¿Los precios de Carrito 3 ($380) y Carrito duo ($220) son correctos?
+3. ¿Los precios son en pesos mexicanos? ¿En qué ciudad o zona entregan, y hacen envíos?
+4. ¿Cuánto tarda la elaboración de un ramo y cuánto es el anticipo? ¿Qué formas de pago aceptan?
+   ¿Qué pasa si se cancela un pedido?
+5. ¿Qué colores de rosas y de papel ofrecen?
+6. ¿Tienen el logo en archivo original y las fotos en buena calidad?
+7. ¿Qué dominio prefieren (`rossvtienda.com`, `rossvtienda.mx`, otro)?
+8. ¿Nombre completo y domicilio del responsable para el aviso de privacidad?
