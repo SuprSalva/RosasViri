@@ -33,13 +33,29 @@ pero evita perder ventas mientras se construye.
 
 | Fase | Qué se hace | Duración estimada | Estado |
 |---|---|---|---|
-| 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **En curso** (capturas recibidas) |
-| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (paleta, fuentes y logo provisional listos; faltan fotos originales) |
-| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **En curso** (primera versión lista con el catálogo visible) |
-| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | Pendiente |
+| 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **Casi lista** (faltan fotos y logo originales) |
+| 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (diseño listo; faltan fotos originales, formas de pago y ciudad) |
+| 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **Lista** (sitio publicado, panel del catálogo con Supabase y Pages CMS) |
+| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (falta Search Console, datos del responsable y revisión legal) |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
 | 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | Pendiente |
 | 6. Seguimiento y Fase 2 | Medir, ajustar y (opcional) pagos en línea | continuo | Pendiente |
+
+### Pendientes al 7 de octubre de 2026
+
+- **Contenido:** fotos originales (11 de 12 productos siguen con recortes de las capturas), nombre y
+  domicilio del responsable para el aviso de privacidad, formas de pago, ciudad o zona de entrega,
+  confirmar precios de Carrito 3 y Carrito duo y los productos que faltaban de Beacons.
+- **Cuentas:**
+  - Google Search Console y Perfil de Empresa de Google.
+  - En Supabase: registro desactivado y URLs de inicio de sesión del panel apuntando al sitio real.
+  - Volver a subir el servicio `panel` a Supabase.
+  - Fecha de vencimiento de la clave de GitHub del panel.
+  - Verificación en dos pasos en GitHub y Supabase.
+- **Lanzamiento (Fase 5):** enlaces en biografías, botón "Nos mudamos" en Beacons, código QR, prueba
+  en celulares reales y revisión legal del aviso de privacidad.
+
+Detalle de seguridad en [`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md).
 
 **Tiempo total para el lanzamiento:** unas **3–4 semanas** a tiempo parcial.
 **Costo fijo mínimo:** solo el dominio (unos 12–20 USD al año). El hosting es gratuito.
@@ -129,8 +145,8 @@ Precios en `$`; lo más probable es que sean pesos mexicanos (MXN), por confirma
       de cada ficha. Las capturas no sirven como fotos del sitio.
 - [ ] **Logo original** (archivo PNG grande o SVG). Si no existe, se redibuja en SVG a partir de
       la captura.
-- [ ] **Enlaces exactos** de TikTok e Instagram y el correo de contacto.
-- [ ] **Número de WhatsApp** para pedidos (¿WhatsApp Business?).
+- [x] **Enlaces exactos** de TikTok e Instagram y el correo de contacto.
+- [x] **Número de WhatsApp** para pedidos.
 - [ ] **Estadísticas de Beacons** (visitas y clics de los últimos 30–90 días), como línea base.
 - [ ] **Suscriptores o contactos** registrados en Beacons, si hay: exportar a CSV.
 - [ ] **Dónde está publicado el enlace de Beacons:** biografías, estados, tarjetas, etiquetas,
@@ -241,22 +257,24 @@ RosasViri/
 │   ├── apple-touch-icon.png
 │   └── og-image.jpg                 # Vista previa al compartir el enlace
 ├── src/
-│   ├── data/tienda.ts               # WhatsApp, redes, correo, categorías y su orden
-│   ├── content/productos/           # Un archivo .md por producto
-│   │   └── fotos/                   # Fotos de cada ramo
-│   ├── content.config.ts            # Campos de los productos (valida precios, fotos...)
-│   ├── components/                  # Logo, Encabezado, Redes, TarjetaProducto, Pie, Icono
-│   ├── layouts/Base.astro           # <head>, SEO, vista previa, botón flotante de WhatsApp
-│   ├── lib/                         # Enlaces de WhatsApp, precios y orden del catálogo
+│   ├── data/*.json                  # Textos y datos de la tienda (se editan con Pages CMS)
+│   ├── assets/productos/            # Fotos de los productos
+│   ├── content/paginas/             # Aviso de privacidad
+│   ├── content.config.ts            # Lee secciones y productos de Supabase y los valida
+│   ├── components/                  # Logo, Encabezado, Redes, TarjetaProducto, Galería, Pie...
+│   ├── layouts/Base.astro           # <head>, SEO, vista previa, aviso de cookies
+│   ├── lib/                         # Enlaces de WhatsApp, catálogo, base de datos y panel/
 │   ├── pages/
 │   │   ├── index.astro              # Inicio con el catálogo completo
 │   │   ├── [categoria]/index.astro  # /rosas/, /girasoles/, /hot-wheels/
 │   │   ├── [categoria]/[producto].astro  # /rosas/ramo-chico-de-rosas/
-│   │   ├── como-pedir.astro         # Pasos, preguntas frecuentes y redes
+│   │   ├── como-pedir.astro         # Pasos, entregas y preguntas frecuentes
+│   │   ├── admin.astro              # Panel del catálogo
 │   │   ├── 404.astro
 │   │   └── robots.txt.ts
 │   └── styles/global.css            # Paleta: #F2E6D8, #E7EAA7, #575B20, #81844B, #3B2E28...
-└── .github/workflows/publicar.yml   # Publicación automática en GitHub Pages
+├── supabase/                        # Tablas y permisos (migrations/) y servicio del panel (functions/)
+└── .github/workflows/               # publicar.yml (publicación) y mantener-supabase.yml
 ```
 
 El formato de cada producto está explicado en el [`README.md`](README.md).
@@ -283,19 +301,25 @@ El formato de cada producto está explicado en el [`README.md`](README.md).
         saber programar.
 13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales, y el
         logo redibujado por el archivo original.
-14. [ ] Agregar los productos que faltan y confirmar el WhatsApp y los precios marcados como
-        `POR CONFIRMAR`. (Redes y correo ya están confirmados.)
-15. [x] Panel de administración (Pages CMS) para todo el contenido y varias fotos por producto.
+14. [ ] Agregar los productos que faltan y confirmar los precios de Carrito 3 y Carrito duo.
+        (WhatsApp, redes y correo ya están confirmados.)
+15. [x] Paneles de administración: catálogo en `/admin/` (Supabase) y textos con Pages CMS. Varias
+        fotos por producto.
 16. [x] Aviso de privacidad, aviso de cookies, `favicon.ico`, íconos, configuración para Google y
         auditoría de seguridad ([`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md)).
         Falta llenar el nombre y domicilio del responsable en el panel.
 
-### 2.4 Panel de administración
+### 2.4 Paneles de administración
 
-Elegido: **Pages CMS** (https://app.pagescms.org), gratuito y sin servidor propio. Se entra con
-una cuenta de GitHub y edita productos (con varias fotos), datos de la tienda, portada,
-secciones, preguntas frecuentes, personalizados, galería, opiniones y aviso de privacidad. Cada
-cambio se publica solo en 1–2 minutos. Instrucciones en el [`README.md`](README.md#panel-de-administración).
+- **Catálogo** (productos, precios, fotos y secciones): panel propio en `/admin/`, con correo y
+  contraseña. Los datos viven en Supabase (plan gratis) y las fotos en el repositorio; tiene
+  Papelera para restaurar lo eliminado.
+- **Textos del sitio** (portada, datos de la tienda, cómo pedir, galería, opiniones, aviso de
+  privacidad): Pages CMS (https://app.pagescms.org), con una cuenta de GitHub.
+
+Cada cambio se publica solo en 1–2 minutos. Instrucciones en el [`README.md`](README.md#administración).
+El proyecto gratis de Supabase se pausa tras 7 días sin uso; `mantener-supabase.yml` lo consulta
+tres veces por semana para evitarlo.
 
 **Definición de terminado de la Fase 2:** todas las páginas funcionan en la URL de prueba de
 GitHub Pages con el catálogo real completo.

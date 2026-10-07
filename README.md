@@ -78,8 +78,49 @@ Nadie puede registrarse solo. Para quitar el acceso, borra a la persona en **Aut
 - El servicio `panel` necesita estos secretos en Supabase (**Edge Functions → Secrets**):
   `TOKEN_GITHUB` (clave de GitHub *fine-grained* solo para este repositorio, con **Contents: Read
   and write** y **Actions: Read and write**) y `ORIGENES` (`https://suprsalva.github.io`).
-- Una publicación automática semanal evita que el proyecto gratis de Supabase se pause por falta de
-  uso.
+  **La clave de GitHub caduca:** anota su fecha de vencimiento y créala de nuevo antes. Cuando vence,
+  el panel deja de subir fotos y de publicar (muestra "GitHub no aceptó el cambio").
+- Las fotos que se suben desde el panel quedan en el historial público a nombre de la cuenta de
+  GitHub dueña de la clave, con un identificador corto de quien la subió (los primeros 8 caracteres
+  de su ID en **Authentication → Users**), sin su correo.
+
+### Que Supabase no se pause
+
+El plan gratis de Supabase **pausa el proyecto si pasa 7 días sin uso**. Mientras está en pausa, el
+sitio publicado sigue en línea, pero no se puede publicar ni entrar al panel.
+
+- [`.github/workflows/mantener-supabase.yml`](.github/workflows/mantener-supabase.yml) lee una fila
+  del catálogo los **lunes, miércoles y viernes** (no publica nada). Si Supabase no responde, la
+  ejecución falla y GitHub te avisa por correo.
+- GitHub **apaga las tareas programadas** de un repositorio público que pasa **60 días sin
+  cambios**, y avisa por correo antes. Si te llega ese aviso, entra al enlace y mantenla activa (o
+  haz cualquier cambio en el sitio).
+- **Si el proyecto se pausó:** entra a [supabase.com](https://supabase.com), abre el proyecto y usa
+  **Restore project**. Después vuelve a publicar desde **Actions → Publicar sitio → Run workflow**.
+
+### Actualizar el servicio del panel
+
+Los cambios en [`supabase/functions/panel/`](supabase/functions/panel/index.ts) **no se publican
+solos**: hay que subirlos a Supabase desde la computadora.
+
+```sh
+npx supabase login
+npx supabase functions deploy panel --project-ref kszhlmaheeokzrzvashv
+```
+
+El identificador del proyecto es la parte de `PUBLIC_SUPABASE_URL` (en `.env`) antes de
+`.supabase.co`. Los cambios en la base de datos (`supabase/migrations/`) se aplican con
+`npx supabase db push --project-ref …`.
+
+### Privacidad del historial
+
+El repositorio es público, así que cada cambio muestra el nombre y el correo de quien lo hizo.
+
+- **Pages CMS** guarda los cambios a nombre de la app (`identity: app` en `.pages.yml`), no de la
+  persona que edita.
+- **Desde tu computadora:** en GitHub, activa **Settings → Emails → Keep my email addresses
+  private** y usa en git el correo `…@users.noreply.github.com` que te muestra esa página
+  (`git config user.email "…@users.noreply.github.com"`).
 
 ### Consejos
 

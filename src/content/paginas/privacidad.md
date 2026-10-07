@@ -1,6 +1,6 @@
 ---
 titulo: Aviso de privacidad
-actualizado: 2026-09-29
+actualizado: 2026-10-07
 ---
 
 ## Qué datos personales recabamos
@@ -11,7 +11,8 @@ Cuando haces un pedido o nos contactas por WhatsApp, correo electrónico o redes
 
 - Nombre.
 - Número de teléfono y correo electrónico.
-- Dirección o punto de entrega.
+- Punto de entrega elegido o, para entregas a domicilio, nombre de quien recibe y datos para ubicar
+  el domicilio: calle, número, colonia, número interior y color de la fachada.
 - Detalles del pedido: productos, colores, dedicatorias y fechas.
 
 No recabamos datos personales sensibles ni pedimos datos de tarjetas bancarias en este sitio.
@@ -21,8 +22,10 @@ No recabamos datos personales sensibles ni pedimos datos de tarjetas bancarias e
 **Finalidades necesarias** para atender tu pedido:
 
 - Confirmar disponibilidad, precio y fecha de entrega.
-- Coordinar el pago y la entrega de tu pedido.
+- Coordinar el pago y la entrega de tu pedido, y enviarte una foto del pedido terminado.
 - Responder tus dudas y dar seguimiento a cambios o aclaraciones.
+- Registrar las entregas en persona que no se recogieron, para aplicar la regla de entregas que
+  aparece en «Cómo pedir».
 
 **Finalidades adicionales**, solo si nos das tu permiso:
 
@@ -33,7 +36,9 @@ Puedes pedirnos en cualquier momento que dejemos de usar tus datos para las fina
 
 ## Con quién compartimos tus datos
 
-No vendemos ni rentamos tus datos personales. Solo los compartimos cuando es necesario para cumplir tu pedido (por ejemplo, con el servicio de mensajería que hace la entrega) o cuando lo requiera una autoridad competente.
+No vendemos ni rentamos tus datos personales. Solo los compartimos cuando es necesario para cumplir tu pedido o cuando lo requiera una autoridad competente.
+
+**Entregas por Uber.** Si eliges esta forma de entrega y tú pides el viaje, tú compartes con Uber los datos de la entrega. Si nosotros pedimos el viaje por ti, compartimos con Uber y con la persona conductora la dirección de entrega y el nombre de quien recibe, solo para que tu pedido llegue. Uber trata esa información conforme a su propio aviso de privacidad.
 
 Nos comunicamos contigo por medio de servicios de terceros, como WhatsApp, correo electrónico y redes sociales, que tratan la información conforme a sus propios avisos de privacidad. Este sitio está alojado en GitHub Pages, que puede registrar la dirección IP de los visitantes por motivos de seguridad.
 

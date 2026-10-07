@@ -5,9 +5,9 @@
 
 settings:
   commit:
-    # Los cambios de colaboradores invitados por correo quedan con su nombre
-    # y correo en el historial, para saber quién cambió qué.
-    identity: user
+    # El repositorio es público: los cambios se guardan a nombre de Pages CMS
+    # para que el correo de quien edita no quede visible en el historial.
+    identity: app
 
 media:
   input: src/assets

@@ -84,7 +84,7 @@ async function github(ruta: string, init: RequestInit): Promise<Response> {
   return respuesta;
 }
 
-async function subirFoto(datos: Record<string, unknown>, correo: string) {
+async function subirFoto(datos: Record<string, unknown>, usuario: string) {
   if (typeof datos.contenido !== 'string' || !datos.contenido) throw new ErrorPanel('No llegó ninguna foto.');
   let bytes: Uint8Array;
   try {
@@ -100,7 +100,9 @@ async function subirFoto(datos: Record<string, unknown>, correo: string) {
   await github(`/contents/${CARPETA}/${archivo}`, {
     method: 'PUT',
     body: JSON.stringify({
-      message: `Subir foto ${archivo} desde el panel (${correo})`,
+      // El repositorio es público: en el mensaje va un identificador corto de la
+      // cuenta (se busca en Supabase → Authentication → Users), no su correo.
+      message: `Subir foto ${archivo} desde el panel (cuenta ${usuario})`,
       content: datos.contenido,
       branch: RAMA,
     }),
@@ -139,7 +141,7 @@ Deno.serve(async (peticion) => {
     const datos = (await peticion.json().catch(() => ({}))) as Record<string, unknown>;
     switch (datos.accion) {
       case 'subir-foto':
-        return responder(await subirFoto(datos, sesion.user.email ?? sesion.user.id));
+        return responder(await subirFoto(datos, sesion.user.id.slice(0, 8)));
       case 'publicar':
         return responder(await publicar());
       default:
