@@ -30,7 +30,7 @@ Tipografías: **Playfair Display** (títulos) y **Lato** (texto).
 Hay dos paneles:
 
 - **Catálogo** (productos, precios, fotos y secciones): el panel propio del sitio en
-  [`/admin/`](https://suprsalva.github.io/RosasViri/admin/). Guarda los datos en una base de datos
+  [`/admin/`](https://rossvtienda.com/admin/). Guarda los datos en una base de datos
   de [Supabase](https://supabase.com) y las fotos en este repositorio.
 - **Textos del sitio** (portada, datos de la tienda, cómo pedir, galería, opiniones, aviso de
   privacidad): [Pages CMS](https://app.pagescms.org), configurado en [`.pages.yml`](.pages.yml).
@@ -77,7 +77,7 @@ Nadie puede registrarse solo. Para quitar el acceso, borra a la persona en **Aut
   no son secretos.
 - El servicio `panel` necesita estos secretos en Supabase (**Edge Functions → Secrets**):
   `TOKEN_GITHUB` (clave de GitHub *fine-grained* solo para este repositorio, con **Contents: Read
-  and write** y **Actions: Read and write**) y `ORIGENES` (`https://suprsalva.github.io`).
+  and write** y **Actions: Read and write**) y `ORIGENES` (`https://rossvtienda.com`).
 - Una publicación automática semanal evita que el proyecto gratis de Supabase se pause por falta de
   uso.
 
@@ -95,13 +95,11 @@ estructurados de productos (con precio y fotos), rutas de navegación y datos de
 opción "Mostrar el sitio en Google" está activada en **Datos de la tienda**.
 
 1. Entra a [Google Search Console](https://search.google.com/search-console) y agrega una propiedad
-   de tipo **Prefijo de URL** con `https://suprsalva.github.io/RosasViri/`.
+   de tipo **Prefijo de URL** con `https://rossvtienda.com/`.
 2. Elige verificar con **Etiqueta HTML**, copia la etiqueta y pégala en el panel, en **Datos de la
    tienda → Google → Código de verificación**. Espera a que se publique y pulsa **Verificar**.
-3. En Search Console, ve a **Sitemaps** y envía `https://suprsalva.github.io/RosasViri/sitemap-index.xml`.
+3. En Search Console, ve a **Sitemaps** y envía `https://rossvtienda.com/sitemap-index.xml`.
 4. Crea o actualiza el **Perfil de Empresa de Google** con el enlace al sitio.
-
-Cuando conectes un dominio propio, repite estos pasos con el dominio nuevo.
 
 ## Enlaces para redes sociales
 
@@ -111,21 +109,19 @@ Adquisición → Adquisición de tráfico**, por *Fuente/medio de la sesión*).
 
 | Dónde | Enlace |
 |---|---|
-| Biografía de Instagram | `https://suprsalva.github.io/RosasViri/?utm_source=instagram&utm_medium=social&utm_campaign=biografia` |
-| Biografía de TikTok | `https://suprsalva.github.io/RosasViri/?utm_source=tiktok&utm_medium=social&utm_campaign=biografia` |
-| Facebook | `https://suprsalva.github.io/RosasViri/?utm_source=facebook&utm_medium=social&utm_campaign=biografia` |
-| Perfil y catálogo de WhatsApp Business | `https://suprsalva.github.io/RosasViri/?utm_source=whatsapp&utm_medium=social&utm_campaign=perfil` |
-| Estados de WhatsApp | `https://suprsalva.github.io/RosasViri/?utm_source=whatsapp&utm_medium=social&utm_campaign=estados` |
-| Perfil de Empresa de Google | `https://suprsalva.github.io/RosasViri/?utm_source=google&utm_medium=organic&utm_campaign=perfil-empresa` |
-| Código QR (tarjetas, etiquetas, bolsas) | `https://suprsalva.github.io/RosasViri/?utm_source=qr&utm_medium=impreso&utm_campaign=tarjeta` |
-| Página de Beacons ("Nos mudamos") | `https://suprsalva.github.io/RosasViri/?utm_source=beacons&utm_medium=referral&utm_campaign=mudanza` |
+| Biografía de Instagram | `https://rossvtienda.com/?utm_source=instagram&utm_medium=social&utm_campaign=biografia` |
+| Biografía de TikTok | `https://rossvtienda.com/?utm_source=tiktok&utm_medium=social&utm_campaign=biografia` |
+| Facebook | `https://rossvtienda.com/?utm_source=facebook&utm_medium=social&utm_campaign=biografia` |
+| Perfil y catálogo de WhatsApp Business | `https://rossvtienda.com/?utm_source=whatsapp&utm_medium=social&utm_campaign=perfil` |
+| Estados de WhatsApp | `https://rossvtienda.com/?utm_source=whatsapp&utm_medium=social&utm_campaign=estados` |
+| Perfil de Empresa de Google | `https://rossvtienda.com/?utm_source=google&utm_medium=organic&utm_campaign=perfil-empresa` |
+| Código QR (tarjetas, etiquetas, bolsas) | `https://rossvtienda.com/?utm_source=qr&utm_medium=impreso&utm_campaign=tarjeta` |
+| Página de Beacons ("Nos mudamos") | `https://rossvtienda.com/?utm_source=beacons&utm_medium=referral&utm_campaign=mudanza` |
 
 - Para una publicación o temporada, cambia `utm_campaign` (por ejemplo `utm_campaign=san-valentin`).
   Usa siempre minúsculas y guiones, sin espacios ni acentos.
 - Funcionan con cualquier página, no solo con el inicio: por ejemplo
-  `https://suprsalva.github.io/RosasViri/girasoles/?utm_source=tiktok&utm_medium=social&utm_campaign=flores-amarillas`.
-- Al conectar el dominio propio, cambia `https://suprsalva.github.io/RosasViri/` por el dominio
-  en todos los enlaces (y genera el QR con el enlace nuevo).
+  `https://rossvtienda.com/girasoles/?utm_source=tiktok&utm_medium=social&utm_campaign=flores-amarillas`.
 - La red de origen se cuenta aunque la persona acepte las cookies en otra página que no sea la de
   llegada: el sitio la recuerda durante la visita.
 
@@ -153,7 +149,7 @@ Requiere Node.js 22 o más reciente.
 
 ```sh
 npm install
-npm run dev       # vista previa en http://localhost:4321/RosasViri/
+npm run dev       # vista previa en http://localhost:4321/
 npm run check     # revisa errores
 npm run build     # genera el sitio en dist/
 ```
@@ -179,15 +175,60 @@ La política de seguridad de contenido (CSP) solo funciona en el sitio construid
 
 ## Publicación
 
-El sitio se publica en GitHub Pages con [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml)
-cada vez que hay cambios en `main`, y queda en https://suprsalva.github.io/RosasViri/.
+El sitio se publica en [Cloudflare Pages](https://pages.cloudflare.com) (plan gratuito) con
+[`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) cada vez que hay cambios en
+`main`, cuando el panel lo pide y cada lunes. Queda en https://rossvtienda.com/.
+GitHub Actions construye el sitio y lo sube a Cloudflare; los encabezados de seguridad (por
+ejemplo, que nadie meta el sitio en un marco) están en [`public/_headers`](public/_headers).
 [Dependabot](.github/dependabot.yml) revisa cada semana las actualizaciones de seguridad.
 
-### Conectar el dominio propio
+**¿Por qué no GitHub Pages?** Sus condiciones no permiten usarlo para una tienda en línea, y el
+plan es cobrar en el sitio más adelante. Además, GitHub Pages no deja mandar encabezados de
+seguridad.
 
-1. En `astro.config.mjs`, cambia `site` por el dominio (por ejemplo `https://rossvtienda.com`)
-   y `base` por `'/'`.
-2. Crea el archivo `public/CNAME` con el dominio (por ejemplo `rossvtienda.com`).
-3. En GitHub, **Settings → Pages → Custom domain**, escribe el dominio y activa **Enforce HTTPS**.
-4. Configura el DNS del dominio según las instrucciones de GitHub Pages.
-5. Repite los pasos de [Aparecer en Google](#aparecer-en-google) con el dominio nuevo.
+### Dominio y Cloudflare (configuración de una sola vez)
+
+El dominio `rossvtienda.com` está registrado en **Hostinger** (renovación automática activada).
+El DNS y el sitio están en **Cloudflare**. No hace falta el hosting de Hostinger.
+
+1. **Agregar el dominio a Cloudflare.** Crea una cuenta gratis en [Cloudflare](https://dash.cloudflare.com),
+   pulsa **Add a domain**, escribe `rossvtienda.com` y elige el plan **Free**. Cloudflare copia los
+   registros DNS que ya tenga el dominio: borra los `A`, `AAAA` y `CNAME` de `rossvtienda.com` y de
+   `www` (son la página de "dominio estacionado" de Hostinger). Deja los `MX` y `TXT` si después
+   se usa correo con el dominio.
+2. **Cambiar los nameservers en Hostinger.** Cloudflare muestra dos nameservers (terminan en
+   `ns.cloudflare.com`). En Hostinger, **Dominios → rossvtienda.com → DNS / Nameservers → Cambiar
+   nameservers**, elige "usar nameservers personalizados" y pega los dos. Si DNSSEC está activado
+   en Hostinger, desactívalo antes. El cambio tarda de minutos a 24 horas; Cloudflare manda un
+   correo cuando el dominio queda activo.
+3. **Crear el proyecto de Pages.** En la computadora, dentro de la carpeta del proyecto:
+
+   ```sh
+   npx wrangler pages project create rossvtienda --production-branch=main
+   ```
+
+   La primera vez abre el navegador para iniciar sesión en Cloudflare.
+4. **Clave para GitHub.** En Cloudflare, **My Profile → API Tokens → Create Token → Create Custom
+   Token**, con un solo permiso: **Account · Cloudflare Pages · Edit**. Ponle fecha de vencimiento y
+   anótala para renovarla. Copia también el **Account ID** (en **Workers & Pages**, a la derecha).
+5. **Secretos en GitHub.** En el repositorio, **Settings → Secrets and variables → Actions → New
+   repository secret**: `CLOUDFLARE_API_TOKEN` (la clave) y `CLOUDFLARE_ACCOUNT_ID`.
+6. **Primera publicación.** En GitHub, **Actions → Publicar sitio → Run workflow**. Al terminar, el
+   sitio se ve en https://rossvtienda.pages.dev (esa dirección no aparece en Google).
+7. **Conectar el dominio al proyecto.** En Cloudflare, **Workers & Pages → rossvtienda → Custom
+   domains → Set up a custom domain**: agrega `rossvtienda.com` y después `www.rossvtienda.com`.
+8. **Siempre con candado y sin `www`.** En Cloudflare, dentro del dominio:
+   - **SSL/TLS → Edge Certificates → Always Use HTTPS**: activado.
+   - **Rules → Redirect Rules → Templates → Redirect from WWW to Root**: créala tal cual.
+9. **Supabase.**
+   - **Authentication → URL Configuration**: *Site URL* `https://rossvtienda.com/admin/`, y en
+     *Redirect URLs* agrega `https://rossvtienda.com/admin/` (lo usan las invitaciones y "olvidé
+     mi contraseña").
+   - **Edge Functions → Secrets**: cambia `ORIGENES` a `https://rossvtienda.com`.
+10. **Probar el panel** en https://rossvtienda.com/admin/: entrar, editar un producto, subir una foto
+    y ver que se publique.
+11. **Apagar GitHub Pages.** Primero entra al panel viejo (`https://suprsalva.github.io/RosasViri/admin/`)
+    en cada celular o computadora donde se haya usado y pulsa **Cerrar sesión**, para que su sesión
+    deje de servir. Después, en GitHub, **Settings → Pages → Unpublish site** y borra el entorno
+    `github-pages` en **Settings → Environments**.
+12. Repite los pasos de [Aparecer en Google](#aparecer-en-google) con el dominio nuevo.

@@ -1,6 +1,6 @@
 ---
 titulo: Aviso de privacidad
-actualizado: 2026-09-29
+actualizado: 2026-10-09
 ---
 
 ## Qué datos personales recabamos
@@ -35,7 +35,7 @@ Puedes pedirnos en cualquier momento que dejemos de usar tus datos para las fina
 
 No vendemos ni rentamos tus datos personales. Solo los compartimos cuando es necesario para cumplir tu pedido (por ejemplo, con el servicio de mensajería que hace la entrega) o cuando lo requiera una autoridad competente.
 
-Nos comunicamos contigo por medio de servicios de terceros, como WhatsApp, correo electrónico y redes sociales, que tratan la información conforme a sus propios avisos de privacidad. Este sitio está alojado en GitHub Pages, que puede registrar la dirección IP de los visitantes por motivos de seguridad.
+Nos comunicamos contigo por medio de servicios de terceros, como WhatsApp, correo electrónico y redes sociales, que tratan la información conforme a sus propios avisos de privacidad. Este sitio está alojado en Cloudflare Pages, que puede registrar la dirección IP de los visitantes por motivos de seguridad.
 
 ## Tus derechos (ARCO)
 

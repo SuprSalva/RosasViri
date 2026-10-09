@@ -16,7 +16,7 @@ const REPO = Deno.env.get('REPO_GITHUB') ?? 'SuprSalva/RosasViri';
 const RAMA = Deno.env.get('RAMA_GITHUB') ?? 'main';
 const API = Deno.env.get('API_GITHUB') ?? 'https://api.github.com';
 const TOKEN = Deno.env.get('TOKEN_GITHUB') ?? '';
-const ORIGENES = (Deno.env.get('ORIGENES') ?? 'https://suprsalva.github.io')
+const ORIGENES = (Deno.env.get('ORIGENES') ?? 'https://rossvtienda.com')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean);
