@@ -181,7 +181,9 @@ publica: `$env:CI = 'true'; npm run build` (PowerShell) o `CI=true npm run build
 
 El sitio se publica en [Cloudflare Pages](https://pages.cloudflare.com) (plan gratuito) con
 [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) cada vez que hay cambios en
-`main`, cuando el panel lo pide y cada lunes. Queda en https://rossvtienda.com/.
+`main`, cuando el panel lo pide y cada lunes. Queda en https://rossvtienda.com/ unos 2 minutos
+después de guardar. Las fotos que sube el panel no publican solas: se publica al guardar el
+producto. Si Cloudflare da un error pasajero, la subida se reintenta una vez.
 GitHub Actions construye el sitio y lo sube a Cloudflare; los encabezados de seguridad (por
 ejemplo, que nadie meta el sitio en un marco) están en [`public/_headers`](public/_headers).
 [Dependabot](.github/dependabot.yml) revisa cada semana las actualizaciones de seguridad.
