@@ -337,7 +337,9 @@ con el catálogo real completo.
 
 ### SEO
 
-- [x] Título y descripción por página. Falta agregar la ciudad cuando se confirme.
+- [x] Título y descripción por página, con la zona de entrega (León, Guanajuato) en el título del
+      inicio y de cada sección, en las descripciones, en el pie de página y en cada producto. Se
+      cambia en Pages CMS, **Datos de la tienda → Zona de entrega**.
 - [x] Datos estructurados `Product` (con precio y fotos) y `BreadcrumbList` en cada ficha;
       `Organization` y `WebSite` en el inicio.
 - [x] `sitemap.xml` (sin `/admin/` ni 404), `robots.txt`, `favicon.ico`, íconos y manifest.
@@ -478,11 +480,11 @@ Cuando el volumen de pedidos lo justifique:
 
 Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram, correo, datos del
 responsable (en Pages CMS, **Datos de la tienda → Responsable**), logo e isotipo original de la
-marca y dominio (`rossvtienda.com`).
+marca, dominio (`rossvtienda.com`) y zona de entrega (León, Guanajuato).
 
 1. ¿Qué productos hay debajo de lo que se ve en las capturas? (nombre, descripción, precio)
 2. ¿Los precios de Carrito 3 ($380) y Carrito duo ($220) son correctos?
-3. ¿Los precios son en pesos mexicanos? ¿En qué ciudad o zona entregan, y hacen envíos?
+3. ¿Los precios son en pesos mexicanos? ¿Hacen envíos fuera de León?
 4. ¿Cuánto tarda la elaboración de un ramo y cuánto es el anticipo? ¿Qué formas de pago aceptan?
    ¿Qué pasa si se cancela un pedido?
 5. ¿Qué colores de rosas y de papel ofrecen?

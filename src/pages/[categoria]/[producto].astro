@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import GaleriaProducto from '../../components/GaleriaProducto.astro';
 import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
-import { tienda } from '../../data/tienda';
+import { conZona, lugar, tienda, zonaGoogle } from '../../data/tienda';
 import {
   categorias,
   galeriaDe,
@@ -57,6 +57,7 @@ const datos = [
       priceCurrency: tienda.moneda,
       availability: disponible ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: absoluta(urlProducto(producto)),
+      areaServed: zonaGoogle,
     },
   },
   {
@@ -73,7 +74,7 @@ const datos = [
 const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 ---
 
-<Base titulo={nombre} descripcion={descripcion} imagen={paraGoogle[0].src} datos={datos} actual="catalogo">
+<Base titulo={nombre} descripcion={conZona(descripcion)} imagen={paraGoogle[0].src} datos={datos} actual="catalogo">
   <div class="contenedor">
     <a class="volver" href={urlCategoria(categoria.id)}>
       <Icono nombre="flecha" />
@@ -163,6 +164,7 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
             {textoBoton}
           </a>
           <p class="nota">
+            {lugar && `Entregamos en ${lugar}. `}
             Te confirmamos disponibilidad, entrega y forma de pago por WhatsApp.{' '}
             <a href={ruta('/como-pedir/')}>¿Cómo pedir?</a>
           </p>

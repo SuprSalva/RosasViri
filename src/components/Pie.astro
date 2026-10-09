@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Redes from './Redes.astro';
-import { tienda } from '../data/tienda';
+import { lugar, tienda } from '../data/tienda';
 import { ruta } from '../lib/enlaces';
 import { menu } from '../lib/navegacion';
 ---
@@ -13,6 +13,7 @@ import { menu } from '../lib/navegacion';
       <span class="nombre">{tienda.nombre}</span>
     </a>
     <p class="lema">{tienda.lema}</p>
+    {lugar && <p class="lema">Entregas en {lugar}</p>}
     <Redes class="redes-pie" />
     <nav aria-label="Pie de página">
       <ul>

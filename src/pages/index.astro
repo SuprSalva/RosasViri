@@ -3,7 +3,7 @@ import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
 import TarjetaProducto from '../components/TarjetaProducto.astro';
-import { comoPedir, portada, tienda } from '../data/tienda';
+import { comoPedir, conZona, portada, tienda, zonaGoogle } from '../data/tienda';
 import { catalogo, destacados, urlCategoria } from '../lib/catalogo';
 import { enlaceWhatsApp, mensajePedido, precio, ruta, usuarioDe } from '../lib/enlaces';
 import { anchos, imagen } from '../lib/imagenes';
@@ -29,6 +29,16 @@ const datos = [
     logo: new URL(ruta('/icono-512.png'), Astro.site).href,
     email: tienda.correo || undefined,
     sameAs: Object.values(tienda.redes).filter(Boolean),
+    // Solo ciudad y estado: la tienda no tiene local abierto al público.
+    address: tienda.zona.ciudad
+      ? {
+          '@type': 'PostalAddress',
+          addressLocality: tienda.zona.ciudad,
+          addressRegion: tienda.zona.estado || undefined,
+          addressCountry: 'MX',
+        }
+      : undefined,
+    areaServed: zonaGoogle,
   },
   {
     '@context': 'https://schema.org',
@@ -40,7 +50,7 @@ const datos = [
 ];
 ---
 
-<Base datos={datos} actual="inicio">
+<Base descripcion={conZona(tienda.descripcion)} datos={datos} actual="inicio">
   <section class="portada contenedor">
     <div class="portada-texto">
       <p class="antetitulo">{portada.antetitulo}</p>

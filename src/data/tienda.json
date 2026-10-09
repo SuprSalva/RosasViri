@@ -9,6 +9,10 @@
     "tiktok": "https://www.tiktok.com/@ross_v1_",
     "facebook": ""
   },
+  "zona": {
+    "ciudad": "León",
+    "estado": "Guanajuato"
+  },
   "moneda": "MXN",
   "google": {
     "indexar": true,

@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { tienda } from '../data/tienda';
+import { conZona, tienda } from '../data/tienda';
 import { enlaceWhatsApp, mensajePedido, ruta, usuarioDe } from '../lib/enlaces';
 
 type Canal = {
@@ -31,7 +31,9 @@ if (tienda.correo)
 
 <Base
   titulo="Contacto"
-  descripcion={`Contacta a ${tienda.nombre} por WhatsApp, Instagram, TikTok o correo para pedidos y ramos personalizados.`}
+  descripcion={conZona(
+    `Contacta a ${tienda.nombre} por WhatsApp, Instagram, TikTok o correo para pedidos y ramos personalizados.`,
+  )}
   actual="contacto"
 >
   <div class="contenedor pagina">

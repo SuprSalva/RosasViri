@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { personalizados, tienda } from '../data/tienda';
+import { conZona, personalizados, tienda } from '../data/tienda';
 
 const { intro, ideas, ocasiones, aviso } = personalizados;
 const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
@@ -9,7 +9,9 @@ const mensaje = `Hola ${tienda.nombre} 🌷 Quiero un ramo personalizado.`;
 
 <Base
   titulo="Pedidos personalizados"
-  descripcion={`Ramos de listón satinado a tu medida: elige colores, tamaño y ocasión. Cuéntanos tu idea y ${tienda.nombre} te dice si es posible y cuánto costaría.`}
+  descripcion={conZona(
+    `Ramos de listón satinado a tu medida: elige colores, tamaño y ocasión. Cuéntanos tu idea y ${tienda.nombre} te dice si es posible y cuánto costaría.`,
+  )}
   actual="personalizados"
 >
   <div class="contenedor pagina">

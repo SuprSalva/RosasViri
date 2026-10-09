@@ -2,7 +2,7 @@
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { galeria, opiniones, tienda } from '../data/tienda';
+import { conZona, galeria, opiniones, tienda } from '../data/tienda';
 import { altFoto, catalogo, fotoDe, urlProducto } from '../lib/catalogo';
 import { enlaceWhatsApp, usuarioDe } from '../lib/enlaces';
 import { anchos, imagen } from '../lib/imagenes';
@@ -23,7 +23,9 @@ const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
 
 <Base
   titulo="Galería"
-  descripcion={`Fotos de ramos de listón satinado hechos a mano por ${tienda.nombre}: rosas eternas, girasoles y ramos con carritos Hot Wheels.`}
+  descripcion={conZona(
+    `Fotos de ramos de listón satinado hechos a mano por ${tienda.nombre}: rosas eternas, girasoles y ramos con carritos Hot Wheels.`,
+  )}
   actual="galeria"
 >
   <div class="contenedor pagina">

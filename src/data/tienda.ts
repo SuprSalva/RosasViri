@@ -35,6 +35,10 @@ const esquemaTienda = z.object({
     tiktok: opcional(z.url()),
     facebook: opcional(z.url()),
   }),
+  // Dónde se entrega. Va en títulos, descripciones, el pie de página y los datos para Google.
+  zona: z
+    .object({ ciudad: z.string().default(''), estado: z.string().default('') })
+    .default({ ciudad: '', estado: '' }),
   moneda: z.string().length(3),
   google: z.object({
     indexar: z.boolean(),
@@ -118,3 +122,16 @@ export const galeria = validar('galeria.json', esquemaGaleria, datosGaleria).fot
   (a, b) => (b.fecha?.getTime() ?? 0) - (a.fecha?.getTime() ?? 0),
 );
 export const opiniones = validar('opiniones.json', esquemaOpiniones, datosOpiniones).opiniones;
+
+/** Zona de entrega completa, por ejemplo "León, Guanajuato" ('' si no hay ciudad). */
+export const lugar = tienda.zona.ciudad && [tienda.zona.ciudad, tienda.zona.estado].filter(Boolean).join(', ');
+
+/** Zona de entrega para Google (schema.org), o `undefined` si no hay ciudad. */
+export const zonaGoogle = lugar ? { '@type': 'City', name: lugar } : undefined;
+
+/** Agrega "Entregas en León, Guanajuato." al final de una descripción para Google y redes. */
+export function conZona(texto: string): string {
+  if (!lugar) return texto;
+  const base = texto.trim();
+  return `${base}${/[.!?…]$/.test(base) ? '' : '.'} Entregas en ${lugar}.`;
+}

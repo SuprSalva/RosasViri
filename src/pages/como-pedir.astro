@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import { comoPedir, tienda } from '../data/tienda';
+import { comoPedir, lugar, tienda } from '../data/tienda';
 import { enlaceWhatsApp, mensajePedido, ruta } from '../lib/enlaces';
 
 const { pasos, entregas, preguntas } = comoPedir;
@@ -9,7 +9,7 @@ const { pasos, entregas, preguntas } = comoPedir;
 
 <Base
   titulo="Cómo pedir"
-  descripcion={`Cómo hacer tu pedido en ${tienda.nombre}: elige tu ramo, personalízalo y envíanos tu pedido por WhatsApp.`}
+  descripcion={`Cómo hacer tu pedido en ${tienda.nombre}: elige tu ramo, personalízalo y envíanos tu pedido por WhatsApp.${lugar ? ` Formas de entrega en ${lugar}.` : ''}`}
   actual="como-pedir"
 >
   <div class="contenedor pagina">
@@ -39,6 +39,7 @@ const { pasos, entregas, preguntas } = comoPedir;
       entregas.length > 0 && (
         <section aria-labelledby="entregas">
           <h2 id="entregas">Formas de entrega</h2>
+          {lugar && <p>Entregamos en {lugar}.</p>}
           <ul class="entregas" role="list">
             {entregas.map((entrega) => (
               <li class="caja">

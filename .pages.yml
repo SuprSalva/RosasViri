@@ -51,6 +51,17 @@ content:
           - name: facebook
             label: Facebook (enlace completo)
             type: string
+      - name: zona
+        label: Zona de entrega
+        description: Sale en Google, en el pie de página y en cada producto. Si la dejas vacía, no se muestra.
+        type: object
+        fields:
+          - name: ciudad
+            label: Ciudad
+            type: string
+          - name: estado
+            label: Estado
+            type: string
       - name: moneda
         label: Moneda
         description: Código de 3 letras, por ejemplo MXN.
