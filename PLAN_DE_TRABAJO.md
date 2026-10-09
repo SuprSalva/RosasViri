@@ -6,8 +6,9 @@ todo lo que hace hoy la página de Beacons (catálogo, redes, contacto) y que ad
 recibir pedidos**, sin comisiones de terceros, sin publicidad de Beacons y con la imagen de la marca.
 
 **Repositorio:** `SuprSalva/RosasViri`.
-**Sitio de prueba:** https://suprsalva.github.io/RosasViri/ (en línea).
-**Última actualización:** 7 de octubre de 2026.
+**Sitio:** https://rossvtienda.com (dominio comprado; en lo que se conecta, sigue en
+https://suprsalva.github.io/RosasViri/).
+**Última actualización:** 9 de octubre de 2026.
 
 ---
 
@@ -40,7 +41,7 @@ pero evita perder ventas mientras se construye.
 | 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **Casi lista** (sitio en línea, catálogo en Supabase con panel propio; falta el contenido real) |
 | 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (SEO, cookies, clics en WhatsApp, UTM y datos del responsable listos; falta Google) |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
-| 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | Pendiente |
+| 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | **En curso** (dominio comprado; falta conectarlo en Cloudflare) |
 | 6. Seguimiento y Fase 2 | Medir, ajustar y (opcional) pagos en línea | continuo | Pendiente |
 
 **Tiempo total para el lanzamiento:** unas **3–4 semanas** a tiempo parcial.
@@ -235,8 +236,10 @@ logo) en una carpeta compartida.
   edita desde el panel `/admin/`. El sitio la lee **al publicarse**, así que sigue siendo estático.
   Las fotos viven en el repositorio. *(Al principio los productos eran archivos Markdown; se
   cambió el 29 de septiembre para tener un panel propio, más sencillo para la dueña.)*
-- **Hosting gratuito:** GitHub Pages con publicación automática en cada cambio. Cloudflare Pages
-  o Netlify son alternativas equivalentes.
+- **Hosting gratuito:** Cloudflare Pages, con publicación automática desde GitHub Actions en cada
+  cambio. *(Hasta el 9 de octubre fue GitHub Pages; se cambió porque sus condiciones no permiten
+  usarlo para una tienda en línea y más adelante se cobrará en el sitio. Cloudflare además deja
+  mandar encabezados de seguridad.)*
 - **Formularios:** no hacen falta. Pedidos y personalizados arman un mensaje de WhatsApp.
 
 ### 2.2 Estructura del repositorio
@@ -250,8 +253,8 @@ RosasViri/
 ├── docs/
 │   ├── auditoria-seguridad.md
 │   └── referencia-beacons/          # Capturas de la página de Beacons
-├── astro.config.mjs                 # Dirección del sitio y CSP (cambiar al conectar el dominio)
-├── public/                          # favicon, íconos, manifest y og-image.jpg
+├── astro.config.mjs                 # Dirección del sitio (rossvtienda.com) y CSP
+├── public/                          # favicon, íconos, manifest, og-image.jpg y _headers
 ├── supabase/
 │   ├── migrations/                  # Tablas, permisos y eliminación lógica
 │   └── functions/panel/             # Servicio que sube fotos y lanza la publicación
@@ -266,7 +269,7 @@ RosasViri/
 │   ├── pages/                       # Inicio, catálogo, secciones, fichas, personalizados,
 │   │                                # galería, cómo pedir, contacto, privacidad, admin y 404
 │   └── styles/global.css            # Paleta: #F2E6D8, #E7EAA7, #575B20, #81844B, #3B2E28...
-└── .github/workflows/publicar.yml   # Publicación en GitHub Pages (cambios, panel y cada lunes)
+└── .github/workflows/publicar.yml   # Publicación en Cloudflare Pages (cambios, panel y cada lunes)
 ```
 
 Cómo administrar el catálogo y los textos está explicado en el [`README.md`](README.md).
@@ -318,8 +321,8 @@ Hay **dos paneles** (instrucciones en el [`README.md`](README.md#administración
 
 En los dos, cada cambio se publica solo en 1–2 minutos.
 
-**Definición de terminado de la Fase 2:** todas las páginas funcionan en la URL de prueba de
-GitHub Pages con el catálogo real completo.
+**Definición de terminado de la Fase 2:** todas las páginas funcionan en https://rossvtienda.com
+con el catálogo real completo.
 
 ---
 
@@ -375,8 +378,12 @@ GitHub Pages con el catálogo real completo.
 
 ## Fase 5: lanzamiento y migración (1–2 días)
 
-1. [ ] **Comprar el dominio** (Cloudflare Registrar, Namecheap o Porkbun; para `.mx`, Akky).
-2. [ ] Apuntar el dominio a GitHub Pages, activar HTTPS y probar con `www` y sin `www`.
+1. [x] **Comprar el dominio:** `rossvtienda.com`, en Hostinger (9 de octubre de 2026). Activar la
+       renovación automática.
+2. [ ] **Pasar el sitio a Cloudflare Pages y conectar el dominio**, con los pasos del
+       [`README.md`](README.md#dominio-y-cloudflare-configuración-de-una-sola-vez): nameservers en
+       Hostinger, proyecto y secretos, `www` y HTTPS, Supabase y apagar GitHub Pages. Probar con
+       `www` y sin `www`.
 3. [ ] **Cambiar el enlace** en las biografías de TikTok e Instagram, en el perfil y catálogo de
        WhatsApp Business, en el Perfil de Empresa de Google y en cualquier otro lugar anotado en
        la Fase 0. Usar los **enlaces con UTM** del [`README.md`](README.md#enlaces-para-redes-sociales),
@@ -420,6 +427,10 @@ Cuando el volumen de pedidos lo justifique:
 
 - Aceptar anticipo o pago completo en línea con **Mercado Pago**, **Stripe** o **PayPal**,
   empezando con enlaces de pago por producto (no requieren servidor).
+- El cobro se hace en la página de Mercado Pago o Stripe: los datos de la tarjeta nunca pasan por
+  el sitio. Si después se quiere un carrito, lo que necesita servidor (crear el cobro y recibir el
+  aviso de "ya pagó") puede ir en una función de Supabase, como el servicio `panel`. El sitio ya
+  está en Cloudflare Pages, que sí permite tiendas en línea.
 - Mostrar datos para transferencia o depósito en la página "Cómo pedir".
 
 ---
@@ -434,11 +445,12 @@ Cuando el volumen de pedidos lo justifique:
 | La dueña no puede actualizar productos o precios | Panel propio en `/admin/` + Pages CMS + README |
 | Supabase (plan gratis) se pausa por falta de uso | Publicación automática cada lunes, que lee la base de datos |
 | Supabase no responde al publicar | La publicación se detiene y el sitio anterior sigue en línea |
-| Alguien toma la sesión del panel desde otro proyecto de `suprsalva.github.io` | Conectar el dominio propio (ver la [auditoría](docs/auditoria-seguridad.md), #13) |
+| Alguien toma la sesión del panel desde otro proyecto de `suprsalva.github.io` | Panel en el dominio propio, cerrar sesión en el panel viejo y apagar GitHub Pages (ver la [auditoría](docs/auditoria-seguridad.md), #13) |
 | El sitio se ve mal dentro de TikTok o Instagram | Probar en esos navegadores integrados (Fase 4) |
 | Pedidos de Hot Wheels con carritos que ya no hay | Aclarar "sujeto a existencias" y confirmar modelos por WhatsApp |
 | No está listo para San Valentín | Lanzar en octubre o noviembre y dejar enero solo para ajustes |
-| Vence el dominio y el sitio se cae | Renovación automática y correo de aviso vigente |
+| Vence el dominio y el sitio se cae | Renovación automática en Hostinger y correo de aviso vigente |
+| Vence la clave de Cloudflare y los cambios dejan de publicarse | Anotar su fecha de vencimiento; renovarla en Cloudflare y actualizar el secreto `CLOUDFLARE_API_TOKEN` en GitHub |
 
 ---
 
@@ -448,14 +460,16 @@ Cuando el volumen de pedidos lo justifique:
 |---|---|
 | Catálogo completo, fotos, logo, textos, precios y aprobaciones | Dueña de la tienda |
 | Diseño, desarrollo, SEO, pruebas y publicación | Desarrollo (en este repo) |
-| Compra del dominio y cuentas (Google, analítica) | Dueña (las cuentas deben quedar a nombre de la tienda) |
+| Compra del dominio y cuentas (Google, analítica, Cloudflare) | Dueña (las cuentas deben quedar a nombre de la tienda) |
 | Cambio de enlaces en TikTok, Instagram y WhatsApp | Dueña, con la lista de la Fase 5 |
 
 ---
 
 ## Preguntas abiertas
 
-Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram, correo, datos del responsable (Fatima Viridiana Rosas Diaz, Juan Alvarez 217 col. Benito Juarez) y logo e isotipo original de la marca.
+Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram, correo, datos del
+responsable (en Pages CMS, **Datos de la tienda → Responsable**), logo e isotipo original de la
+marca y dominio (`rossvtienda.com`).
 
 1. ¿Qué productos hay debajo de lo que se ve en las capturas? (nombre, descripción, precio)
 2. ¿Los precios de Carrito 3 ($380) y Carrito duo ($220) son correctos?
@@ -464,4 +478,3 @@ Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram,
    ¿Qué pasa si se cancela un pedido?
 5. ¿Qué colores de rosas y de papel ofrecen?
 6. ¿Tienen las fotos originales de cada producto en buena calidad (para reemplazar las capturas de Beacons)?
-7. ¿Qué dominio prefieren (`rossvtienda.com`, `rossvtienda.mx`, otro)?
