@@ -9,9 +9,11 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { $, aDireccion, el } from './dom';
 import { prepararFoto } from './fotos';
 
-type Foto = { src: string; alt?: string };
+/** `color`: id del color al que pertenece la foto; sin él, la foto es para todos. */
+type Foto = { src: string; alt?: string; color?: string };
 type Opcion = { nombre: string; ejemplo?: string };
-type Color = { nombre: string; foto: string; disponible: boolean };
+/** Un color del producto: la bolita que el cliente elige (muestra = "#rrggbb"). */
+type Color = { id: string; nombre: string; muestra: string; disponible: boolean };
 type Producto = {
   id: string;
   nombre: string;
@@ -21,7 +23,6 @@ type Producto = {
   descripcion: string;
   fotos: Foto[];
   opciones: Opcion[];
-  /** La misma flor en varios colores, cada uno con su foto. */
   colores: Color[];
   disponible: boolean;
   destacado: boolean;
@@ -52,6 +53,33 @@ const RESERVADAS = new Set([
   '404',
 ]);
 
+// Colores que se agregan con un toque (listón y flores); "+ Otro color" deja elegir cualquiera.
+const PALETA: [nombre: string, muestra: string][] = [
+  ['Rojo', '#c8102e'],
+  ['Vino', '#7b1e34'],
+  ['Rosa', '#f29bb4'],
+  ['Rosa pastel', '#f9d5df'],
+  ['Fucsia', '#d6267a'],
+  ['Coral', '#f27b6b'],
+  ['Durazno', '#f7b994'],
+  ['Naranja', '#f08a24'],
+  ['Amarillo', '#f5d020'],
+  ['Champagne', '#ecdcb8'],
+  ['Dorado', '#c9a227'],
+  ['Blanco', '#ffffff'],
+  ['Plateado', '#c0c0c0'],
+  ['Negro', '#1e1e1e'],
+  ['Lila', '#c9a7e0'],
+  ['Morado', '#6a3d9a'],
+  ['Azul cielo', '#9cc3e6'],
+  ['Azul rey', '#1f4fa3'],
+  ['Azul marino', '#1b2a4a'],
+  ['Turquesa', '#2bb3b1'],
+  ['Verde menta', '#a8e0c5'],
+  ['Verde', '#3f8f4a'],
+];
+const SIN_MUESTRA = '#cccccc';
+
 let supabase: SupabaseClient;
 // Incluyen lo eliminado (la Papelera); usa activas() y activos() para lo visible.
 let categorias: Categoria[] = [];
@@ -79,6 +107,24 @@ function urlFoto(ruta: string): string {
 function miniatura(ruta: string | undefined, alt = ''): HTMLElement {
   if (!ruta) return el('span', { class: 'sin-foto', 'aria-hidden': 'true' });
   return el('img', { src: urlFoto(ruta), alt, loading: 'lazy', decoding: 'async' });
+}
+
+/** Bolita de color en SVG: la política de seguridad no deja usar style="" para pintarla. */
+function bolita(muestra: string): SVGSVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 36 36');
+  svg.setAttribute('aria-hidden', 'true');
+  const circulo = document.createElementNS(ns, 'circle');
+  const atributos = { cx: '18', cy: '18', r: '17', fill: muestra, stroke: '#3b2e28', 'stroke-opacity': '0.3' };
+  for (const [nombre, valor] of Object.entries(atributos)) circulo.setAttribute(nombre, valor);
+  svg.append(circulo);
+  return svg;
+}
+
+/** Id corto para un color nuevo: las fotos lo usan para saber de qué color son. */
+function nuevoId(): string {
+  return crypto.randomUUID().slice(0, 8);
 }
 
 let temporizadorAviso: ReturnType<typeof setTimeout> | undefined;
@@ -409,7 +455,12 @@ function abrirProducto(producto?: Producto) {
   edicion.original = producto;
   edicion.fotos = structuredClone(producto?.fotos ?? []);
   edicion.opciones = structuredClone(producto?.opciones ?? []);
-  edicion.colores = structuredClone(producto?.colores ?? []);
+  edicion.colores = (producto?.colores ?? []).map((c) => ({
+    id: c.id || nuevoId(),
+    nombre: c.nombre ?? '',
+    muestra: /^#[0-9a-f]{6}$/i.test(c.muestra ?? '') ? c.muestra : SIN_MUESTRA,
+    disponible: c.disponible ?? true,
+  }));
   edicion.subiendo = 0;
 
   const vista = $('[data-vista="producto"]');
@@ -475,6 +526,26 @@ function pintarFotos() {
               oninput: (e: Event) => (foto.alt = (e.target as HTMLInputElement).value),
             }),
           ),
+          edicion.colores.length > 0 &&
+            el(
+              'label',
+              { class: 'campo' },
+              'Color de esta foto',
+              el(
+                'select',
+                {
+                  onchange: (e: Event) => {
+                    const color = (e.target as HTMLSelectElement).value;
+                    if (color) foto.color = color;
+                    else delete foto.color;
+                  },
+                },
+                el('option', { value: '' }, 'Todos los colores'),
+                ...edicion.colores.map((color, k) =>
+                  el('option', { value: color.id, selected: foto.color === color.id }, color.nombre.trim() || `Color ${k + 1}`),
+                ),
+              ),
+            ),
           el(
             'div',
             { class: 'mini-botones' },
@@ -554,113 +625,110 @@ function pintarColores() {
         const [quitado] = edicion.colores.splice(i, 1);
         edicion.colores.splice(i + delta, 0, quitado);
         pintarColores();
+        pintarFotos();
       };
-      const cambiarFoto = el('input', {
+      const subirFotos = el('input', {
         type: 'file',
         accept: 'image/jpeg,image/png,image/webp',
+        multiple: true,
         class: 'visualmente-oculto',
         onchange: async (e: Event) => {
-          const archivo = (e.target as HTMLInputElement).files?.[0];
-          if (archivo) await subirFotoColor(archivo, color);
+          const entrada = e.target as HTMLInputElement;
+          if (entrada.files?.length) await agregarFotos(entrada.files, color.id);
+          entrada.value = '';
         },
       });
       return el(
         'li',
-        { class: 'foto-editor' },
-        miniatura(color.foto, color.nombre ? `Foto del color ${color.nombre}` : `Foto del color ${i + 1}`),
+        { class: 'color-editor' },
+        el('input', {
+          type: 'color',
+          value: color.muestra,
+          'aria-label': 'Color de la bolita',
+          title: 'Cambiar el color de la bolita',
+          oninput: (e: Event) => (color.muestra = (e.target as HTMLInputElement).value),
+        }),
+        el(
+          'label',
+          { class: 'campo' },
+          'Nombre del color',
+          el('input', {
+            value: color.nombre,
+            maxlength: 30,
+            placeholder: 'Ej. Azul cielo',
+            'data-nombre-color': true,
+            oninput: (e: Event) => {
+              color.nombre = (e.target as HTMLInputElement).value;
+              // Las fotos muestran el nombre en su lista de colores.
+              pintarFotos();
+            },
+          }),
+        ),
+        el(
+          'label',
+          { class: 'interruptor' },
+          el('input', {
+            type: 'checkbox',
+            checked: color.disponible,
+            onchange: (e: Event) => (color.disponible = (e.target as HTMLInputElement).checked),
+          }),
+          'Disponible',
+        ),
         el(
           'div',
-          {},
+          { class: 'mini-botones' },
+          el('button', { type: 'button', class: 'mini', disabled: i === 0, onclick: () => mover(-1), 'aria-label': 'Mover antes' }, '↑'),
+          el('button', { type: 'button', class: 'mini', disabled: i === total - 1, onclick: () => mover(1), 'aria-label': 'Mover después' }, '↓'),
+          el('label', { class: 'mini' }, '+ Fotos de este color', subirFotos),
           el(
-            'label',
-            { class: 'campo' },
-            'Nombre del color',
-            el('input', {
-              value: color.nombre,
-              maxlength: 30,
-              placeholder: 'Ej. Azul',
-              'data-nombre-color': true,
-              oninput: (e: Event) => (color.nombre = (e.target as HTMLInputElement).value),
-            }),
-          ),
-          el(
-            'label',
-            { class: 'interruptor' },
-            el('input', {
-              type: 'checkbox',
-              checked: color.disponible,
-              onchange: (e: Event) => (color.disponible = (e.target as HTMLInputElement).checked),
-            }),
-            'Disponible',
-          ),
-          el(
-            'div',
-            { class: 'mini-botones' },
-            el('button', { type: 'button', class: 'mini', disabled: i === 0, onclick: () => mover(-1), 'aria-label': 'Mover antes' }, '↑'),
-            el('button', { type: 'button', class: 'mini', disabled: i === total - 1, onclick: () => mover(1), 'aria-label': 'Mover después' }, '↓'),
-            el('label', { class: 'mini' }, 'Cambiar foto', cambiarFoto),
-            el(
-              'button',
-              {
-                type: 'button',
-                class: 'mini',
-                onclick: () => {
-                  edicion.colores.splice(i, 1);
-                  pintarColores();
-                },
+            'button',
+            {
+              type: 'button',
+              class: 'mini',
+              onclick: () => {
+                edicion.colores.splice(i, 1);
+                // Sus fotos se quedan, pero pasan a ser para todos los colores.
+                for (const foto of edicion.fotos) if (foto.color === color.id) delete foto.color;
+                pintarColores();
+                pintarFotos();
               },
-              'Quitar',
-            ),
+            },
+            'Quitar',
           ),
         ),
       );
     }),
   );
-  if (!total) lista.append(el('li', { class: 'nota' }, 'Sin colores: el producto se muestra tal cual.'));
+  if (!total) lista.append(el('li', { class: 'nota' }, 'Sin colores: el producto se pide tal cual.'));
 }
 
-/** Cada foto elegida es un color nuevo; después se escribe su nombre. */
-async function agregarColores(archivos: FileList) {
-  const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
-  const antes = edicion.colores.length;
-  for (const archivo of Array.from(archivos)) {
-    edicion.subiendo++;
-    aviso(`Subiendo «${archivo.name}»…`);
-    try {
-      edicion.colores.push({ nombre: '', foto: await subirFoto(archivo, `${nombre}-color`), disponible: true });
-      pintarColores();
-      aviso('Color agregado. Escribe su nombre y recuerda guardar el producto.');
-    } catch (e) {
-      aviso((e as Error).message, 'error');
-    } finally {
-      edicion.subiendo--;
-    }
-  }
-  document.querySelectorAll<HTMLInputElement>('[data-nombre-color]')[antes]?.focus();
+function pintarPaleta() {
+  $('[data-paleta]').replaceChildren(
+    ...PALETA.map(([nombre, muestra]) =>
+      el('button', { type: 'button', title: nombre, 'aria-label': `Agregar ${nombre}`, onclick: () => agregarColor(nombre, muestra) }, bolita(muestra)),
+    ),
+  );
 }
 
-async function subirFotoColor(archivo: File, color: Color) {
-  const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
-  edicion.subiendo++;
-  aviso(`Subiendo «${archivo.name}»…`);
-  try {
-    color.foto = await subirFoto(archivo, `${nombre}-color`);
-    pintarColores();
-    aviso('Foto cambiada. Recuerda guardar el producto.');
-  } catch (e) {
-    aviso((e as Error).message, 'error');
-  } finally {
-    edicion.subiendo--;
-  }
+/** Agrega un color de la paleta o, sin nombre, uno nuevo para escribirlo. */
+function agregarColor(nombre = '', muestra = SIN_MUESTRA) {
+  const igual = (otro: string) => otro.trim().toLocaleLowerCase('es') === nombre.toLocaleLowerCase('es');
+  if (nombre && edicion.colores.some((c) => igual(c.nombre))) return aviso(`«${nombre}» ya está en la lista.`, 'error');
+  edicion.colores.push({ id: nuevoId(), nombre, muestra, disponible: true });
+  pintarColores();
+  pintarFotos();
+  if (!nombre) [...document.querySelectorAll<HTMLInputElement>('[data-nombre-color]')].at(-1)?.focus();
 }
 
-async function agregarFotos(archivos: FileList) {
+/** Sube fotos al producto; con `color`, quedan como fotos de ese color. */
+async function agregarFotos(archivos: FileList, color?: string) {
   const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
   for (const archivo of Array.from(archivos)) {
     edicion.subiendo++;
     aviso(`Subiendo «${archivo.name}»…`);
     try {
-      edicion.fotos.push({ src: await subirFoto(archivo, nombre) });
+      const src = await subirFoto(archivo, nombre);
+      edicion.fotos.push(color ? { src, color } : { src });
       pintarFotos();
       aviso('Foto agregada. Recuerda guardar el producto.');
     } catch (e) {
@@ -685,12 +753,19 @@ async function guardarProducto(evento: SubmitEvent) {
   if (!categoria) return aviso('Elige una sección. Si no hay, crea una en «Secciones».', 'error');
   if (!(precioNumero > 0)) return aviso('Escribe un precio mayor a 0.', 'error');
   if (!edicion.fotos.length) return aviso('Agrega al menos una foto.', 'error');
-  const colores = edicion.colores.map((c) => ({ nombre: c.nombre.trim(), foto: c.foto, disponible: c.disponible }));
+  const colores: Color[] = edicion.colores.map((c) => ({ ...c, nombre: c.nombre.trim() }));
   if (colores.some((c) => !c.nombre)) return aviso('Escribe el nombre de cada color.', 'error');
   const repetido = colores.find(
     (c, i) => colores.findIndex((otro) => otro.nombre.toLocaleLowerCase('es') === c.nombre.toLocaleLowerCase('es')) !== i,
   );
   if (repetido) return aviso(`El color «${repetido.nombre}» está dos veces.`, 'error');
+  const ids = new Set(colores.map((c) => c.id));
+  const fotos = edicion.fotos.map((f) => {
+    const limpia: Foto = { src: f.src };
+    if (f.alt?.trim()) limpia.alt = f.alt.trim();
+    if (f.color && ids.has(f.color)) limpia.color = f.color;
+    return limpia;
+  });
 
   const datos = {
     nombre,
@@ -698,7 +773,7 @@ async function guardarProducto(evento: SubmitEvent) {
     precio: precioNumero,
     resumen: valor('resumen'),
     descripcion: (form.elements.namedItem('descripcion') as HTMLTextAreaElement).value.trim(),
-    fotos: edicion.fotos.map((f) => (f.alt?.trim() ? { src: f.src, alt: f.alt.trim() } : { src: f.src })),
+    fotos,
     opciones: edicion.opciones
       .filter((o) => o.nombre.trim())
       .map((o) => (o.ejemplo?.trim() ? { nombre: o.nombre.trim(), ejemplo: o.ejemplo.trim() } : { nombre: o.nombre.trim() })),
@@ -785,7 +860,7 @@ function pintarEleccion() {
     ...new Set([
       edicionCategoria.foto,
       ...vistasLocales.keys(),
-      ...productos.flatMap((p) => [...p.fotos.map((f) => f.src), ...p.colores.map((c) => c.foto)]),
+      ...productos.flatMap((p) => p.fotos.map((f) => f.src)),
       ...Object.keys(miniaturas),
     ]),
   ].filter(Boolean);
@@ -939,11 +1014,8 @@ function conectarEventos() {
     if (entradaFotos.files?.length) await agregarFotos(entradaFotos.files);
     entradaFotos.value = '';
   });
-  const entradaColores = $<HTMLInputElement>('[data-subir-colores]');
-  entradaColores.addEventListener('change', async () => {
-    if (entradaColores.files?.length) await agregarColores(entradaColores.files);
-    entradaColores.value = '';
-  });
+  pintarPaleta();
+  $('[data-agregar-color]').addEventListener('click', () => agregarColor());
 
   const formCategoria = formularioCategoria();
   formCategoria.addEventListener('submit', guardarCategoria);

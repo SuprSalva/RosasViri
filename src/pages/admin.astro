@@ -204,6 +204,18 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
             </label>
           </div>
 
+          <div class="caja grupo g-colores">
+            <h2>Colores</h2>
+            <p class="nota">
+              Si viene en varios colores, agrégalos aquí: en el sitio aparecen como bolitas para elegir y el color va en el
+              mensaje de WhatsApp. Después, en «Fotos», elige de qué color es cada foto (o déjala para todos).
+            </p>
+            <ul class="colores-editor" role="list" data-colores></ul>
+            <p class="nota">Toca un color para agregarlo:</p>
+            <div class="paleta" role="group" aria-label="Colores para agregar" data-paleta></div>
+            <button class="boton boton-secundario boton-chico" type="button" data-agregar-color>+ Otro color</button>
+          </div>
+
           <div class="caja grupo g-opciones">
             <h2>Lo que el cliente puede elegir</h2>
             <p class="nota">Aparecen como preguntas antes del botón de WhatsApp. Por ejemplo "Color de rosas".</p>
@@ -220,20 +232,6 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
             <label class="boton boton-secundario subir">
               + Agregar fotos
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-fotos class="visualmente-oculto" />
-            </label>
-          </div>
-
-          <div class="caja grupo g-colores">
-            <h2>Colores</h2>
-            <p class="nota">
-              ¿Tienes esta misma flor en varios colores? Sube una foto de cada color y escribe su nombre. En el sitio el
-              cliente elige el color, ve su foto y el color va en el mensaje de WhatsApp. Si usas colores, quita la
-              pregunta «Color» de «Lo que el cliente puede elegir».
-            </p>
-            <ul class="fotos-editor" role="list" data-colores></ul>
-            <label class="boton boton-secundario subir">
-              + Agregar colores (una foto por color)
-              <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-colores class="visualmente-oculto" />
             </label>
           </div>
 
@@ -519,7 +517,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     align-content: start;
   }
 
-  /* En el celular: una sola columna en el orden datos → fotos → colores → preguntas → estado. */
+  /* En el celular: una sola columna en el orden datos → colores → fotos → preguntas → estado. */
   @media (max-width: 1099px) {
     .columna {
       display: contents;
@@ -529,11 +527,11 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       order: 1;
     }
 
-    .g-fotos {
+    .g-colores {
       order: 2;
     }
 
-    .g-colores {
+    .g-fotos {
       order: 3;
     }
 
@@ -582,6 +580,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
   }
 
   .panel :global(.fotos-editor),
+  .panel :global(.colores-editor),
   .panel :global(.opciones) {
     display: grid;
     gap: 10px;
@@ -632,7 +631,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     cursor: pointer;
   }
 
-  /* "Cambiar foto" de un color: una etiqueta con el selector de archivo escondido. */
+  /* "+ Fotos" de un color: una etiqueta con el selector de archivo escondido. */
   .panel :global(label.mini) {
     display: inline-flex;
     align-items: center;
@@ -643,8 +642,70 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     outline-offset: 2px;
   }
 
-  .panel :global(.foto-editor .interruptor) {
-    margin-top: 8px;
+  .panel :global(.color-editor) {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 4px 12px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--fondo);
+  }
+
+  /* La bolita a la izquierda; nombre, interruptor y botones en la columna de al lado. */
+  .panel :global(.color-editor > :not(:first-child)) {
+    grid-column: 2;
+  }
+
+  .panel :global(.color-editor > :first-child) {
+    align-self: start;
+  }
+
+  /* El selector de color del navegador, como una bolita. */
+  .panel :global(.color-editor input[type='color']) {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+  }
+
+  .panel :global(.color-editor input[type='color']::-webkit-color-swatch-wrapper) {
+    padding: 0;
+  }
+
+  .panel :global(.color-editor input[type='color']::-webkit-color-swatch) {
+    border: 1px solid rgb(59 46 40 / 0.3);
+    border-radius: 50%;
+  }
+
+  .panel :global(.color-editor input[type='color']::-moz-color-swatch) {
+    border: 1px solid rgb(59 46 40 / 0.3);
+    border-radius: 50%;
+  }
+
+  .paleta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .panel :global(.paleta button) {
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+  }
+
+  .panel :global(.paleta svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .panel :global(.mini:disabled) {

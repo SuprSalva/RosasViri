@@ -306,10 +306,12 @@ Cómo administrar el catálogo y los textos está explicado en el [`README.md`](
 19. [x] Páginas de error propias: 404 del sitio y 401, 403 y 500 del panel.
 20. [x] Publicación automática semanal para que el proyecto gratis de Supabase no se pause.
 21. [x] Que el panel no funcione dentro de un marco de otro sitio (auditoría, #18).
-22. [x] **Colores por producto** (pedido de la dueña, 9 de octubre): la misma flor en varios
-        colores, cada uno con su foto y si está disponible. En la ficha el cliente elige con
-        muestras, la galería muestra esa foto y el color va en el mensaje de WhatsApp y en
-        Analytics. Columna `colores` en Supabase (migración `20261009200000_colores.sql`).
+22. [x] **Colores por producto** (pedido de la dueña, 9 de octubre), como en Mercado Libre o
+        Liverpool: bolitas de color para elegir, cada color con su nombre y si está disponible, y
+        cada foto asignada a un color o para todos. Al elegir un color, la galería muestra sus
+        fotos y las generales; el color va en el mensaje de WhatsApp y en Analytics. Columna
+        `colores` en Supabase (migraciones `20261009200000_colores.sql` y
+        `20261009210000_colores_bolitas.sql`).
 23. [x] Fotos de las tarjetas del catálogo siempre cuadradas (antes una foto vertical estiraba la
         tarjeta) y sin el hueco sobre el nombre en las páginas de sección.
 

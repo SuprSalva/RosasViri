@@ -43,10 +43,12 @@ Se entra con correo y contraseña. Desde ahí se puede:
 
 - Crear y editar productos: nombre, sección, precio, texto corto, descripción, **varias fotos**
   (subir, ordenar, describir, quitar), preguntas para el cliente, destacado y orden.
-- **Colores:** si la misma flor viene en varios colores, se sube una foto por color y se escribe
-  su nombre (cada color se puede marcar como agotado). En la ficha el cliente elige el color con
-  muestras redondas, la galería salta a su foto y el color va en el mensaje de WhatsApp; la
-  tarjeta del catálogo dice "En N colores".
+- **Colores**, como en las tiendas en línea: se agregan con un toque desde la paleta (o "+ Otro
+  color" con cualquier tono), cada uno con su nombre y su interruptor de disponible. En «Fotos»
+  se elige de qué color es cada foto o se deja para todos ("+ Fotos de este color" sube fotos
+  ya asignadas). En la ficha el cliente ve "Color: …" con bolitas; al elegir una, la galería
+  muestra las fotos de ese color más las generales, y el color va en el mensaje de WhatsApp. La
+  tarjeta del catálogo muestra las bolitas.
 - Marcar un producto como agotado con el interruptor **Disponible**, directo en la lista.
 - Crear y editar secciones del catálogo, con su foto de portada.
 - **Eliminar sin perder nada:** lo eliminado deja de verse en el sitio y pasa a la **Papelera**,

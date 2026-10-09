@@ -54,16 +54,16 @@ export function altFoto(producto: Producto, indice: number): string {
 }
 
 /**
- * Fotos de la ficha del producto: primero las suyas y después la de cada color
- * que no esté ya entre ellas. `ruta` sirve para encontrar la foto de un color.
+ * Fotos de la ficha del producto, cada una con el id de su color si es de uno
+ * (si el color ya no existe, la foto queda para todos).
  */
-export function galeriaDe(producto: Producto): { ruta: string; src: ImageMetadata; alt: string }[] {
-  const fotos = producto.data.fotos.map((foto, i) => ({ ruta: foto.src, src: fotoDe(producto, i), alt: altFoto(producto, i) }));
-  for (const color of producto.data.colores) {
-    if (fotos.some((foto) => foto.ruta === color.foto)) continue;
-    fotos.push({ ruta: color.foto, src: imagen(color.foto), alt: `${producto.data.nombre} en ${color.nombre.toLowerCase()}` });
-  }
-  return fotos;
+export function galeriaDe(producto: Producto): { src: ImageMetadata; alt: string; color?: string }[] {
+  const ids = new Set(producto.data.colores.map((c) => c.id));
+  return producto.data.fotos.map((foto, i) => ({
+    src: fotoDe(producto, i),
+    alt: altFoto(producto, i),
+    color: foto.color && ids.has(foto.color) ? foto.color : undefined,
+  }));
 }
 
 /** La descripción del panel, separada en párrafos por renglones en blanco. */

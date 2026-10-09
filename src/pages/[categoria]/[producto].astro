@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { getImage, Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import GaleriaProducto from '../../components/GaleriaProducto.astro';
 import Icono from '../../components/Icono.astro';
@@ -29,7 +29,7 @@ interface Props {
   producto: Producto;
 }
 const { producto } = Astro.props;
-const { nombre, resumen, opciones, disponible } = producto.data;
+const { nombre, resumen, opciones, colores, disponible } = producto.data;
 const entrada = (await categorias()).find((c) => c.id === producto.data.categoria);
 if (!entrada) throw new Error(`El producto "${producto.id}" está en la sección "${producto.data.categoria}", que no existe.`);
 const categoria = { id: entrada.id, ...entrada.data };
@@ -37,13 +37,7 @@ const relacionados = (await productosDe(categoria.id)).filter((p) => p.id !== pr
 
 const mensaje = mensajePedido(producto.data);
 const descripcion = [resumen, producto.data.descripcion.trim()].filter(Boolean).join('. ');
-const galeria = galeriaDe(producto);
-const fotosGaleria = galeria.map(({ src, alt }) => ({ src, alt }));
-// Cada color sabe en qué foto de la galería está, para mostrarla al elegirlo.
-const colores = producto.data.colores.map((color) => {
-  const indice = galeria.findIndex((foto) => foto.ruta === color.foto);
-  return { ...color, indice, miniatura: galeria[indice].src };
-});
+const fotosGaleria = galeriaDe(producto);
 const paraGoogle = await Promise.all(
   fotosGaleria.map(({ src }) => getImage({ src, format: 'jpg', width: Math.min(src.width, 1200) })),
 );
@@ -107,23 +101,30 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
         <form class="pedido" data-pedido data-mensaje={mensaje} data-numero={tienda.whatsapp}>
           {
             colores.length > 0 && (
-              <fieldset>
-                <legend>Elige el color</legend>
-                <div class="muestras">
+              <fieldset class="colores">
+                <legend>
+                  Color: <span data-color-elegido>elige uno</span>
+                </legend>
+                <div class="bolitas">
                   {colores.map((color) => (
-                    <label class="muestra">
+                    <label class="bolita" title={color.disponible ? color.nombre : `${color.nombre} (agotado)`}>
                       <input
                         class="visualmente-oculto"
                         type="radio"
                         name="Color"
                         value={color.nombre}
                         disabled={!color.disponible}
-                        data-color
-                        data-indice={color.indice}
+                        data-color={color.id}
                       />
-                      <Image src={color.miniatura} alt="" width={128} height={128} loading="lazy" />
-                      <span class="muestra-nombre">{color.nombre}</span>
-                      {!color.disponible && <span class="muestra-agotado">Agotado</span>}
+                      {/* SVG y no style="": la política de seguridad no permite estilos en línea. */}
+                      <svg viewBox="0 0 36 36" aria-hidden="true">
+                        <circle cx="18" cy="18" r="17" fill={color.muestra} stroke="#3b2e28" stroke-opacity="0.25" />
+                        {!color.disponible && <line x1="7" y1="29" x2="29" y2="7" stroke="#3b2e28" stroke-width="2" />}
+                      </svg>
+                      <span class="visualmente-oculto">
+                        {color.nombre}
+                        {!color.disponible && ' (agotado)'}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -231,12 +232,14 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     formulario.addEventListener('input', actualizar);
     formulario.addEventListener('change', (evento) => {
       actualizar();
-      // Al elegir un color, la galería muestra su foto.
+      // Al elegir un color: se escribe su nombre y la galería muestra sus fotos.
       const elegido = evento.target as HTMLInputElement;
       if (!elegido.matches('[data-color]')) return;
+      const nombre = formulario.querySelector('[data-color-elegido]');
+      if (nombre) nombre.textContent = elegido.value;
       document
         .querySelector('[data-galeria]')
-        ?.dispatchEvent(new CustomEvent('ir-a-foto', { detail: Number(elegido.dataset.indice) }));
+        ?.dispatchEvent(new CustomEvent('filtrar-color', { detail: elegido.dataset.color }));
     });
     formulario.addEventListener('submit', (evento) => {
       evento.preventDefault();
@@ -413,66 +416,59 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     font-weight: 700;
   }
 
-  .muestras {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .muestra {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: 68px;
-    font-weight: 400;
-    text-align: center;
-    cursor: pointer;
-  }
-
-  .muestra :global(img) {
-    width: 60px;
-    height: 60px;
-    border: 3px solid transparent;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 0 1px rgb(59 46 40 / 0.15);
-    transition: border-color 0.15s ease;
-  }
-
-  .muestra:hover :global(img) {
-    border-color: var(--crema);
-  }
-
-  .muestra:has(:checked) :global(img) {
-    border-color: var(--boton);
-  }
-
-  .muestra:has(:checked) .muestra-nombre {
+  /* Colores como en las tiendas en línea: "Color: Azul" y bolitas para elegir. */
+  .colores legend {
+    margin-bottom: 4px;
+    font-family: inherit;
+    font-size: 1rem;
     font-weight: 700;
   }
 
-  .muestra:has(:focus-visible) :global(img) {
-    outline: 3px solid var(--texto);
+  .colores legend span {
+    font-weight: 400;
+  }
+
+  .bolitas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .bolita {
+    display: block;
+    padding: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .bolita svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: outline-color 0.15s ease;
+    outline: 2px solid transparent;
     outline-offset: 2px;
   }
 
-  .muestra:has(:disabled) {
+  .bolita:hover svg {
+    outline-color: var(--crema);
+  }
+
+  .bolita:has(:checked) svg {
+    outline-color: var(--texto);
+  }
+
+  .bolita:has(:focus-visible) svg {
+    outline: 3px solid var(--boton);
+  }
+
+  .bolita:has(:disabled) {
     cursor: default;
   }
 
-  .muestra:has(:disabled) :global(img) {
-    opacity: 0.45;
-  }
-
-  .muestra-nombre {
-    font-size: 0.92rem;
-    line-height: 1.2;
-  }
-
-  .muestra-agotado {
-    font-size: 0.8rem;
-    color: var(--texto-suave);
+  .bolita:has(:disabled) svg {
+    opacity: 0.5;
   }
 
   input:not([type='radio']) {

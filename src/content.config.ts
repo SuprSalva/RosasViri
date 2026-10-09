@@ -32,13 +32,21 @@ const productos = defineCollection({
     resumen: z.string(),
     precio: z.number().positive(),
     descripcion: z.string(),
-    // La primera es la de la tarjeta.
-    fotos: z.array(z.object({ src: foto, alt: z.string().optional() })).min(1),
-    // Datos que el cliente escribe antes de pedir (color, carritos...).
+    // La primera es la de la tarjeta. `color` es el id de uno de sus colores
+    // (la foto se muestra al elegir ese color); sin `color`, es para todos.
+    fotos: z.array(z.object({ src: foto, alt: z.string().optional(), color: z.string().optional() })).min(1),
+    // Datos que el cliente escribe antes de pedir (carritos, dedicatoria...).
     opciones: z.array(z.object({ nombre: z.string(), ejemplo: z.string().optional() })),
-    // La misma flor en varios colores, cada uno con su foto; el cliente elige uno.
+    // Colores en que viene el producto, como bolitas para elegir (muestra: "#rrggbb").
     colores: z
-      .array(z.object({ nombre: z.string().min(1), foto, disponible: z.boolean().default(true) }))
+      .array(
+        z.object({
+          id: z.string().min(1),
+          nombre: z.string().min(1),
+          muestra: z.string().regex(/^#[0-9a-f]{6}$/i, 'El color debe ser como "#1f4fa3".'),
+          disponible: z.boolean().default(true),
+        }),
+      )
       .default([]),
     disponible: z.boolean(),
     // Aparece en "Destacados" en la portada.

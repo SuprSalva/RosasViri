@@ -4,7 +4,8 @@ import Icono from './Icono.astro';
 import { anchos } from '../lib/imagenes';
 
 interface Props {
-  fotos: { src: ImageMetadata; alt: string }[];
+  /** `color`: id del color al que pertenece la foto (sin él, es para todos). */
+  fotos: { src: ImageMetadata; alt: string; color?: string }[];
 }
 const { fotos } = Astro.props;
 const total = fotos.length;
@@ -29,6 +30,7 @@ const total = fotos.length;
             sizes="(min-width: 960px) 500px, 100vw"
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchpriority={i === 0 ? 'high' : undefined}
+            pictureAttributes={{ 'data-foto': '', 'data-color': foto.color }}
           />
         ))
       }
@@ -45,7 +47,7 @@ const total = fotos.length;
             <span class="visualmente-oculto">Foto siguiente</span>
           </button>
           <p class="contador" aria-hidden="true">
-            <span data-actual>1</span> / {total}
+            <span data-actual>1</span> / <span data-total>{total}</span>
           </p>
         </>
       )
@@ -59,7 +61,8 @@ const total = fotos.length;
           <button
             type="button"
             data-miniatura={i}
-            aria-label={`Ver foto ${i + 1} de ${total}`}
+            data-color={foto.color}
+            aria-label={`Ver foto ${i + 1}`}
             aria-current={i === 0 ? 'true' : undefined}
           >
             <Image src={foto.src} alt="" width={128} height={128} loading="lazy" />
@@ -75,35 +78,52 @@ const total = fotos.length;
 
   for (const galeria of document.querySelectorAll<HTMLElement>('[data-galeria]')) {
     const fotos = galeria.querySelector<HTMLElement>('[data-fotos]');
-    const miniaturas = [...galeria.querySelectorAll<HTMLButtonElement>('[data-miniatura]')];
+    const todas = [...galeria.querySelectorAll<HTMLElement>('[data-foto]')];
+    const todasMiniaturas = [...galeria.querySelectorAll<HTMLButtonElement>('[data-miniatura]')];
     const actual = galeria.querySelector<HTMLElement>('[data-actual]');
-    const total = miniaturas.length;
-    if (!fotos || total < 2) continue;
+    const totalTexto = galeria.querySelector<HTMLElement>('[data-total]');
+    if (!fotos || todas.length < 2) continue;
 
+    // Al elegir un color se esconden las fotos de los demás colores; las
+    // cuentas se hacen solo con las que se ven.
+    const visibles = () => todas.filter((f) => !f.hidden);
+    const miniaturas = () => todasMiniaturas.filter((m) => !m.hidden);
     const indice = () => Math.round(fotos.scrollLeft / fotos.clientWidth);
-    const ir = (i: number) => {
+    const ir = (i: number, animar = suave) => {
+      const total = visibles().length;
       const destino = (i + total) % total;
-      fotos.scrollTo({ left: destino * fotos.clientWidth, behavior: suave ? 'smooth' : 'auto' });
+      fotos.scrollTo({ left: destino * fotos.clientWidth, behavior: animar ? 'smooth' : 'auto' });
+    };
+    const marcar = () => {
+      const i = indice();
+      miniaturas().forEach((m, k) => (k === i ? m.setAttribute('aria-current', 'true') : m.removeAttribute('aria-current')));
+      if (actual) actual.textContent = String(i + 1);
     };
 
-    // La ficha del producto la usa para mostrar la foto del color elegido.
-    galeria.addEventListener('ir-a-foto', (evento) => ir((evento as CustomEvent<number>).detail));
+    // La ficha del producto lo lanza al elegir un color (detail = id del color).
+    galeria.addEventListener('filtrar-color', (evento) => {
+      const color = (evento as CustomEvent<string>).detail;
+      const tieneFotos = todas.some((f) => f.dataset.color === color);
+      todas.forEach((foto, k) => {
+        // Si el color no tiene fotos propias, se ven todas.
+        const oculta = tieneFotos && !!foto.dataset.color && foto.dataset.color !== color;
+        foto.hidden = oculta;
+        todasMiniaturas[k].hidden = oculta;
+      });
+      const cuantas = visibles().length;
+      if (totalTexto) totalTexto.textContent = String(cuantas);
+      galeria.toggleAttribute('data-una-foto', cuantas < 2);
+      ir(tieneFotos ? visibles().findIndex((f) => f.dataset.color === color) : indice(), false);
+      marcar();
+    });
     galeria.querySelector('[data-anterior]')?.addEventListener('click', () => ir(indice() - 1));
     galeria.querySelector('[data-siguiente]')?.addEventListener('click', () => ir(indice() + 1));
-    miniaturas.forEach((m, i) => m.addEventListener('click', () => ir(i)));
+    todasMiniaturas.forEach((m) => m.addEventListener('click', () => ir(miniaturas().indexOf(m))));
     fotos.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') ir(indice() - 1);
       if (e.key === 'ArrowRight') ir(indice() + 1);
     });
-    fotos.addEventListener(
-      'scroll',
-      () => {
-        const i = indice();
-        miniaturas.forEach((m, k) => (k === i ? m.setAttribute('aria-current', 'true') : m.removeAttribute('aria-current')));
-        if (actual) actual.textContent = String(i + 1);
-      },
-      { passive: true },
-    );
+    fotos.addEventListener('scroll', marcar, { passive: true });
   }
 </script>
 
@@ -133,6 +153,17 @@ const total = fotos.length;
   .fotos :global(picture) {
     flex: 0 0 100%;
     scroll-snap-align: center;
+  }
+
+  .fotos :global(picture[hidden]) {
+    display: none;
+  }
+
+  /* Un color con una sola foto: sin flechas, contador ni miniaturas. */
+  .galeria[data-una-foto] .flecha,
+  .galeria[data-una-foto] .contador,
+  .galeria[data-una-foto] .miniaturas {
+    display: none;
   }
 
   .fotos :global(img) {

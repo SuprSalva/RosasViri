@@ -12,6 +12,8 @@ interface Props {
 const { producto, nivel: Titulo = 'h3', prioridad = false } = Astro.props;
 const { nombre, resumen, disponible, colores } = producto.data;
 const foto = fotoDe(producto, 0);
+// Bolitas de color que caben en la tarjeta; si hay más, se muestra "+N".
+const MAXIMO_BOLITAS = 6;
 ---
 
 <a class="tarjeta" href={urlProducto(producto)}>
@@ -30,7 +32,19 @@ const foto = fotoDe(producto, 0);
   <div class="cuerpo">
     <Titulo class="nombre">{nombre}</Titulo>
     {resumen && <p class="resumen">{resumen}</p>}
-    {colores.length > 1 && <p class="colores">En {colores.length} colores</p>}
+    {
+      colores.length > 1 && (
+        <p class="colores">
+          <span class="visualmente-oculto">Colores: {colores.map((c) => c.nombre).join(', ')}.</span>
+          {colores.slice(0, MAXIMO_BOLITAS).map((color) => (
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" fill={color.muestra} stroke="#3b2e28" stroke-opacity="0.3" />
+            </svg>
+          ))}
+          {colores.length > MAXIMO_BOLITAS && <span aria-hidden="true">+{colores.length - MAXIMO_BOLITAS}</span>}
+        </p>
+      )
+    }
     <p class="precio precio-num">{precio(producto.data.precio)}</p>
     <span class="ver" aria-hidden="true">Ver más</span>
   </div>
@@ -102,10 +116,19 @@ const foto = fotoDe(producto, 0);
   }
 
   .colores {
-    margin-top: 4px;
-    color: var(--oliva);
-    font-size: 0.88rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    color: var(--texto-suave);
+    font-size: 0.85rem;
     font-weight: 700;
+  }
+
+  .colores svg {
+    width: 16px;
+    height: 16px;
   }
 
   .precio {
