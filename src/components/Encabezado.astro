@@ -118,8 +118,10 @@ const { actual } = Astro.props;
     background: var(--crema);
   }
 
-  .ovalo :global(svg) {
+  .ovalo :global(svg),
+  .ovalo :global(img) {
     width: 20px;
+    height: auto;
   }
 
   .nombre {
