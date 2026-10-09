@@ -58,6 +58,9 @@ const redirigirAlBase = {
 export default defineConfig({
   site,
   base,
+  // En GitHub (CI) el HTML se publica comprimido en un solo renglón; en la
+  // computadora queda legible para poder revisarlo en dist/.
+  compressHTML: Boolean(process.env.CI),
   // Sin resaltado de código: usa estilos en línea que la política de seguridad bloquea.
   markdown: { syntaxHighlight: false },
   // No incrustar fuentes ni imágenes como `data:`; la política de seguridad solo

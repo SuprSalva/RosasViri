@@ -38,7 +38,7 @@ pero evita perder ventas mientras se construye.
 | 0. Inventario y decisiones | Capturar todo lo que hay en Beacons y fijar alcance | 1–2 días | **En curso** (redes, correo y WhatsApp confirmados; faltan productos y fotos originales) |
 | 1. Diseño y contenido | Identidad visual, estructura, fotos y textos | 3–5 días | **En curso** (paleta, fuentes, logo provisional e íconos listos; faltan fotos originales y descripciones) |
 | 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **Casi lista** (sitio en línea, catálogo en Supabase con panel propio; falta el contenido real) |
-| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (SEO, cookies, clics en WhatsApp y UTM listos; faltan Google y datos del responsable) |
+| 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (SEO, cookies, clics en WhatsApp, UTM y datos del responsable listos; falta Google) |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
 | 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | Pendiente |
 | 6. Seguimiento y Fase 2 | Medir, ajustar y (opcional) pagos en línea | continuo | Pendiente |
@@ -134,8 +134,7 @@ Precios en `$`; lo más probable es que sean pesos mexicanos (MXN), por confirma
       quizá más de Hot Wheels), con nombre, descripción, precio y el orden de las secciones.
 - [ ] **Fotos originales** de cada producto, en la mejor calidad posible, incluidas las 5 fotos
       de cada ficha. Las capturas no sirven como fotos del sitio.
-- [ ] **Logo original** (archivo PNG grande o SVG). Si no existe, se redibuja en SVG a partir de
-      la captura.
+- [x] **Logo original:** archivos originales subidos (isotipo en 'V' con flor y logotipo completo 'ROSS V · flores eternas & detalles'). Integrado en el sitio.
 - [x] **Enlaces exactos** de TikTok e Instagram y el correo de contacto.
 - [x] **Número de WhatsApp** para pedidos: 52 479 202 5177.
 - [ ] **Estadísticas de Beacons** (visitas y clics de los últimos 30–90 días), como línea base.
@@ -195,7 +194,7 @@ Estructura elegida: **portada de tienda** (29/09/2026).
 ### 1.3 Identidad visual
 
 - [x] Conservar la paleta actual (tabla de la sección 0.1) como base del diseño.
-- [x] Logo en SVG redibujado a partir de la captura. Falta cambiarlo por el original, si existe.
+- [x] Logo e isotipo original integrados en encabezado, pie, favicon, iconos PWA y vista previa para redes.
 - [x] Favicon con el tulipán en "V", más una imagen de vista previa (1200×630) para WhatsApp,
       Facebook e Instagram.
 - [x] Tipografías: **Playfair Display** para títulos y **Lato** para texto (opción "Elegante",
@@ -291,15 +290,14 @@ Cómo administrar el catálogo y los textos está explicado en el [`README.md`](
         navegación con teclado.
 12. [x] `README.md` con instrucciones para agregar ramos, cambiar precios o marcar agotados sin
         saber programar.
-13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales, y el
-        logo redibujado por el archivo original.
+13. [ ] Cambiar las fotos provisionales (recortadas de las capturas) por las originales. (El logo original ya fue integrado).
 14. [ ] Agregar los productos que faltan y confirmar los precios de **Carrito 3** ($380) y
         **Carrito duo** ($220). (Redes, correo y WhatsApp ya están confirmados.) Revisar si
         **"rosa-roja"**, creado desde el panel, es un producto real o una prueba.
 15. [x] Panel de administración (Pages CMS) para todo el contenido y varias fotos por producto.
 16. [x] Aviso de privacidad, aviso de cookies, `favicon.ico`, íconos, configuración para Google y
         auditoría de seguridad ([`docs/auditoria-seguridad.md`](docs/auditoria-seguridad.md)).
-        Falta llenar el nombre y domicilio del responsable en Pages CMS.
+        Nombre y domicilio del responsable completados.
 17. [x] Catálogo en Supabase con panel propio en `/admin/`: productos y secciones, varias fotos
         (se reducen y se les quita el GPS), disponible/agotado, destacados y orden.
 18. [x] Eliminación lógica con **Papelera** (nada se borra de verdad) y pruebas del panel.
@@ -352,8 +350,7 @@ GitHub Pages con el catálogo real completo.
 
 ### Legal
 
-- [x] Aviso de privacidad y sección de cookies en `/privacidad/`. Pendiente: nombre y domicilio
-      del responsable, y revisión de un abogado.
+- [x] Aviso de privacidad y sección de cookies en `/privacidad/` (nombre y domicilio del responsable completados). Pendiente: revisión de un abogado.
 - [ ] Políticas claras de anticipo, cambios y cancelaciones en "Cómo pedir". Hoy solo dice que el
       pago total se liquida al ver la foto del pedido terminado; falta cuánto es el anticipo y qué
       pasa si se cancela.
@@ -458,7 +455,7 @@ Cuando el volumen de pedidos lo justifique:
 
 ## Preguntas abiertas
 
-Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram y correo.
+Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram, correo, datos del responsable (Fatima Viridiana Rosas Diaz, Juan Alvarez 217 col. Benito Juarez) y logo e isotipo original de la marca.
 
 1. ¿Qué productos hay debajo de lo que se ve en las capturas? (nombre, descripción, precio)
 2. ¿Los precios de Carrito 3 ($380) y Carrito duo ($220) son correctos?
@@ -466,6 +463,5 @@ Resueltas: número de WhatsApp (52 479 202 5177), enlaces de TikTok e Instagram 
 4. ¿Cuánto tarda la elaboración de un ramo y cuánto es el anticipo? ¿Qué formas de pago aceptan?
    ¿Qué pasa si se cancela un pedido?
 5. ¿Qué colores de rosas y de papel ofrecen?
-6. ¿Tienen el logo en archivo original y las fotos en buena calidad?
+6. ¿Tienen las fotos originales de cada producto en buena calidad (para reemplazar las capturas de Beacons)?
 7. ¿Qué dominio prefieren (`rossvtienda.com`, `rossvtienda.mx`, otro)?
-8. ¿Nombre completo y domicilio del responsable para el aviso de privacidad?

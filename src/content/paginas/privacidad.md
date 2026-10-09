@@ -1,6 +1,6 @@
 ---
 titulo: Aviso de privacidad
-actualizado: 2026-09-29
+actualizado: 2026-10-09
 ---
 
 ## Qué datos personales recabamos

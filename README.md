@@ -177,6 +177,10 @@ contraseña) se ven en http://127.0.0.1:54324.
 La política de seguridad de contenido (CSP) solo funciona en el sitio construido; para probarla usa
 `npm run build` y `npx astro preview`.
 
+En la computadora, `npm run build` deja el HTML de `dist/` con saltos de línea para poder leerlo; al
+publicar en GitHub se comprime en un solo renglón. Para ver localmente la versión exacta que se
+publica: `$env:CI = 'true'; npm run build` (PowerShell) o `CI=true npm run build` (Git Bash).
+
 ## Publicación
 
 El sitio se publica en GitHub Pages con [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml)
