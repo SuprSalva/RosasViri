@@ -224,8 +224,14 @@ El DNS y el sitio están en **Cloudflare**. No hace falta el hosting de Hostinge
 7. **Conectar el dominio al proyecto.** En Cloudflare, **Workers & Pages → rossvtienda → Custom
    domains → Set up a custom domain**: agrega `rossvtienda.com` y después `www.rossvtienda.com`.
 8. **Siempre con candado y sin `www`.** En Cloudflare, dentro del dominio:
-   - **SSL/TLS → Edge Certificates → Always Use HTTPS**: activado.
-   - **Rules → Redirect Rules → Templates → Redirect from WWW to Root**: créala tal cual.
+   - **SSL/TLS → Edge Certificates → Always Use HTTPS**: activado (Pages ya manda `http://` a
+     `https://`; esto lo asegura).
+   - **Rules → Redirect Rules → Templates → Redirect from WWW to Root**: créala tal cual, pero
+     marca **Preserve query string** para no perder los UTM. Si avisa que `www` no pasa por
+     Cloudflare, elige **Ignore and deploy rule anyway** (el registro de `www` lo creó Pages y sí
+     pasa por Cloudflare).
+   - **Web Analytics → rossvtienda.com → Manage site → Disable**. Si no, Cloudflare mete en cada
+     página un script de estadísticas que la CSP bloquea y que el aviso de privacidad no menciona.
 9. **Supabase.**
    - **Authentication → URL Configuration**: *Site URL* `https://rossvtienda.com/admin/`, y en
      *Redirect URLs* agrega `https://rossvtienda.com/admin/` (lo usan las invitaciones y "olvidé

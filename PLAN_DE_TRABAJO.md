@@ -6,8 +6,7 @@ todo lo que hace hoy la página de Beacons (catálogo, redes, contacto) y que ad
 recibir pedidos**, sin comisiones de terceros, sin publicidad de Beacons y con la imagen de la marca.
 
 **Repositorio:** `SuprSalva/RosasViri`.
-**Sitio:** https://rossvtienda.com (dominio comprado; en lo que se conecta, sigue en
-https://suprsalva.github.io/RosasViri/).
+**Sitio:** https://rossvtienda.com (en línea en Cloudflare Pages desde el 9 de octubre de 2026).
 **Última actualización:** 9 de octubre de 2026.
 
 ---
@@ -41,7 +40,7 @@ pero evita perder ventas mientras se construye.
 | 2. Desarrollo | Construir el sitio en este repo | 5–8 días | **Casi lista** (sitio en línea, catálogo en Supabase con panel propio; falta el contenido real) |
 | 3. SEO, analítica y legal | Metadatos, medición y avisos legales | 1–2 días | **En curso** (SEO, cookies, clics en WhatsApp, UTM y datos del responsable listos; falta Google) |
 | 4. Pruebas | Celulares, velocidad, enlaces, pedidos | 1–2 días | Pendiente |
-| 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | **En curso** (dominio comprado; falta conectarlo en Cloudflare) |
+| 5. Lanzamiento y migración | Dominio, cambio de enlaces en redes, retiro de Beacons | 1–2 días | **En curso** (dominio conectado y sitio en Cloudflare; faltan Search Console, enlaces en redes, QR y Beacons) |
 | 6. Seguimiento y Fase 2 | Medir, ajustar y (opcional) pagos en línea | continuo | Pendiente |
 
 **Tiempo total para el lanzamiento:** unas **3–4 semanas** a tiempo parcial.
@@ -380,10 +379,12 @@ con el catálogo real completo.
 
 1. [x] **Comprar el dominio:** `rossvtienda.com`, en Hostinger (9 de octubre de 2026). Activar la
        renovación automática.
-2. [ ] **Pasar el sitio a Cloudflare Pages y conectar el dominio**, con los pasos del
-       [`README.md`](README.md#dominio-y-cloudflare-configuración-de-una-sola-vez): nameservers en
-       Hostinger, proyecto y secretos, `www` y HTTPS, Supabase y apagar GitHub Pages. Probar con
-       `www` y sin `www`.
+2. [x] **Pasar el sitio a Cloudflare Pages y conectar el dominio** (9 de octubre de 2026), con los
+       pasos del [`README.md`](README.md#dominio-y-cloudflare-configuración-de-una-sola-vez):
+       nameservers en Hostinger, proyecto y secretos, `www` y HTTPS, Supabase y GitHub Pages
+       apagado. Probado: `https://rossvtienda.com` abre con candado; `www` y `http://` llevan ahí
+       conservando la página y los UTM; el panel sube fotos y publica; la dirección vieja da 404.
+       Falta dar de alta el dominio en Search Console (README, paso 12).
 3. [ ] **Cambiar el enlace** en las biografías de TikTok e Instagram, en el perfil y catálogo de
        WhatsApp Business, en el Perfil de Empresa de Google y en cualquier otro lugar anotado en
        la Fase 0. Usar los **enlaces con UTM** del [`README.md`](README.md#enlaces-para-redes-sociales),
@@ -445,7 +446,7 @@ Cuando el volumen de pedidos lo justifique:
 | La dueña no puede actualizar productos o precios | Panel propio en `/admin/` + Pages CMS + README |
 | Supabase (plan gratis) se pausa por falta de uso | Publicación automática cada lunes, que lee la base de datos |
 | Supabase no responde al publicar | La publicación se detiene y el sitio anterior sigue en línea |
-| Alguien toma la sesión del panel desde otro proyecto de `suprsalva.github.io` | Panel en el dominio propio, cerrar sesión en el panel viejo y apagar GitHub Pages (ver la [auditoría](docs/auditoria-seguridad.md), #13) |
+| Alguien toma la sesión del panel desde otro proyecto de `suprsalva.github.io` | ✅ Resuelto el 9 de octubre: el panel vive en `rossvtienda.com` y GitHub Pages está apagado (ver la [auditoría](docs/auditoria-seguridad.md), #13) |
 | El sitio se ve mal dentro de TikTok o Instagram | Probar en esos navegadores integrados (Fase 4) |
 | Pedidos de Hot Wheels con carritos que ya no hay | Aclarar "sujeto a existencias" y confirmar modelos por WhatsApp |
 | No está listo para San Valentín | Lanzar en octubre o noviembre y dejar enero solo para ajustes |
