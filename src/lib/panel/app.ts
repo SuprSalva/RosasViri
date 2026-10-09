@@ -11,6 +11,7 @@ import { prepararFoto } from './fotos';
 
 type Foto = { src: string; alt?: string };
 type Opcion = { nombre: string; ejemplo?: string };
+type Color = { nombre: string; foto: string; disponible: boolean };
 type Producto = {
   id: string;
   nombre: string;
@@ -20,6 +21,8 @@ type Producto = {
   descripcion: string;
   fotos: Foto[];
   opciones: Opcion[];
+  /** La misma flor en varios colores, cada uno con su foto. */
+  colores: Color[];
   disponible: boolean;
   destacado: boolean;
   orden: number;
@@ -231,7 +234,7 @@ async function cargar() {
     return false;
   }
   categorias = c.data as Categoria[];
-  productos = (p.data as Producto[]).map((x) => ({ ...x, precio: Number(x.precio) }));
+  productos = (p.data as Producto[]).map((x) => ({ ...x, precio: Number(x.precio), colores: x.colores ?? [] }));
   return true;
 }
 
@@ -277,7 +280,13 @@ function filaProducto(producto: Producto): HTMLElement {
       'div',
       { class: 'fila-texto' },
       el('strong', {}, producto.nombre),
-      el('span', { class: 'nota' }, [precio(producto.precio), producto.resumen].filter(Boolean).join(' · ')),
+      el(
+        'span',
+        { class: 'nota' },
+        [precio(producto.precio), producto.resumen, producto.colores.length > 1 && `${producto.colores.length} colores`]
+          .filter(Boolean)
+          .join(' · '),
+      ),
     ),
     el(
       'div',
@@ -383,9 +392,10 @@ async function restaurar(tabla: 'productos' | 'categorias', registro: Producto |
 
 // ---------------------------------------------------------------- editor de producto
 
-const edicion: { original?: Producto; fotos: Foto[]; opciones: Opcion[]; subiendo: number } = {
+const edicion: { original?: Producto; fotos: Foto[]; opciones: Opcion[]; colores: Color[]; subiendo: number } = {
   fotos: [],
   opciones: [],
+  colores: [],
   subiendo: 0,
 };
 
@@ -399,6 +409,7 @@ function abrirProducto(producto?: Producto) {
   edicion.original = producto;
   edicion.fotos = structuredClone(producto?.fotos ?? []);
   edicion.opciones = structuredClone(producto?.opciones ?? []);
+  edicion.colores = structuredClone(producto?.colores ?? []);
   edicion.subiendo = 0;
 
   const vista = $('[data-vista="producto"]');
@@ -421,6 +432,7 @@ function abrirProducto(producto?: Producto) {
 
   actualizarDireccionProducto();
   pintarFotos();
+  pintarColores();
   pintarOpciones();
   mostrar('producto');
 }
@@ -533,6 +545,115 @@ function pintarOpciones() {
   );
 }
 
+function pintarColores() {
+  const lista = $('[data-colores]');
+  const total = edicion.colores.length;
+  lista.replaceChildren(
+    ...edicion.colores.map((color, i) => {
+      const mover = (delta: number) => {
+        const [quitado] = edicion.colores.splice(i, 1);
+        edicion.colores.splice(i + delta, 0, quitado);
+        pintarColores();
+      };
+      const cambiarFoto = el('input', {
+        type: 'file',
+        accept: 'image/jpeg,image/png,image/webp',
+        class: 'visualmente-oculto',
+        onchange: async (e: Event) => {
+          const archivo = (e.target as HTMLInputElement).files?.[0];
+          if (archivo) await subirFotoColor(archivo, color);
+        },
+      });
+      return el(
+        'li',
+        { class: 'foto-editor' },
+        miniatura(color.foto, color.nombre ? `Foto del color ${color.nombre}` : `Foto del color ${i + 1}`),
+        el(
+          'div',
+          {},
+          el(
+            'label',
+            { class: 'campo' },
+            'Nombre del color',
+            el('input', {
+              value: color.nombre,
+              maxlength: 30,
+              placeholder: 'Ej. Azul',
+              'data-nombre-color': true,
+              oninput: (e: Event) => (color.nombre = (e.target as HTMLInputElement).value),
+            }),
+          ),
+          el(
+            'label',
+            { class: 'interruptor' },
+            el('input', {
+              type: 'checkbox',
+              checked: color.disponible,
+              onchange: (e: Event) => (color.disponible = (e.target as HTMLInputElement).checked),
+            }),
+            'Disponible',
+          ),
+          el(
+            'div',
+            { class: 'mini-botones' },
+            el('button', { type: 'button', class: 'mini', disabled: i === 0, onclick: () => mover(-1), 'aria-label': 'Mover antes' }, '↑'),
+            el('button', { type: 'button', class: 'mini', disabled: i === total - 1, onclick: () => mover(1), 'aria-label': 'Mover después' }, '↓'),
+            el('label', { class: 'mini' }, 'Cambiar foto', cambiarFoto),
+            el(
+              'button',
+              {
+                type: 'button',
+                class: 'mini',
+                onclick: () => {
+                  edicion.colores.splice(i, 1);
+                  pintarColores();
+                },
+              },
+              'Quitar',
+            ),
+          ),
+        ),
+      );
+    }),
+  );
+  if (!total) lista.append(el('li', { class: 'nota' }, 'Sin colores: el producto se muestra tal cual.'));
+}
+
+/** Cada foto elegida es un color nuevo; después se escribe su nombre. */
+async function agregarColores(archivos: FileList) {
+  const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
+  const antes = edicion.colores.length;
+  for (const archivo of Array.from(archivos)) {
+    edicion.subiendo++;
+    aviso(`Subiendo «${archivo.name}»…`);
+    try {
+      edicion.colores.push({ nombre: '', foto: await subirFoto(archivo, `${nombre}-color`), disponible: true });
+      pintarColores();
+      aviso('Color agregado. Escribe su nombre y recuerda guardar el producto.');
+    } catch (e) {
+      aviso((e as Error).message, 'error');
+    } finally {
+      edicion.subiendo--;
+    }
+  }
+  document.querySelectorAll<HTMLInputElement>('[data-nombre-color]')[antes]?.focus();
+}
+
+async function subirFotoColor(archivo: File, color: Color) {
+  const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
+  edicion.subiendo++;
+  aviso(`Subiendo «${archivo.name}»…`);
+  try {
+    color.foto = await subirFoto(archivo, `${nombre}-color`);
+    pintarColores();
+    aviso('Foto cambiada. Recuerda guardar el producto.');
+  } catch (e) {
+    aviso((e as Error).message, 'error');
+  } finally {
+    edicion.subiendo--;
+  }
+}
+
 async function agregarFotos(archivos: FileList) {
   const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
   for (const archivo of Array.from(archivos)) {
@@ -564,6 +685,12 @@ async function guardarProducto(evento: SubmitEvent) {
   if (!categoria) return aviso('Elige una sección. Si no hay, crea una en «Secciones».', 'error');
   if (!(precioNumero > 0)) return aviso('Escribe un precio mayor a 0.', 'error');
   if (!edicion.fotos.length) return aviso('Agrega al menos una foto.', 'error');
+  const colores = edicion.colores.map((c) => ({ nombre: c.nombre.trim(), foto: c.foto, disponible: c.disponible }));
+  if (colores.some((c) => !c.nombre)) return aviso('Escribe el nombre de cada color.', 'error');
+  const repetido = colores.find(
+    (c, i) => colores.findIndex((otro) => otro.nombre.toLocaleLowerCase('es') === c.nombre.toLocaleLowerCase('es')) !== i,
+  );
+  if (repetido) return aviso(`El color «${repetido.nombre}» está dos veces.`, 'error');
 
   const datos = {
     nombre,
@@ -575,6 +702,7 @@ async function guardarProducto(evento: SubmitEvent) {
     opciones: edicion.opciones
       .filter((o) => o.nombre.trim())
       .map((o) => (o.ejemplo?.trim() ? { nombre: o.nombre.trim(), ejemplo: o.ejemplo.trim() } : { nombre: o.nombre.trim() })),
+    colores,
     disponible: marcado('disponible'),
     destacado: marcado('destacado'),
     orden: Math.round(Number(valor('orden')) || 100),
@@ -593,7 +721,7 @@ async function guardarProducto(evento: SubmitEvent) {
           .single();
     const { data, error } = await consulta;
     if (error) return fallo(error);
-    const guardado = { ...(data as Producto), precio: Number((data as Producto).precio) };
+    const guardado = { ...(data as Producto), precio: Number((data as Producto).precio), colores: (data as Producto).colores ?? [] };
     productos = original ? productos.map((p) => (p.id === original.id ? guardado : p)) : [...productos, guardado];
     productos.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre, 'es'));
     publicar();
@@ -653,9 +781,14 @@ function actualizarDireccionCategoria() {
 
 function pintarEleccion() {
   // Todas las fotos conocidas: las del sitio y las recién subidas.
-  const rutas = [...new Set([edicionCategoria.foto, ...vistasLocales.keys(), ...productos.flatMap((p) => p.fotos.map((f) => f.src)), ...Object.keys(miniaturas)])].filter(
-    Boolean,
-  );
+  const rutas = [
+    ...new Set([
+      edicionCategoria.foto,
+      ...vistasLocales.keys(),
+      ...productos.flatMap((p) => [...p.fotos.map((f) => f.src), ...p.colores.map((c) => c.foto)]),
+      ...Object.keys(miniaturas),
+    ]),
+  ].filter(Boolean);
   $('[data-eleccion]').replaceChildren(
     ...rutas.map((ruta) =>
       el(
@@ -805,6 +938,11 @@ function conectarEventos() {
   entradaFotos.addEventListener('change', async () => {
     if (entradaFotos.files?.length) await agregarFotos(entradaFotos.files);
     entradaFotos.value = '';
+  });
+  const entradaColores = $<HTMLInputElement>('[data-subir-colores]');
+  entradaColores.addEventListener('change', async () => {
+    if (entradaColores.files?.length) await agregarColores(entradaColores.files);
+    entradaColores.value = '';
   });
 
   const formCategoria = formularioCategoria();

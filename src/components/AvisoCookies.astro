@@ -142,6 +142,7 @@ const { idAnalytics } = Astro.props;
       gtag('event', 'pedido_whatsapp', {
         producto: origen.dataset.producto ?? 'General',
         pagina: location.pathname,
+        ...(origen.dataset.color && { color: origen.dataset.color }),
         ...(precio > 0 && { value: precio, currency: moneda }),
       });
     };

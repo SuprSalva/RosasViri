@@ -36,6 +36,10 @@ const productos = defineCollection({
     fotos: z.array(z.object({ src: foto, alt: z.string().optional() })).min(1),
     // Datos que el cliente escribe antes de pedir (color, carritos...).
     opciones: z.array(z.object({ nombre: z.string(), ejemplo: z.string().optional() })),
+    // La misma flor en varios colores, cada uno con su foto; el cliente elige uno.
+    colores: z
+      .array(z.object({ nombre: z.string().min(1), foto, disponible: z.boolean().default(true) }))
+      .default([]),
     disponible: z.boolean(),
     // Aparece en "Destacados" en la portada.
     destacado: z.boolean(),

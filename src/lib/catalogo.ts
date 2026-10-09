@@ -53,6 +53,19 @@ export function altFoto(producto: Producto, indice: number): string {
   return total > 1 ? `${producto.data.nombre}, foto ${indice + 1} de ${total}` : producto.data.nombre;
 }
 
+/**
+ * Fotos de la ficha del producto: primero las suyas y después la de cada color
+ * que no esté ya entre ellas. `ruta` sirve para encontrar la foto de un color.
+ */
+export function galeriaDe(producto: Producto): { ruta: string; src: ImageMetadata; alt: string }[] {
+  const fotos = producto.data.fotos.map((foto, i) => ({ ruta: foto.src, src: fotoDe(producto, i), alt: altFoto(producto, i) }));
+  for (const color of producto.data.colores) {
+    if (fotos.some((foto) => foto.ruta === color.foto)) continue;
+    fotos.push({ ruta: color.foto, src: imagen(color.foto), alt: `${producto.data.nombre} en ${color.nombre.toLowerCase()}` });
+  }
+  return fotos;
+}
+
 /** La descripción del panel, separada en párrafos por renglones en blanco. */
 export function parrafos(texto: string): string[] {
   return texto

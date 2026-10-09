@@ -50,8 +50,10 @@ export async function leerTabla(tabla: 'categorias' | 'productos', orden: string
 function sinFotosFaltantes(fila: Fila): Fila[] {
   if (!Array.isArray(fila.fotos)) return [fila];
   const fotos = (fila.fotos as { src: string }[]).filter((f) => existeImagen(f.src));
-  if (fotos.length < fila.fotos.length) {
+  const todosLosColores = Array.isArray(fila.colores) ? (fila.colores as { foto: string }[]) : [];
+  const colores = todosLosColores.filter((c) => existeImagen(c.foto));
+  if (fotos.length < fila.fotos.length || colores.length < todosLosColores.length) {
     console.warn(`[catálogo] "${fila.id}" tiene fotos que aún no están en esta computadora. Haz git pull para traerlas.`);
   }
-  return fotos.length ? [{ ...fila, fotos }] : [];
+  return fotos.length ? [{ ...fila, fotos, ...(Array.isArray(fila.colores) && { colores }) }] : [];
 }

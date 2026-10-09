@@ -43,6 +43,10 @@ Se entra con correo y contraseña. Desde ahí se puede:
 
 - Crear y editar productos: nombre, sección, precio, texto corto, descripción, **varias fotos**
   (subir, ordenar, describir, quitar), preguntas para el cliente, destacado y orden.
+- **Colores:** si la misma flor viene en varios colores, se sube una foto por color y se escribe
+  su nombre (cada color se puede marcar como agotado). En la ficha el cliente elige el color con
+  muestras redondas, la galería salta a su foto y el color va en el mensaje de WhatsApp; la
+  tarjeta del catálogo dice "En N colores".
 - Marcar un producto como agotado con el interruptor **Disponible**, directo en la lista.
 - Crear y editar secciones del catálogo, con su foto de portada.
 - **Eliminar sin perder nada:** lo eliminado deja de verse en el sitio y pasa a la **Papelera**,
@@ -134,10 +138,11 @@ Adquisición → Adquisición de tráfico**, por *Fuente/medio de la sesión*).
   de cookies del aviso de privacidad se actualiza sola.
 - **Clics en WhatsApp:** cada clic en un botón de WhatsApp (y cada envío del formulario de
   pedidos personalizados) se registra en Analytics como el evento `pedido_whatsapp`, con el
-  `producto` ("General" en los botones que no son de un producto), la `pagina` y el precio. Para
+  `producto` ("General" en los botones que no son de un producto), la `pagina`, el precio y, si
+  el cliente eligió uno, el `color`. Para
   ver los productos en los informes, en Analytics ve a **Administrar → Definiciones
   personalizadas → Crear dimensión personalizada** y crea una de tipo *Evento* con el parámetro
-  `producto` (y otra con `pagina`, si quieres). Solo se cuentan las visitas que aceptaron las
+  `producto` (y otras con `pagina` y `color`, si quieres). Solo se cuentan las visitas que aceptaron las
   cookies.
 - **Aviso de privacidad:** llena el **nombre completo y el domicilio del responsable** en **Datos de
   la tienda → Responsable**; mientras falten, la página dice "Por completar". Se recomienda que un

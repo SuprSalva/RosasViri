@@ -223,6 +223,20 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
             </label>
           </div>
 
+          <div class="caja grupo g-colores">
+            <h2>Colores</h2>
+            <p class="nota">
+              ¿Tienes esta misma flor en varios colores? Sube una foto de cada color y escribe su nombre. En el sitio el
+              cliente elige el color, ve su foto y el color va en el mensaje de WhatsApp. Si usas colores, quita la
+              pregunta «Color» de «Lo que el cliente puede elegir».
+            </p>
+            <ul class="fotos-editor" role="list" data-colores></ul>
+            <label class="boton boton-secundario subir">
+              + Agregar colores (una foto por color)
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-subir-colores class="visualmente-oculto" />
+            </label>
+          </div>
+
           <div class="caja grupo g-estado">
             <label class="interruptor">
               <input type="checkbox" name="disponible" />
@@ -505,7 +519,7 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     align-content: start;
   }
 
-  /* En el celular: una sola columna en el orden datos → fotos → preguntas → estado. */
+  /* En el celular: una sola columna en el orden datos → fotos → colores → preguntas → estado. */
   @media (max-width: 1099px) {
     .columna {
       display: contents;
@@ -519,16 +533,20 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
       order: 2;
     }
 
-    .g-opciones {
+    .g-colores {
       order: 3;
     }
 
-    .g-estado {
+    .g-opciones {
       order: 4;
     }
 
-    .botones-editor {
+    .g-estado {
       order: 5;
+    }
+
+    .botones-editor {
+      order: 6;
     }
   }
 
@@ -612,6 +630,21 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
+  }
+
+  /* "Cambiar foto" de un color: una etiqueta con el selector de archivo escondido. */
+  .panel :global(label.mini) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .panel :global(label.mini:focus-within) {
+    outline: 3px solid var(--texto);
+    outline-offset: 2px;
+  }
+
+  .panel :global(.foto-editor .interruptor) {
+    margin-top: 8px;
   }
 
   .panel :global(.mini:disabled) {

@@ -10,7 +10,7 @@ interface Props {
   prioridad?: boolean;
 }
 const { producto, nivel: Titulo = 'h3', prioridad = false } = Astro.props;
-const { nombre, resumen, disponible } = producto.data;
+const { nombre, resumen, disponible, colores } = producto.data;
 const foto = fotoDe(producto, 0);
 ---
 
@@ -30,6 +30,7 @@ const foto = fotoDe(producto, 0);
   <div class="cuerpo">
     <Titulo class="nombre">{nombre}</Titulo>
     {resumen && <p class="resumen">{resumen}</p>}
+    {colores.length > 1 && <p class="colores">En {colores.length} colores</p>}
     <p class="precio precio-num">{precio(producto.data.precio)}</p>
     <span class="ver" aria-hidden="true">Ver más</span>
   </div>
@@ -98,6 +99,13 @@ const foto = fotoDe(producto, 0);
     color: var(--texto-suave);
     font-size: 0.9rem;
     line-height: 1.35;
+  }
+
+  .colores {
+    margin-top: 4px;
+    color: var(--oliva);
+    font-size: 0.88rem;
+    font-weight: 700;
   }
 
   .precio {

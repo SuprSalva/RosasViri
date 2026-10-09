@@ -86,6 +86,8 @@ const total = fotos.length;
       fotos.scrollTo({ left: destino * fotos.clientWidth, behavior: suave ? 'smooth' : 'auto' });
     };
 
+    // La ficha del producto la usa para mostrar la foto del color elegido.
+    galeria.addEventListener('ir-a-foto', (evento) => ir((evento as CustomEvent<number>).detail));
     galeria.querySelector('[data-anterior]')?.addEventListener('click', () => ir(indice() - 1));
     galeria.querySelector('[data-siguiente]')?.addEventListener('click', () => ir(indice() + 1));
     miniaturas.forEach((m, i) => m.addEventListener('click', () => ir(i)));

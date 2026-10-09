@@ -1,15 +1,14 @@
 ---
 import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import GaleriaProducto from '../../components/GaleriaProducto.astro';
 import Icono from '../../components/Icono.astro';
 import TarjetaProducto from '../../components/TarjetaProducto.astro';
 import { tienda } from '../../data/tienda';
 import {
-  altFoto,
   categorias,
-  fotoDe,
+  galeriaDe,
   parrafos,
   productosDe,
   urlCategoria,
@@ -30,7 +29,7 @@ interface Props {
   producto: Producto;
 }
 const { producto } = Astro.props;
-const { nombre, resumen, fotos, opciones, disponible } = producto.data;
+const { nombre, resumen, opciones, disponible } = producto.data;
 const entrada = (await categorias()).find((c) => c.id === producto.data.categoria);
 if (!entrada) throw new Error(`El producto "${producto.id}" está en la sección "${producto.data.categoria}", que no existe.`);
 const categoria = { id: entrada.id, ...entrada.data };
@@ -38,7 +37,13 @@ const relacionados = (await productosDe(categoria.id)).filter((p) => p.id !== pr
 
 const mensaje = mensajePedido(producto.data);
 const descripcion = [resumen, producto.data.descripcion.trim()].filter(Boolean).join('. ');
-const fotosGaleria = fotos.map((_, i) => ({ src: fotoDe(producto, i), alt: altFoto(producto, i) }));
+const galeria = galeriaDe(producto);
+const fotosGaleria = galeria.map(({ src, alt }) => ({ src, alt }));
+// Cada color sabe en qué foto de la galería está, para mostrarla al elegirlo.
+const colores = producto.data.colores.map((color) => {
+  const indice = galeria.findIndex((foto) => foto.ruta === color.foto);
+  return { ...color, indice, miniatura: galeria[indice].src };
+});
 const paraGoogle = await Promise.all(
   fotosGaleria.map(({ src }) => getImage({ src, format: 'jpg', width: Math.min(src.width, 1200) })),
 );
@@ -100,6 +105,31 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
         </div>
 
         <form class="pedido" data-pedido data-mensaje={mensaje} data-numero={tienda.whatsapp}>
+          {
+            colores.length > 0 && (
+              <fieldset>
+                <legend>Elige el color</legend>
+                <div class="muestras">
+                  {colores.map((color) => (
+                    <label class="muestra">
+                      <input
+                        class="visualmente-oculto"
+                        type="radio"
+                        name="Color"
+                        value={color.nombre}
+                        disabled={!color.disponible}
+                        data-color
+                        data-indice={color.indice}
+                      />
+                      <Image src={color.miniatura} alt="" width={128} height={128} loading="lazy" />
+                      <span class="muestra-nombre">{color.nombre}</span>
+                      {!color.disponible && <span class="muestra-agotado">Agotado</span>}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )
+          }
           {
             opciones.length > 0 && (
               <fieldset>
@@ -180,20 +210,34 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
 <script>
   import { urlWhatsApp } from '../../lib/whatsapp';
 
-  // Arma el mensaje de WhatsApp con lo que el cliente escribió.
+  // Arma el mensaje de WhatsApp con el color elegido y lo que el cliente escribió.
   const formulario = document.querySelector<HTMLFormElement>('[data-pedido]');
   const botones = document.querySelectorAll<HTMLAnchorElement>('[data-pedir]');
   if (formulario) {
     const actualizar = () => {
       let mensaje = formulario.dataset.mensaje ?? '';
-      for (const campo of formulario.querySelectorAll('input')) {
-        const valor = campo.value.trim();
-        if (valor) mensaje += `\n${campo.name}: ${valor}`;
+      for (const [nombre, valor] of new FormData(formulario)) {
+        const texto = String(valor).trim();
+        if (texto) mensaje += `\n${nombre}: ${texto}`;
       }
       const url = urlWhatsApp(formulario.dataset.numero ?? '', mensaje);
-      botones.forEach((boton) => (boton.href = url));
+      const color = formulario.querySelector<HTMLInputElement>('[data-color]:checked')?.value;
+      botones.forEach((boton) => {
+        boton.href = url;
+        // Para contar en Analytics qué colores se piden.
+        if (color) boton.dataset.color = color;
+      });
     };
     formulario.addEventListener('input', actualizar);
+    formulario.addEventListener('change', (evento) => {
+      actualizar();
+      // Al elegir un color, la galería muestra su foto.
+      const elegido = evento.target as HTMLInputElement;
+      if (!elegido.matches('[data-color]')) return;
+      document
+        .querySelector('[data-galeria]')
+        ?.dispatchEvent(new CustomEvent('ir-a-foto', { detail: Number(elegido.dataset.indice) }));
+    });
     formulario.addEventListener('submit', (evento) => {
       evento.preventDefault();
       actualizar();
@@ -369,7 +413,69 @@ const textoBoton = disponible ? 'Pedir por WhatsApp' : 'Preguntar por WhatsApp';
     font-weight: 700;
   }
 
-  input {
+  .muestras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .muestra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 68px;
+    font-weight: 400;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .muestra :global(img) {
+    width: 60px;
+    height: 60px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 1px rgb(59 46 40 / 0.15);
+    transition: border-color 0.15s ease;
+  }
+
+  .muestra:hover :global(img) {
+    border-color: var(--crema);
+  }
+
+  .muestra:has(:checked) :global(img) {
+    border-color: var(--boton);
+  }
+
+  .muestra:has(:checked) .muestra-nombre {
+    font-weight: 700;
+  }
+
+  .muestra:has(:focus-visible) :global(img) {
+    outline: 3px solid var(--texto);
+    outline-offset: 2px;
+  }
+
+  .muestra:has(:disabled) {
+    cursor: default;
+  }
+
+  .muestra:has(:disabled) :global(img) {
+    opacity: 0.45;
+  }
+
+  .muestra-nombre {
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .muestra-agotado {
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+  }
+
+  input:not([type='radio']) {
     width: 100%;
     min-height: 48px;
     padding: 10px 14px;
