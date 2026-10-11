@@ -2,6 +2,7 @@ import { ruta } from './enlaces';
 
 /** Páginas del menú principal y del pie de página. */
 export const menu = [
+  { id: 'inicio', texto: 'Inicio', href: ruta('/') },
   { id: 'catalogo', texto: 'Catálogo', href: ruta('/catalogo/') },
   { id: 'personalizados', texto: 'Personalizados', href: ruta('/pedidos-personalizados/') },
   { id: 'galeria', texto: 'Galería', href: ruta('/galeria/') },
