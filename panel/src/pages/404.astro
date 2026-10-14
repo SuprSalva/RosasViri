@@ -1,0 +1,20 @@
+---
+// Dirección que no existe dentro del panel: el panel es una sola página.
+import Base from '../layouts/Base.astro';
+import AvisoError from '../components/AvisoError.astro';
+---
+
+<Base titulo="Página no encontrada">
+  <div class="pagina">
+    <AvisoError codigo="404" titulo="Esta página no existe">
+      <p>Todo el panel está en una sola página. Vuelve al inicio para seguir.</p>
+      <a slot="acciones" class="boton" href="/">Ir al panel</a>
+    </AvisoError>
+  </div>
+</Base>
+
+<style>
+  .pagina {
+    padding-block: 32px 48px;
+  }
+</style>

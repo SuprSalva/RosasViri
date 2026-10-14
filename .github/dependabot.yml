@@ -13,6 +13,17 @@ updates:
       # @astrojs/check solo acepta TypeScript 5 o 6; quitar cuando soporte la 7.
       - dependency-name: typescript
         update-types: ['version-update:semver-major']
+  # El panel (panel/) tiene sus propias dependencias.
+  - package-ecosystem: npm
+    directory: /panel
+    schedule:
+      interval: weekly
+    groups:
+      dependencias:
+        patterns: ['*']
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:

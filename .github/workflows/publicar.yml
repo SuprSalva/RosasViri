@@ -9,7 +9,8 @@ on:
     branches: [main]
     # Las fotos que sube el panel llegan antes de guardar el producto; el panel
     # publica al guardar, así que esa subida sola no hace falta publicarla.
-    paths-ignore: ['src/assets/productos/**']
+    # El panel nuevo (panel/) se publica aparte y no cambia la tienda.
+    paths-ignore: ['src/assets/productos/**', 'panel/**']
   # El panel de /admin/ lo lanza después de cada cambio en el catálogo.
   workflow_dispatch:
   # Una vez por semana, para que el proyecto gratis de Supabase no se pause

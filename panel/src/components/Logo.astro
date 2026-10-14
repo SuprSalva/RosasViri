@@ -1,0 +1,12 @@
+---
+import { Image } from 'astro:assets';
+import isotipo from '../assets/marca/isotipo-transparente.png';
+
+interface Props {
+  class?: string;
+}
+const { class: clase } = Astro.props;
+---
+
+<Image src={isotipo} alt="" class={clase} loading="eager" decoding="async" />
+

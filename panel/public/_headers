@@ -1,0 +1,24 @@
+# Encabezados que Cloudflare Pages agrega a las respuestas del panel.
+# Formato: https://developers.cloudflare.com/pages/configuration/headers/
+# El resto de la política de seguridad (CSP) va en la página, desde astro.config.mjs.
+#
+# - frame-ancestors y X-Frame-Options: nadie puede mostrar el panel dentro de un marco (clickjacking).
+# - Referrer-Policy: el panel no le dice a ningún otro sitio de dónde viene quien hace clic.
+# - Cross-Origin-Opener-Policy: una ventana abierta desde otro sitio no puede tocar la del panel.
+# - Permissions-Policy: el panel no usa cámara, micrófono ni ubicación (elegir fotos no los necesita).
+# - X-Robots-Tag: que ningún buscador lo muestre, tampoco en la dirección .pages.dev.
+/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
+  X-Robots-Tag: noindex, nofollow
+
+# Archivos de Astro: el nombre cambia cuando cambia el contenido, así que se
+# pueden guardar en el navegador un año.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,348 @@
+---
+// El panel completo es esta página: cada pantalla es una <section data-vista>
+// y el código (src/lib/) muestra la que toca.
+import Base from '../layouts/Base.astro';
+import AvisoError from '../components/AvisoError.astro';
+---
+
+<Base>
+  <div class="pagina">
+    <section data-vista="cargando">
+      <p class="intro">Cargando el panel…</p>
+    </section>
+
+    <section data-vista="entrar" hidden>
+      <div class="pagina-cabeza">
+        <p class="antetitulo">Solo para la tienda</p>
+        <h1>Entrar al panel</h1>
+      </div>
+      <form class="caja formulario-panel" data-form-entrar>
+        <label class="campo">
+          Correo
+          <input type="email" name="correo" autocomplete="username" required />
+        </label>
+        <label class="campo">
+          Contraseña
+          <input type="password" name="contrasena" autocomplete="current-password" required />
+        </label>
+        <button class="boton" type="submit">Entrar</button>
+        <button class="enlace" type="button" data-olvide>¿Olvidaste tu contraseña?</button>
+      </form>
+    </section>
+
+    <section data-vista="recuperar" hidden>
+      <div class="pagina-cabeza">
+        <h1>Recuperar contraseña</h1>
+        <p class="intro">Te mandamos un enlace a tu correo para crear una contraseña nueva.</p>
+      </div>
+      <form class="caja formulario-panel" data-form-recuperar>
+        <label class="campo">
+          Correo
+          <input type="email" name="correo" autocomplete="username" required />
+        </label>
+        <button class="boton" type="submit">Enviar enlace</button>
+        <button class="enlace" type="button" data-ir="entrar">Volver</button>
+      </form>
+    </section>
+
+    <section data-vista="codigo" hidden>
+      <div class="pagina-cabeza">
+        <p class="antetitulo">Verificación en dos pasos</p>
+        <h1>Escribe tu código</h1>
+        <p class="intro">Abre tu app de códigos (por ejemplo Google Authenticator) y escribe los 6 números de Rossvtienda.</p>
+      </div>
+      <form class="caja formulario-panel" data-form-codigo>
+        <label class="campo">
+          Código
+          <input name="codigo" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required />
+        </label>
+        <button class="boton" type="submit">Entrar</button>
+        <button class="enlace" type="button" data-salir>Entrar con otra cuenta</button>
+      </form>
+      <p class="nota ayuda">
+        ¿Cambiaste de celular y ya no tienes la app? Pide a quien administra el proyecto que quite la verificación de tu
+        cuenta. Al volver a entrar, la activas otra vez.
+      </p>
+    </section>
+
+    <section data-vista="activar" hidden>
+      <div class="pagina-cabeza">
+        <p class="antetitulo">Un paso más de seguridad</p>
+        <h1>Activa la verificación en dos pasos</h1>
+        <p class="intro">
+          Para entrar vas a escribir, además de tu contraseña, un código de 6 números que te da una app del celular. Así
+          nadie puede entrar aunque adivine tu contraseña. Solo se hace una vez.
+        </p>
+      </div>
+      <ol class="pasos" role="list">
+        <li class="caja">
+          <h2>1. Instala una app de códigos</h2>
+          <p>
+            Te recomendamos <strong>Google Authenticator</strong>: es gratis, para iPhone y Android. Entra a la app con tu
+            cuenta de Google para no perder tus códigos si cambias de celular.
+          </p>
+        </li>
+        <li class="caja">
+          <h2>2. Agrega Rossvtienda a la app</h2>
+          <p><strong>Si estás en el celular:</strong> toca el botón y acepta en la app.</p>
+          <a class="boton boton-secundario" href="#" data-abrir-app>Agregar a mi app de códigos</a>
+          <p><strong>Si estás en la computadora:</strong> en la app del celular toca «+» y escanea este código.</p>
+          <img class="qr" alt="Código QR para agregar Rossvtienda a tu app de códigos" width="200" height="200" data-qr />
+          <details>
+            <summary>¿No funciona? Escribe la clave a mano</summary>
+            <p class="nota">En la app elige «Ingresar una clave de configuración», ponle de nombre Rossvtienda y escribe:</p>
+            <code class="clave" data-clave-app></code>
+            <button class="boton boton-secundario boton-chico" type="button" data-copiar-clave>Copiar la clave</button>
+          </details>
+        </li>
+        <li class="caja">
+          <h2>3. Escribe el código</h2>
+          <p>La app muestra un código de 6 números que cambia cada 30 segundos.</p>
+          <form class="formulario-panel" data-form-activar>
+            <label class="campo">
+              Código
+              <input name="codigo" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required />
+            </label>
+            <button class="boton" type="submit">Activar y entrar</button>
+          </form>
+        </li>
+      </ol>
+      <button class="enlace" type="button" data-salir>Salir</button>
+    </section>
+
+    <section data-vista="contrasena" hidden>
+      <div class="pagina-cabeza">
+        <h1>Crea tu contraseña</h1>
+        <p class="intro">Usa al menos 10 caracteres. La vas a usar para entrar a este panel.</p>
+      </div>
+      <form class="caja formulario-panel" data-form-contrasena>
+        <label class="campo">
+          Contraseña nueva
+          <input type="password" name="contrasena" autocomplete="new-password" minlength="10" required />
+        </label>
+        <label class="campo">
+          Repítela
+          <input type="password" name="repetida" autocomplete="new-password" minlength="10" required />
+        </label>
+        <button class="boton" type="submit">Guardar contraseña</button>
+      </form>
+    </section>
+
+    <section data-vista="sin-permiso" hidden>
+      <AvisoError codigo="403" titulo="Esta cuenta no tiene permiso">
+        <p>
+          Entraste como <strong data-correo></strong>, pero esa cuenta no puede administrar la tienda. Pide acceso a quien
+          administra el proyecto.
+        </p>
+        <Fragment slot="acciones">
+          <button class="boton boton-secundario" type="button" data-salir>Entrar con otra cuenta</button>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="en-marco" hidden>
+      <AvisoError codigo="403" titulo="El panel no se puede abrir aquí">
+        <p>
+          Otra página está mostrando el panel dentro de la suya. Por seguridad, solo funciona abierto directamente en el
+          navegador.
+        </p>
+        <Fragment slot="acciones">
+          <a class="boton" href="/" target="_blank" rel="noopener noreferrer">Abrir el panel</a>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="error-401" hidden>
+      <AvisoError codigo="401" titulo="Tu sesión terminó">
+        <p>Por seguridad, la sesión se cierra después de un tiempo. Vuelve a entrar para seguir.</p>
+        <p class="nota">Si estabas editando algo y no se guardó, tendrás que escribirlo de nuevo.</p>
+        <Fragment slot="acciones">
+          <button class="boton" type="button" data-salir>Volver a entrar</button>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="error-500" hidden>
+      <AvisoError codigo="500" titulo="No pudimos conectar con la tienda">
+        <p>
+          Puede ser tu conexión a internet o que la base de datos esté en mantenimiento. Tus datos están a salvo: no se
+          perdió nada.
+        </p>
+        <p class="nota" data-detalle-error></p>
+        <Fragment slot="acciones">
+          <button class="boton" type="button" data-reintentar>Reintentar</button>
+        </Fragment>
+      </AvisoError>
+    </section>
+
+    <section data-vista="panel" hidden>
+      <header class="barra-panel">
+        <p class="nota">Entraste como <strong data-correo></strong></p>
+        <button class="boton boton-secundario boton-chico" type="button" data-salir>Salir</button>
+      </header>
+      <div class="pagina-cabeza">
+        <p class="antetitulo">Panel de la tienda</p>
+        <h1>¡Hola!</h1>
+        <p class="intro">Desde aquí vas a administrar Rossvtienda.</p>
+      </div>
+      <div class="areas">
+        <article class="caja area">
+          <h2>Catálogo</h2>
+          <p>Productos, precios, fotos y secciones. Mientras lo pasamos a este panel, se sigue editando en el panel de la tienda.</p>
+          <a class="boton" href="https://rossvtienda.com/admin/" rel="noopener noreferrer">Abrir el catálogo</a>
+        </article>
+      </div>
+      <p class="nota seguridad">Verificación en dos pasos activa: para entrar se pide el código de tu app.</p>
+    </section>
+
+    <div class="aviso-panel" role="status" aria-live="polite" data-aviso hidden></div>
+  </div>
+</Base>
+
+<script>
+  import { mostrar } from '../lib/comun';
+  import { iniciar } from '../lib/sesion';
+  iniciar(() => mostrar('panel'));
+</script>
+
+<style>
+  .pagina {
+    padding-block: 32px 48px;
+  }
+
+  .pagina-cabeza {
+    display: grid;
+    gap: 8px;
+    max-width: 40em;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .formulario-panel {
+    display: grid;
+    gap: 14px;
+    max-width: 420px;
+    margin-top: 24px;
+  }
+
+  /* El código de 6 números, grande y espaciado para leerlo bien. */
+  .codigo {
+    font-size: 1.5rem;
+    letter-spacing: 0.3em;
+  }
+
+  .ayuda {
+    max-width: 420px;
+    margin-top: 20px;
+  }
+
+  .pasos {
+    display: grid;
+    gap: 14px;
+    max-width: 560px;
+    margin: 24px 0 16px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pasos > li {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+
+  .pasos .formulario-panel {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* Fondo blanco: las apps leen mejor el código QR con buen contraste. */
+  .qr {
+    width: 200px;
+    height: 200px;
+    padding: 10px;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  summary {
+    min-height: 44px;
+    padding-block: 10px;
+    color: var(--boton);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  details[open] > :not(summary) {
+    margin-top: 10px;
+  }
+
+  .clave {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--fondo);
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    word-break: break-word;
+  }
+
+  .barra-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .areas {
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  @media (min-width: 720px) {
+    .areas {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 960px;
+    }
+  }
+
+  .area {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    justify-items: start;
+  }
+
+  .seguridad {
+    margin-top: 28px;
+  }
+
+  .aviso-panel {
+    position: fixed;
+    left: 50%;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 70;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: var(--texto);
+    color: var(--crema);
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgb(59 46 40 / 0.3);
+    transform: translateX(-50%);
+  }
+
+  .aviso-panel[data-tipo='error'] {
+    background: var(--peligro);
+  }
+</style>
