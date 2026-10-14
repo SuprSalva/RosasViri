@@ -18,7 +18,7 @@ const delCatalogo = (await catalogo()).flatMap((s) =>
   s.productos.flatMap((p) => p.data.fotos.map((_, i) => ({ src: fotoDe(p, i), alt: altFoto(p, i), producto: p }))),
 );
 
-const invitacion = `Hola ${tienda.nombre} 🌷 Te comparto la foto de mi ramo.`;
+const invitacion = `Hola ${tienda.nombre}, te comparto la foto de mi ramo.`;
 ---
 
 <Base

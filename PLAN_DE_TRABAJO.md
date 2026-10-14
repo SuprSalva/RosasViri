@@ -211,11 +211,11 @@ Estructura elegida: **portada de tienda** (29/09/2026).
 - [ ] Textos de "Cómo pedir": tiempo de elaboración, anticipo, formas de pago (transferencia,
       efectivo, etc.), entregas y costo de envío.
 - [x] Mensaje de WhatsApp prellenado, por ejemplo:
-      > Hola Rossvtienda 🌷 Quiero pedir: **Ramo chico de rosas** ($220).
+      > Hola Rossvtienda, quiero pedir: **Ramo chico de rosas** ($220).
       > Color de rosas: ____. ¿Para qué fecha lo tendrían?
 
       Y para Hot Wheels:
-      > Hola Rossvtienda 🌷 Quiero pedir: **Carrito 2** ($290).
+      > Hola Rossvtienda, quiero pedir: **Carrito 2** ($290).
       > Color de rosas: ____. Carritos que me gustan: ____. ¿Para qué fecha lo tendrían?
 
 **Definición de terminado de la Fase 1:** maqueta aprobada y todo el contenido (textos, fotos y

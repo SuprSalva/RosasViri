@@ -14,9 +14,9 @@ export function enlaceWhatsApp(mensaje: string): string {
 }
 
 export function mensajePedido(producto?: { nombre: string; precio: number }): string {
-  const saludo = `Hola ${tienda.nombre} 🌷`;
-  if (!producto) return `${saludo} Quiero hacer un pedido.`;
-  return `${saludo} Quiero pedir: *${producto.nombre}* (${precio(producto.precio)}).`;
+  const saludo = `Hola ${tienda.nombre}`;
+  if (!producto) return `${saludo}, quiero hacer un pedido.`;
+  return `${saludo}, quiero pedir: *${producto.nombre}* (${precio(producto.precio)}).`;
 }
 
 export function precio(valor: number): string {
