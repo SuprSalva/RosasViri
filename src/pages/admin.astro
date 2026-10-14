@@ -208,7 +208,8 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
             <h2>Colores</h2>
             <p class="nota">
               Si viene en varios colores, agrégalos aquí: en el sitio aparecen como bolitas para elegir y el color va en el
-              mensaje de WhatsApp. Después, en «Fotos», elige de qué color es cada foto (o déjala para todos).
+              mensaje de WhatsApp. Después, en «Fotos», elige de qué color es cada foto (o déjala para todos). Si
+              arrastras fotos y las sueltas sobre un color, quedan como fotos de ese color.
             </p>
             <ul class="colores-editor" role="list" data-colores></ul>
             <p class="nota">Toca un color para agregarlo:</p>
@@ -225,9 +226,12 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
 
         </div>
         <div class="columna">
-          <div class="caja grupo g-fotos">
+          <div class="caja grupo g-fotos" data-soltar-fotos>
             <h2>Fotos</h2>
-            <p class="nota">La primera es la que aparece en el catálogo. Usa las flechas para cambiar el orden.</p>
+            <p class="nota">
+              La primera es la que aparece en el catálogo. Usa las flechas para cambiar el orden. En la computadora
+              también puedes arrastrar fotos desde una carpeta y soltarlas aquí.
+            </p>
             <ul class="fotos-editor" role="list" data-fotos></ul>
             <label class="boton boton-secundario subir">
               + Agregar fotos
@@ -287,9 +291,9 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
           </div>
         </div>
         <div class="columna">
-          <div class="caja grupo">
+          <div class="caja grupo" data-soltar-foto-categoria>
             <h2>Foto de la sección</h2>
-            <p class="nota">Aparece en la portada. Elige una de tus fotos o sube una nueva.</p>
+            <p class="nota">Aparece en la portada. Elige una de tus fotos o sube una nueva (también puedes arrastrarla aquí).</p>
             <div class="galeria-eleccion" role="radiogroup" aria-label="Foto de la sección" data-eleccion></div>
             <label class="boton boton-secundario subir">
               + Subir foto
@@ -730,6 +734,13 @@ for (const [ruta, foto] of Object.entries(todasLasImagenes())) {
 
   .subir {
     justify-self: start;
+  }
+
+  /* Recuadro (o color) sobre el que se está arrastrando una foto: ahí cae al soltarla. */
+  .panel :global(.soltando) {
+    outline: 3px dashed var(--boton);
+    outline-offset: -3px;
+    background: var(--tarjeta);
   }
 
   .galeria-eleccion {

@@ -7,7 +7,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { $, aDireccion, el } from './dom';
-import { prepararFoto } from './fotos';
+import { prepararFoto, traeArchivos, zonaParaSoltar } from './fotos';
 
 /** `color`: id del color al que pertenece la foto; sin él, la foto es para todos. */
 type Foto = { src: string; alt?: string; color?: string };
@@ -638,7 +638,7 @@ function pintarColores() {
           entrada.value = '';
         },
       });
-      return el(
+      const fila = el(
         'li',
         { class: 'color-editor' },
         el('input', {
@@ -697,6 +697,9 @@ function pintarColores() {
           ),
         ),
       );
+      // Fotos soltadas sobre un color quedan como fotos de ese color.
+      zonaParaSoltar(fila, (archivos) => agregarFotos(archivos, color.id));
+      return fila;
     }),
   );
   if (!total) lista.append(el('li', { class: 'nota' }, 'Sin colores: el producto se pide tal cual.'));
@@ -721,7 +724,7 @@ function agregarColor(nombre = '', muestra = SIN_MUESTRA) {
 }
 
 /** Sube fotos al producto; con `color`, quedan como fotos de ese color. */
-async function agregarFotos(archivos: FileList, color?: string) {
+async function agregarFotos(archivos: FileList | File[], color?: string) {
   const nombre = (formularioProducto().elements.namedItem('nombre') as HTMLInputElement).value || 'producto';
   for (const archivo of Array.from(archivos)) {
     edicion.subiendo++;
@@ -885,6 +888,19 @@ function pintarEleccion() {
   );
 }
 
+/** Sube una foto nueva y la deja elegida como la foto de la sección. */
+async function subirFotoCategoria(archivo: File) {
+  const corto = (formularioCategoria().elements.namedItem('corto') as HTMLInputElement).value;
+  aviso(`Subiendo «${archivo.name}»…`);
+  try {
+    edicionCategoria.foto = await subirFoto(archivo, corto || 'seccion');
+    pintarEleccion();
+    aviso('Foto agregada. Recuerda guardar la sección.');
+  } catch (e) {
+    aviso((e as Error).message, 'error');
+  }
+}
+
 async function guardarCategoria(evento: SubmitEvent) {
   evento.preventDefault();
   const form = formularioCategoria();
@@ -1014,6 +1030,7 @@ function conectarEventos() {
     if (entradaFotos.files?.length) await agregarFotos(entradaFotos.files);
     entradaFotos.value = '';
   });
+  zonaParaSoltar($('[data-soltar-fotos]'), (archivos) => agregarFotos(archivos));
   pintarPaleta();
   $('[data-agregar-color]').addEventListener('click', () => agregarColor());
 
@@ -1025,14 +1042,24 @@ function conectarEventos() {
   entradaFotoCategoria.addEventListener('change', async () => {
     const archivo = entradaFotoCategoria.files?.[0];
     entradaFotoCategoria.value = '';
-    if (!archivo) return;
-    aviso(`Subiendo «${archivo.name}»…`);
-    try {
-      edicionCategoria.foto = await subirFoto(archivo, (formCategoria.elements.namedItem('corto') as HTMLInputElement).value || 'seccion');
-      pintarEleccion();
-      aviso('Foto agregada. Recuerda guardar la sección.');
-    } catch (e) {
-      aviso((e as Error).message, 'error');
+    if (archivo) await subirFotoCategoria(archivo);
+  });
+  // La sección lleva una sola foto: si sueltan varias, se usa la primera.
+  zonaParaSoltar($('[data-soltar-foto-categoria]'), ([archivo]) => subirFotoCategoria(archivo));
+
+  // Una foto soltada fuera de su recuadro haría que el navegador la abra en
+  // esta pestaña, y se perderían los cambios sin guardar. Fuera de las zonas
+  // para soltar, el arrastre no hace nada.
+  window.addEventListener('dragover', (evento) => {
+    if (evento.defaultPrevented || !traeArchivos(evento)) return;
+    evento.preventDefault();
+    evento.dataTransfer!.dropEffect = 'none';
+  });
+  window.addEventListener('drop', (evento) => {
+    if (evento.defaultPrevented || !traeArchivos(evento)) return;
+    evento.preventDefault();
+    if (!$('[data-vista="producto"]').hidden || !$('[data-vista="categoria"]').hidden) {
+      aviso('Suelta la foto dentro del recuadro de fotos (o sobre un color).', 'error');
     }
   });
 
