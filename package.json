@@ -11,16 +11,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/sitemap": "^3.7.5",
     "@fontsource/lato": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
-    "@supabase/supabase-js": "^2.117.2",
-    "astro": "^7.3.5",
-    "simple-icons": "^16.33.0"
+    "@supabase/supabase-js": "^2.119.0",
+    "astro": "^7.4.12",
+    "simple-icons": "^16.37.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "supabase": "^2.118.0",
+    "@astrojs/check": "^0.9.12",
+    "supabase": "^3.1.0",
     "typescript": "^6.0.3"
   }
 }
